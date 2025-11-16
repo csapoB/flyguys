@@ -6,6 +6,8 @@
         <title>Főoldal</title>
         <!--!Bootstrap-->
         <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="../bootstrap/css/bootstrap-grid.min.css">
+        <link rel="stylesheet" href="../bootstrap/css/bootstrap-utilities.min.css">
         <!--?Popper: dropdowns, popovers, tooltips-->
         <script src="../bootstrap/js/popper.min.js"></script>
         <script src="../bootstrap/js/bootstrap.min.js"></script>
@@ -13,11 +15,63 @@
         <link rel="stylesheet" href="../css/index.css" />
         <!--!JavaScript-->
         <script src="../javascript/index.js"></script>
+        <script src="../javascript/indexmeadiaquery.js"></script>
     </head>
     <body>
         <div class="container-fluid py-5" id="keret">
             <div class="row text-center">
                 <h1 class="display-1">A szerver fut.</h1>
+            </div>
+        </div>
+        <div class="container">
+            <div class="border rounded">
+                <div class="row">
+                    <div id="origin_and_destination_div" class="col-md-12 col-lg-4 border-endcd">
+                        <div class="container-fluid p-3">
+                            <div class="row">
+                                <div id="origin_div" class="col-lg-5">
+                                    <input type="text" class="form-control" placeholder="Indulási hely" aria-label="Indulási hely">
+                                </div>
+                                <div id="switcher_div" class="col-lg-2 p-0 d-flex justify-content-center">
+                                    <button type="button" class="d-flex align-items-center btn btn-outline-danger">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-right" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="col-lg-5">
+                                    <input type="text" class="form-control" placeholder="Érkezési hely" aria-label="Érkezési hely">
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <div id="departure_and_return_div" class="col-md-12 col-lg-4 border-end">
+                        <div class="container-fluid p-3">
+                            <div class="row">
+                                <div id="departure_div" class="col-lg-6">
+                                    <input name="departure" readonly="readonly" type="text" class="form-control" placeholder="Indulás" aria-label="Indulás">
+                                </div>
+                                <div class="col-lg-6">
+                                    <input name="return" readonly="readonly" type="text" class="form-control" placeholder="Visszaút" aria-label="Visszaút">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-lg-4">
+                        <div class="container-fluid p-3">
+                            <div class="row">
+                                <div id="passengers_div" class="col-lg-6">
+                                    <input name="passengers" readonly="readonly" type="text" class="form-control" placeholder="Utasok" aria-label="Utasok">
+                                </div>
+                                <div class="col-lg-6">
+                                    <button class="w-100 btn btn-danger" id="search_flights">Keresés</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </body>
