@@ -13,3 +13,29 @@ h2 {
 .bg-light {
     background-color: #d3d3d3;
 }
+
+a{
+    color: #A4161A;
+}
+
+a:hover{
+    color: #660708;
+}
+
+
+/* Kisméretű kép változások */
+@media only screen and (max-width: 992px) {
+
+    #eltunes{
+        display: none;
+    }
+
+}
+#hatterkep {
+    background-image: url('https://wallpaperaccess.com/full/8514389.jpg'); 
+    background-size: cover; 
+    background-position: center;
+    background-repeat: no-repeat;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
