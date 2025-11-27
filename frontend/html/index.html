@@ -16,6 +16,7 @@
         <!--!JavaScript-->
         <script src="../javascript/index.js"></script>
         <script src="../javascript/indexmeadiaquery.js"></script>
+        <script src="../javascript/modal.js"></script>
     </head>
     <body>
         <nav class="navbar navbar-expand-lg navbar-light bg-danger">
@@ -42,7 +43,7 @@
                 <form class="d-flex">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex">
                         <li class="nav-item">
-                            <a class="nav-link" href="#login">Bejelentkezés</a>
+                            <a class="nav-link" id="login_button" data-bs-toggle="modal" href="#monadModal">Bejelentkezés</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#lang">Magyar</a>
@@ -103,6 +104,15 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Itt kezdődik a modal -->
+        <div id="modal_frame">
+            <div class="modal fade" id="monadModal" tabindex="-1" aria-labelledby="monadModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content" id="monadModal_content">
                     </div>
                 </div>
             </div>
