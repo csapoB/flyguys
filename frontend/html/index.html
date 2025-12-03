@@ -1,33 +1,42 @@
 <!DOCTYPE html>
 <html lang="hu">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Főoldal</title>
-        <!--!Bootstrap-->
-        <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="../bootstrap/css/bootstrap-grid.min.css">
-        <link rel="stylesheet" href="../bootstrap/css/bootstrap-utilities.min.css">
-        <!--?Popper: dropdowns, popovers, tooltips-->
-        <script src="../bootstrap/js/popper.min.js"></script>
-        <script src="../bootstrap/js/bootstrap.min.js"></script>
-        <!--!CSS-->
-        <link rel="stylesheet" href="../css/index.css" />
-        <!--!JavaScript-->
-        <script src="../javascript/index.js"></script>
-        <script src="../javascript/indexmeadiaquery.js"></script>
-    </head>
-    <body>
-        <nav class="navbar navbar-expand-lg navbar-light bg-danger">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">
-                    <img src="logo">
-                    Flyguys
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarCollapse">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Főoldal</title>
+    <!--!Bootstrap-->
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap-grid.min.css">
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap-utilities.min.css">
+    <!--?Popper: dropdowns, popovers, tooltips-->
+    <script src="../bootstrap/js/popper.min.js"></script>
+    <script src="../bootstrap/js/bootstrap.min.js"></script>
+    <!--!CSS-->
+    <link rel="stylesheet" href="../css/index.css" />
+    <!--!JavaScript-->
+    <script src="../javascript/index.js"></script>
+    <script src="../javascript/indexmeadiaquery.js"></script>
+
+    <!-- Zalando Sans Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Zalando+Sans+Expanded:ital,wght@0,200..900;1,200..900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-lg navbar-light bg-danger">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="logo">
+                Flyguys
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex">
                     <li class="nav-item">
                         <a class="nav-link" href="#rolunk">Rólunk</a>
@@ -50,12 +59,9 @@
                     </ul>
                 </form>
             </div>
-        </nav>
-        <div class="container-fluid py-5" id="keret">
-            <div class="row text-center">
-                <h1 class="display-1">A szerver fut.</h1>
-            </div>
-        </div>
+    </nav>
+
+    <main class="flex-grow-1">
         <div class="container">
             <div class="border rounded">
                 <div class="row">
@@ -63,31 +69,37 @@
                         <div class="container-fluid p-3">
                             <div class="row">
                                 <div id="origin_div" class="col-lg-5">
-                                    <input type="text" class="form-control" placeholder="Indulási hely" aria-label="Indulási hely">
+                                    <input type="text" class="form-control" placeholder="Indulási hely"
+                                        aria-label="Indulási hely">
                                 </div>
                                 <div id="switcher_div" class="col-lg-2 p-0 d-flex justify-content-center">
                                     <button type="button" class="d-flex align-items-center btn btn-outline-danger">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-right" viewBox="0 0 16 16">
-                                            <path fill-rule="evenodd" d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5"/>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            fill="currentColor" class="bi bi-arrow-left-right" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd"
+                                                d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5" />
                                         </svg>
                                     </button>
                                 </div>
                                 <div class="col-lg-5">
-                                    <input type="text" class="form-control" placeholder="Érkezési hely" aria-label="Érkezési hely">
+                                    <input type="text" class="form-control" placeholder="Érkezési hely"
+                                        aria-label="Érkezési hely">
                                 </div>
                             </div>
                         </div>
-                        
+
                     </div>
-                    
+
                     <div id="departure_and_return_div" class="col-md-12 col-lg-4 border-end">
                         <div class="container-fluid p-3">
                             <div class="row">
                                 <div id="departure_div" class="col-lg-6">
-                                    <input name="departure" readonly="readonly" type="text" class="form-control" placeholder="Indulás" aria-label="Indulás">
+                                    <input name="departure" readonly="readonly" type="text" class="form-control"
+                                        placeholder="Indulás" aria-label="Indulás">
                                 </div>
                                 <div class="col-lg-6">
-                                    <input name="return" readonly="readonly" type="text" class="form-control" placeholder="Visszaút" aria-label="Visszaút">
+                                    <input name="return" readonly="readonly" type="text" class="form-control"
+                                        placeholder="Visszaút" aria-label="Visszaút">
                                 </div>
                             </div>
                         </div>
@@ -96,7 +108,8 @@
                         <div class="container-fluid p-3">
                             <div class="row">
                                 <div id="passengers_div" class="col-lg-6">
-                                    <input name="passengers" readonly="readonly" type="text" class="form-control" placeholder="Utasok" aria-label="Utasok">
+                                    <input name="passengers" readonly="readonly" type="text" class="form-control"
+                                        placeholder="Utasok" aria-label="Utasok">
                                 </div>
                                 <div class="col-lg-6">
                                     <button class="w-100 btn btn-danger" id="search_flights">Keresés</button>
@@ -107,5 +120,78 @@
                 </div>
             </div>
         </div>
-    </body>
+        <div class="container-fluid py-5" id="keret">
+            <div class="row text-center">
+            </div>
+        </div>
+    </main>
+
+
+
+    <footer>
+        <div class="container-fluid" id="hatterkep">
+            <div class="row justify-content-around">
+                <div class="col-xl-2 col-lg-2 col-md-4" id="eltunes">
+                    <div>
+                        <h4>Rólunk</h4>
+                        <ul class="list-unstyled">
+                            <li>
+                                <a href="#" class="text-decoration-none">Vállalati információk</a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-decoration-none">Hírek</a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-decoration-none">Valami</a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-decoration-none">Valami</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                    <div>
+                        <h4>Szolgáltatásaink</h4>
+                        <ul class="list-unstyled">
+                            <li>
+                                <a href="#" class="text-decoration-none">Törzsvásárlói program</a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-decoration-none">Járat kereső</a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-decoration-none">Járataim</a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-decoration-none">Útvonaltervező</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                    <div>
+                        <h4>Elérhetőségeink</h4>
+                        <ul class="list-unstyled">
+                            <li>
+                                <p>+36305164050</p>
+                            </li>
+                            <li>
+                                <p><a href="#">ugyfelszolgalat@FlyGuys.com</a>
+                                </p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center">
+
+                <div class="copyright">
+                    <p><i>FlyGuys Minden jog fentartva.</i></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
 </html>
