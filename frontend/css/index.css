@@ -1,6 +1,11 @@
 .form-control:focus {
+
   border-color: #A4161A;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #A4161A;
+}
+.modal_input.form-control:focus{
+border-color: #000;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #000;
 }
 h3 {
     color: #660708;
@@ -14,6 +19,18 @@ h2 {
     background-color: #d3d3d3;
 }
 
+.modal-backdrop {
+  --bs-backdrop-zindex: 1050;
+  --bs-backdrop-bg: #A4161A;
+  --bs-backdrop-opacity: 0.5;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--bs-backdrop-zindex);
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bs-backdrop-bg);
+}
 a{
     color: #A4161A;
 }
