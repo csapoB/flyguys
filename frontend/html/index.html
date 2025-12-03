@@ -17,6 +17,7 @@
     <!--!JavaScript-->
     <script src="../javascript/index.js"></script>
     <script src="../javascript/indexmeadiaquery.js"></script>
+    <script src="../javascript/modal.js"></script>
 
     <!-- Zalando Sans Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -51,7 +52,7 @@
                 <form class="d-flex">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex">
                         <li class="nav-item">
-                            <a class="nav-link" href="#login">Bejelentkezés</a>
+                            <a class="nav-link" id="login_button" data-bs-toggle="modal" href="#monadModal">Bejelentkezés</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#lang">Magyar</a>
@@ -192,6 +193,14 @@
             </div>
         </div>
     </footer>
+    <div id="modal_frame">
+        <div class="modal fade" id="monadModal" tabindex="-1" aria-labelledby="monadModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" id="monadModal_content">
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
