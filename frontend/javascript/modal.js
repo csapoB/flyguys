@@ -56,6 +56,10 @@ function init_modal_content_template(id, type){
 
 function login_modal() {
     
+    
+    if (document.getElementById("monadModal").nextElementSibling != null) {
+        document.getElementById("modal_frame").lastChild.remove();
+    }
     init_modal_content_template("monadModal_content", "monad");
 
 
@@ -127,7 +131,6 @@ function login_modal() {
 
 function regis_modal() {
 
-    
     let modal_header = document.getElementById("childModal_header");
     let modal_body = document.getElementById("childModal_body");
     let modal_footer = document.getElementById("childModal_footer");
