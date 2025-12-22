@@ -28,10 +28,6 @@ router.get('/', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/index.html'));
 });
 
-router.get('/map', (request, response) => {
-    response.sendFile(path.join(__dirname, '../frontend/html/map.html'));
-});
-
 //!API endpoints
 app.use('/', router);
 const endpoints = require('./api/api.js');
