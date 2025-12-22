@@ -15,9 +15,17 @@
     <!--!CSS-->
     <link rel="stylesheet" href="../css/index.css" />
     <!--!JavaScript-->
-    <script src="../javascript/index.js"></script>
+    
     <script src="../javascript/indexmeadiaquery.js"></script>
     <script src="../javascript/modal.js"></script>
+    <script src="../javascript/map.js"></script>
+
+    <style>
+    #map{
+        height: 60vh;
+        width: 60vw;
+    }
+    </style>
 
     <!-- Zalando Sans Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -121,9 +129,10 @@
                 </div>
             </div>
         </div>
-        <div class="container-fluid py-5" id="keret">
-            <div class="row text-center">
-            </div>
+        
+        <!--map-->
+        <div class="container-fluid p-3" id="map">
+            
         </div>
     </main>
 
@@ -201,6 +210,10 @@
             </div>
         </div>
     </div>
+
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNA1UEHYWkf5oY5eDUKo_UuRgtTYY2k0s&map_ids=339ffbadd5c5008584bb6746&loading=async&callback=initMap">
+    </script>
 </body>
 
 </html>
