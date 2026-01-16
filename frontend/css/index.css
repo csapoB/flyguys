@@ -66,3 +66,17 @@ a:hover{
 /*.popover{
   max-width: 450px;
 }*/
+
+.planner_input {
+  padding: 0;
+  outline: none;
+  border: none;
+  max-width: inherit;
+  line-height: 1.5;
+  font-size: 1rem;
+}
+.planner_label {
+  display: block;
+  font-size: 12px;
+  
+}
