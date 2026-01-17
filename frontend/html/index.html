@@ -21,9 +21,9 @@
     <script src="../javascript/jquery-3.7.1.min.js"></script>
     <script src="../javascript/jquery-ui.min.js"></script>
     <script src="../javascript/index.js"></script>
-    <script src="../javascript/indexmeadiaquery.js"></script>
     <script src="../javascript/modal.js"></script>
     <script src="../javascript/popover.js"></script>
+    <script src="../javascript/planner.js"></script>
 
     <!-- Zalando Sans Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -72,12 +72,12 @@
         <div class="container">
             <div class="border rounded">
                 <div class="row">
-                    <div id="origin_and_destination_div" class="col-md-12 col-lg-4 border-endcd">
+                    <div id="origin_and_destination_div" class="col-md-12 col-lg-4 pe-0 border-end">
                         <div class="container-fluid p-3">
-                            <div class="row">
-                                <div id="origin_div" class="col-lg-5">
-                                    <!--<label class="planner_label" for="origin">Indulási hely</label>-->
-                                    <input id="origin_input" type="text" class="form-control" name="origin" placeholder="Indulási hely"
+                            <div class="row d-flex flex-row justify-content-center ps-2 pe-2">
+                                <div id="origin_div" class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center" tabindex="-1">
+                                    <label class="planner_label" for="origin_input" >Indulási hely</label>
+                                    <input id="origin_input" type="text" class="planner_input" name="origin"
                                         aria-label="Indulási hely">
                                 </div>
                                 <div id="switcher_div" class="col-lg-2 p-0 d-flex justify-content-center">
@@ -89,35 +89,39 @@
                                         </svg>
                                     </button>
                                 </div>
-                                <div id="destination_div" class="col-lg-5">
-                                    <input id="destination_input" type="text" class="form-control" placeholder="Érkezési hely"
+                                <div id="destination_div" class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center" tabindex="-1">
+                                    <label class="planner_label" for="destination_input">Érkezési hely</label>
+                                    <input id="destination_input" type="text" class="planner_input" name="destination"
                                         aria-label="Érkezési hely">
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div id="departure_and_return_div" class="col-md-12 col-lg-4 border-end">
+                    <div id="departure_and_return_div" class="col-md-12 col-lg-4 border-end pe-0 ps-0">
                         <div class="container-fluid p-3">
-                            <div class="row">
-                                <div id="departure_div" class="col-lg-6">
-                                    <input id="departure_input" name="departure" readonly="readonly" type="text" class="form-control"
-                                        placeholder="Indulás" aria-label="Indulás">
+                            <div class="row ps-2 pe-2">
+                                <div id="departure_div" class="pt-1 col-lg-6 border rounded planner_div d-flex flex-column justify-content-center">
+                                    <label class="planner_label" for="departure_input">Indulás</label>
+                                    <input id="departure_input" name="departure" readonly="readonly" type="text" class="planner_input"
+                                         aria-label="Indulás">
                                 </div>
-                                <div class="col-lg-6">
-                                    <input id="return_input" name="return" readonly="readonly" type="text" class="form-control"
-                                        placeholder="Visszaút" aria-label="Visszaút">
+                                <div id="return_div" class="pt-1 col-lg-6 border rounded planner_div d-flex flex-column justify-content-center">
+                                    <label class="planner_label" for="return_input">Visszaút</label>
+                                    <input id="return_input" name="return" readonly="readonly" type="text" class="planner_input"
+                                         aria-label="Visszaút">
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-12 col-lg-4">
+                    <div id="passengers_and_search_div" class="col-md-12 col-lg-4 pe-0 ps-0">
                         <div class="container-fluid p-3">
-                            <div class="row">
-                                <div id="passengers_div" class="col-lg-6">
-                                    <input id="passengers_input" name="passengers" readonly="readonly" type="text" class="form-control"
-                                        placeholder="Utasok" aria-label="Utasok">
+                            <div class="row ps-2 pe-2">
+                                <div id="passengers_div" class="pt-1 col-lg-6 border rounded planner_div d-flex flex-column justify-content-center">
+                                    <label class="planner_label" for="passengers_input">Utasok</label>
+                                    <input id="passengers_input" name="passengers" readonly="readonly" type="text" class="planner_input"
+                                         aria-label="Utasok">
                                 </div>
-                                <div class="col-lg-6">
+                                <div class="col-lg-6 d-flex flex-column justify-content-center">
                                     <button class="w-100 btn btn-danger" id="search_flights">Keresés</button>
                                 </div>
                             </div>
