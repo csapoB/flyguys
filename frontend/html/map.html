@@ -12,7 +12,6 @@
     <!--?Popper: dropdowns, popovers, tooltips-->
     <script src="../bootstrap/js/popper.min.js"></script>
     <script src="../bootstrap/js/bootstrap.min.js"></script>
-    <!--<script src="../bootstrap/js/bootstrap.bundle.min.js"></script>-->
     <!--!CSS-->
     <link rel="stylesheet" href="../css/jquery-ui.min.css">
     <link rel="stylesheet" href="../css/index.css" />
@@ -20,10 +19,17 @@
     
     <script src="../javascript/jquery-3.7.1.min.js"></script>
     <script src="../javascript/jquery-ui.min.js"></script>
-    <script src="../javascript/index.js"></script>
     <script src="../javascript/modal.js"></script>
+    <script src="../javascript/map.js"></script>
     <script src="../javascript/popover.js"></script>
     <script src="../javascript/planner.js"></script>
+
+    <style>
+    #map{
+        height: 60vh;
+        width: 60vw;
+    }
+    </style>
 
     <!-- Zalando Sans Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,7 +42,7 @@
 <body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg navbar-light bg-danger">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="/">
                 <img src="logo">
                 Flyguys
             </a>
@@ -130,11 +136,13 @@
                 </div>
             </div>
         </div>
-        <div class="container-fluid py-5" id="keret">
-            <div class="row text-center">
-            </div>
+        
+        <!--map-->
+        <div class="container-fluid p-3" id="map">
+            
         </div>
     </main>
+
 
 
     <footer>
@@ -209,6 +217,9 @@
             </div>
         </div>
     </div>
+
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=??????????&map_ids=339ffbadd5c5008584bb6746&loading=async&callback=initMap">
+    </script>
 </body>
 
-</html>
