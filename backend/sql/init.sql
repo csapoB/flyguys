@@ -120,10 +120,10 @@ INSERT INTO airport (airport.AirportCode, airport.City, airport.Country) VALUES
 ("BAH","Manama","Bahrain"),
 ("BUD", "Budapest", "Hungary");
 
-INSERT INTO fareclass (fareclass.Name) VALUES 
-("First Class"),
-("Business Class"),
-("Economy Class");
+INSERT INTO fareclass (fareclass.Name, fareclass.Multiplier) VALUES 
+("First Class", 2.5),
+("Business Class", 1.75),
+("Economy Class", 1.0);
 
 INSERT INTO useraccount (useraccount.UserName, useraccount.UserPassword) VALUES
 ("admin", "adminpassw");
