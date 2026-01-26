@@ -32,12 +32,21 @@ a:hover{
 
 }
 #hatterkep {
+<<<<<<< Updated upstream
     background-image: url('https://wallpaperaccess.com/full/8514389.jpg'); 
+=======
+    background-image: url('../css/images/footer_background.png');
+>>>>>>> Stashed changes
     background-size: cover; 
     background-position: center;
     background-repeat: no-repeat;
     padding-top: 20px;
     padding-bottom: 20px;
+}
+
+#hatterkep *{
+  color: #0b090a;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
 }
 
 /* FONT teszt */
