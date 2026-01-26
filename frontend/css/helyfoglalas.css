@@ -1,0 +1,46 @@
+.repulotest{
+    background-color: white;
+    border-radius: 60px 60px 20px 20px;
+    padding: 50px 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 15px;
+}
+
+.ules{
+    width: 40px;
+    height: 45px;
+    margin: 4px;
+    border: 2px solid #A4161A;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    background-color: white;
+}
+
+.ules:hover{
+    border-color: #660708;
+}
+
+.ules.kivalasztott{
+    background-color: #323232;
+    border-color: #660708;
+    color: white;
+}
+
+.ules.nagylab{
+    border-color: aqua;
+}
+
+.folyoso{
+    width: 40px;
+}
+
+.sorszama{
+    width: 30px;
+    display: flex;
+    align-items: center;
+    color: #A4161A;
+}

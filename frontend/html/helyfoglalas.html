@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>FLYGUYS Magazin</title>
+        <!--!Bootstrap-->
+        <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="../bootstrap/css/bootstrap-grid.min.css">
+        <link rel="stylesheet" href="../bootstrap/css/bootstrap-utilities.min.css">
+        <!--?Popper: dropdowns, popovers, tooltips-->
+        <script src="../bootstrap/js/popper.min.js"></script>
+        <script src="../bootstrap/js/bootstrap.min.js"></script>
+        <!--!CSS-->
+        <link rel="stylesheet" href="../css/jquery-ui.min.css">
+        <link rel="stylesheet" href="../css/helyfoglalas.css" />
+        <!--!JavaScript-->
+        <script src="../javascript/jquery-3.7.1.min.js"></script>
+        <script src="../javascript/jquery-ui.min.js"></script>
+        <script src="../javascript/helyfoglalas.js"></script>
+        <!-- <script src="../javascript/indexmeadiaquery.js"></script> -->
+
+        <!-- Zalando Sans Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Zalando+Sans+Expanded:ital,wght@0,200..900;1,200..900&display=swap"
+        rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid my-5">
+        <div class="row">
+            <div class="col-md-8 text-center">
+                <div class="repulotest mx-auto">
+                    <h4 class="mb-4">Válassz helyet!</h4>
+                    <div id="helyek"></div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title border-bottom pb-2">Kiválasztott helyek</h5>
+                        <ul id="kivalasztottak" class="list-group list-group-flush mb-3">
+                            <li class="list-group-item italic">Nincs kiválasztott hely!</li>
+                        </ul>
+                        <div class="d-flex justify-content-between align-items-center fw-bold">
+                            <p>Összesen:</p>
+                            <span><span id="ar">0</span> Ft</span>
+                        </div>
+                        <input type="button" value="Lefoglalás" class="btn w-100 mt-3" id="lefoglal">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
