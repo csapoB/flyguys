@@ -11,11 +11,13 @@ function myFunction(x) {
     let $origin_and_destination_div = $("#origin_and_destination_div");
     let $departure_and_return_div = $("#departure_and_return_div");
     let $passengers_and_search_div = $("#passengers_and_search_div");
+    let $departure_and_return_div_row = $("#departure_and_return_div_row");
     if (x.matches) { // If media query matches
         $("#origin_div").addClass("mb-2");
         $("#switcher_div").addClass("mb-2");
         $("#departure_div").addClass("mb-3");
         $("#passengers_div").addClass("mb-3");
+        $departure_and_return_div_row.addClass("pe-2 ps-2");
         $origin_and_destination_div.children().first().addClass("border-bottom");
         $departure_and_return_div.children().first().addClass("border-bottom");
         $origin_and_destination_div.removeClass("border-end pe-0");
@@ -31,6 +33,7 @@ function myFunction(x) {
     $("#switcher_div").removeClass("mb-2");
     $("#departure_div").removeClass("mb-3");
     $("#passengers_div").removeClass("mb-3");
+    $departure_and_return_div_row.removeClass("pe-2 ps-2");
     $origin_and_destination_div.addClass("border-end pe-0");
     $departure_and_return_div.addClass("border-end pe-0 ps-0");
     $passengers_and_search_div.addClass("pe-0 ps-0");
