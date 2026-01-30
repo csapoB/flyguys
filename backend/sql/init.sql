@@ -7,15 +7,15 @@ USE FLYGUYS;
 
 -- FareClass Table
 CREATE TABLE IF NOT EXISTS FareClass (
-	ID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    Name VARCHAR(50) UNIQUE,
+	FareClassID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    FareClassName VARCHAR(50) UNIQUE,
     Multiplier DOUBLE NOT NULL
 );
 
 -- LoyaltyStatus Table
 CREATE TABLE IF NOT EXISTS LoyaltyStatus (
-	ID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    Name VARCHAR(50) UNIQUE,
+	LoyaltyStatusID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    LoyaltyStatusName VARCHAR(50) UNIQUE,
     DiscountInPercentage INT(8)
 );
 
@@ -86,20 +86,32 @@ CREATE TABLE IF NOT EXISTS Reservation (
    -- Price INT NOT NULL,
     FOREIGN KEY (FlightID) REFERENCES Flight(FlightID),
     FOREIGN KEY (PassengerID) REFERENCES UserAccount(UserID),
-    FOREIGN KEY (FareClassID) REFERENCES FareClass(ID)
+    FOREIGN KEY (FareClassID) REFERENCES FareClass(FareClassID)
 );
 
 CREATE VIEW Reservations_With_Prices AS 
-	SELECT reservation.*, flight.BasePrice*fareclass.Multiplier AS "Price"
-    	FROM reservation INNER JOIN flight ON reservation.FlightID = flight.FlightID INNER JOIN fareclass ON reservation.FareClassID = fareclass.ID;
+	SELECT reservation.*, (flight.BasePrice*fareclass.Multiplier)*((100-loyaltystatus.DiscountInPercentage)/100) AS "Price"
+    	FROM reservation INNER JOIN flight ON reservation.FlightID = flight.FlightID INNER JOIN fareclass ON reservation.FareClassID = fareclass.FareClassID INNER JOIN useraccount ON reservation.PassengerID = useraccount.UserID INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID;
 
+ 
 CREATE VIEW Airports_In_English AS
 	SELECT airport.AirportCode, city.English AS "City", country.English AS "Country" 
     	FROM airport INNER JOIN city ON airport.CityID = city.CityID INNER JOIN country ON airport.CountryID = country.CountryID ORDER BY country.English ASC, city.English ASC;
 
+CREATE VIEW Airports_In_Hungarian AS
+	SELECT airport.AirportCode, city.Hungarian AS "City", country.Hungarian AS "Country" 
+    	FROM airport INNER JOIN city ON airport.CityID = city.CityID INNER JOIN country ON airport.CountryID = country.CountryID ORDER BY country.Hungarian ASC, city.Hungarian ASC;
+
 CREATE VIEW Flights_Without_IDs AS 
 	SELECT flight.DepartureAirport, flight.ArrivalAirport, flight.DepartureDateTime, flight.ArrivalDateTime, flight.BasePrice FROM flight; 
 
+
+INSERT INTO loyaltystatus (loyaltystatus.LoyaltyStatusName, loyaltystatus.DiscountInPercentage) VALUES 
+("Bronze", 1),
+("Silver", 5),
+("Gold", 7),
+("Platinum", 10),
+("Diamond", 15);
 
 INSERT INTO city (city.English, city.Hungarian) VALUES
 ("London","London"),
@@ -207,7 +219,7 @@ INSERT INTO aircraft (aircraft.AircraftType, aircraft.NumberOfSeats) VALUES
 ("Boeing 737-900",185),
 ("Boeing 737-900",185);
 
-INSERT INTO fareclass (fareclass.Name, fareclass.Multiplier) VALUES 
+INSERT INTO fareclass (fareclass.FareClassName, fareclass.Multiplier) VALUES 
 ("First Class", 2.5),
 ("Business Class", 1.75),
 ("Economy Class", 1.0);
