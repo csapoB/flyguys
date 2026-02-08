@@ -103,8 +103,13 @@ CREATE VIEW Airports_In_Hungarian AS
     	FROM airport INNER JOIN city ON airport.CityID = city.CityID INNER JOIN country ON airport.CountryID = country.CountryID ORDER BY country.Hungarian ASC, city.Hungarian ASC;
 
 CREATE VIEW Flights_Without_IDs AS 
-	SELECT flight.DepartureAirport, flight.ArrivalAirport, flight.DepartureDateTime, flight.ArrivalDateTime, flight.BasePrice FROM flight; 
+	SELECT flight.DepartureAirport, flight.ArrivalAirport, flight.DepartureDateTime, flight.ArrivalDateTime, flight.BasePrice FROM flight;
 
+CREATE VIEW available_flights AS
+	SELECT flights_without_ids.* FROM flights_without_ids WHERE flights_without_ids.DepartureDateTime > NOW();
+
+CREATE VIEW available_flights_simplified AS
+	SELECT available_flights.DepartureAirport, available_flights.ArrivalAirport, DATE(available_flights.DepartureDateTime) AS "DepartureDate" FROM available_flights;
 
 INSERT INTO loyaltystatus (loyaltystatus.LoyaltyStatusName, loyaltystatus.DiscountInPercentage) VALUES 
 ("Bronze", 1),
@@ -229,4 +234,11 @@ INSERT INTO flight (flight.DepartureAirport, flight.ArrivalAirport, flight.Depar
 ("BUD", "ATH", "2026-01-30 10:30:00", "2026-01-30 13:30:00", 1, 15000),
 ("BUD", "MUC", "2026-01-30 15:40:00", "2026-01-30 16:55:00", 3, 8000),
 ("ZRH", "FCO", "2026-02-01 8:10:00", "2026-02-01 9:45:00", 4, 30000),
-("CPH", "MAD", "2026-02-2 10:10:00", "2026-02-15 13:35:00", 2, 25000);
+("CPH", "MAD", "2026-02-2 10:10:00", "2026-02-15 13:35:00", 2, 25000),
+("BUD", "ATH", "2026-02-07 11:30:00", "2026-02-07 14:30:00", 9, 16000),
+("BUD", "MUC", "2026-02-08 11:40:00", "2026-02-08 12:55:00", 8, 10000),
+("LHR", "ATH", "2026-02-10 07:40:00", "2026-02-10 13:20:00", 5, 40000),
+("BUD", "MUC", "2026-02-13 14:40:00", "2026-02-13 15:55:00", 3, 9000),
+("CPH", "MUC", "2026-02-13 14:05:00", "2026-02-13 15:40:00", 7, 22000),
+("BUD", "ZRH", "2026-02-14 4:00:00", "2026-02-14 5:40:00", 6, 18000); 
+

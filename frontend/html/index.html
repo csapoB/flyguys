@@ -20,10 +20,11 @@
     
     <script src="../javascript/jquery-3.7.1.min.js"></script>
     <script src="../javascript/jquery-ui.min.js"></script>
+    <script src="../javascript/datepicker-hu.js"></script>
     <script src="../javascript/index.js"></script>
     <script src="../javascript/modal.js"></script>
-    <script src="../javascript/popover.js"></script>
     <script src="../javascript/planner.js"></script>
+    <script src="../javascript/plannerresizer.js"></script>
 
     <!-- Zalando Sans Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -77,11 +78,12 @@
                             <div class="row d-flex flex-row justify-content-center ps-2 pe-2">
                                 <div id="origin_div" class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center" tabindex="-1">
                                     <label class="planner_label" for="origin_input" >Indulási hely</label>
-                                    <input id="origin_input" type="text" class="planner_input" name="origin"
-                                        aria-label="Indulási hely">
+                                    <div class="d-flex flex-row airport_container">
+                                        <input id="origin_input" readonly="readonly" type="text" class="planner_input" name="origin" aria-label="Indulási hely" tabindex="1">
+                                    </div>
                                 </div>
-                                <div id="switcher_div" class="col-lg-2 p-0 d-flex justify-content-center">
-                                    <button type="button" class="d-flex align-items-center btn btn-outline-danger">
+                                <div id="switcher_div_origin_destination" class="col-lg-2 p-0 d-flex justify-content-center">
+                                    <button type="button" class="d-flex align-items-center btn btn-outline-danger" tabindex="2">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                             fill="currentColor" class="bi bi-arrow-left-right" viewBox="0 0 16 16">
                                             <path fill-rule="evenodd"
@@ -91,24 +93,35 @@
                                 </div>
                                 <div id="destination_div" class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center" tabindex="-1">
                                     <label class="planner_label" for="destination_input">Érkezési hely</label>
-                                    <input id="destination_input" type="text" class="planner_input" name="destination"
-                                        aria-label="Érkezési hely">
+                                    <div class="d-flex flex-row airport_container">
+                                        <input id="destination_input" readonly="readonly" type="text" class="planner_input" name="destination"
+                                        aria-label="Érkezési hely" tabindex="3">
+                                    </div>
+                                    
+                                    
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div id="departure_and_return_div" class="col-md-12 col-lg-4 border-end pe-0 ps-0">
                         <div class="container-fluid p-3">
-                            <div id="departure_and_return_div_row" class="row d-flex flex-row justify-content-around">
-                                <div id="departure_div" class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center">
-                                    <label class="planner_label" for="departure_input">Indulás</label>
-                                    <input id="departure_input" name="departure" readonly="readonly" type="text" class="planner_input"
-                                         aria-label="Indulás">
+                            <div class="row d-flex flex-row justify-content-center ps-2 pe-2">
+                                <div id="departure_div" class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center" tabindex="-1">
+                                    <label class="planner_label" for="departure" >Indulás</label>
+                                    <input id="departure_input" readonly="readonly" type="text" class="planner_input" name="departure"
+                                        aria-label="Indulás" tabindex="4">
                                 </div>
-                                <div id="return_div" class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center">
-                                    <label class="planner_label" for="return_input">Visszaút</label>
-                                    <input id="return_input" name="return" readonly="readonly" type="text" class="planner_input"
-                                         aria-label="Visszaút">
+                                <div id="switcher_div_departure_return" class="col-lg-2 p-0 d-flex justify-content-center">
+                                    <button type="button" class="d-flex align-items-center btn btn-outline-danger" tabindex="5">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div id="return_div" class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center" tabindex="-1">
+                                    <label class="planner_label" for="return">Visszaút</label>
+                                    <input id="return_input" readonly="readonly" type="text" class="planner_input" name="return"
+                                        aria-label="Visszaút" tabindex="6">
                                 </div>
                             </div>
                         </div>
@@ -119,10 +132,10 @@
                                 <div id="passengers_div" class="pt-1 col-lg-6 border rounded planner_div d-flex flex-column justify-content-center">
                                     <label class="planner_label" for="passengers_input">Utasok</label>
                                     <input id="passengers_input" name="passengers" readonly="readonly" type="text" class="planner_input"
-                                         aria-label="Utasok">
+                                         aria-label="Utasok" tabindex="7">
                                 </div>
                                 <div class="col-lg-6 d-flex flex-column justify-content-center">
-                                    <button class="w-100 btn btn-danger" id="search_flights">Keresés</button>
+                                    <button class="w-100 btn btn-danger" id="search_flights" tabindex="8">Keresés</button>
                                 </div>
                             </div>
                         </div>
