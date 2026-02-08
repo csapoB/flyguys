@@ -36,6 +36,14 @@ router.get('/helyfoglalas', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/helyfoglalas.html'));
 });
 
+router.get('/profil', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/profile.html'));
+});
+
+router.get('/admin', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/admin.html'));
+});
+
 //!API endpoints
 app.use('/', router);
 const endpoints = require('./api/api.js');
