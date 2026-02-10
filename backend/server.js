@@ -38,6 +38,8 @@ router.get('/helyfoglalas', (request, response) => {
 
 router.get('/husegprogram', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/husegprogram.html'));
+});
+
 router.get('/profil', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/profile.html'));
 });
