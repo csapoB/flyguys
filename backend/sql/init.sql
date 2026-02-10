@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS UserAccount (
     UserBirthDate DATE,
     NumberOfFlights INT,
     LoyaltyStatusID INT,
+    AdminStatus BOOLEAN DEFAULT 0,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (LoyaltyStatusID) REFERENCES LoyaltyStatus(ID)
 );
 
@@ -52,7 +54,7 @@ CREATE TABLE IF NOT EXISTS Flight (
     DepartureDateTime DATETIME NOT NULL,
     ArrivalDateTime DATETIME NOT NULL,
     AircraftID INT NOT NULL,
-    BasePrice INT NOT NULL
+    BasePrice INT NOT NULL,
     FOREIGN KEY (AircraftID) REFERENCES Aircraft(AircraftID),
     FOREIGN KEY (DepartureAirport) REFERENCES Airport(AirportCode),
     FOREIGN KEY (ArrivalAirport) REFERENCES Airport(AirportCode)
@@ -125,8 +127,8 @@ INSERT INTO fareclass (fareclass.Name, fareclass.Multiplier) VALUES
 ("Business Class", 1.75),
 ("Economy Class", 1.0);
 
-INSERT INTO useraccount (useraccount.UserName, useraccount.UserPassword) VALUES
-("admin", "adminpassw");
+INSERT INTO useraccount (useraccount.UserName, useraccount.UserEmail, useraccount.UserPassword, useraccount.AdminStatus) VALUES
+("admin", "admin@admin", "$2b$10$nAETe84Wnqon6iMkr0LMmORd76sUgCcME/cmaN0D/t2MjEgok5kqK", 1);
 
 INSERT INTO flight (flight.DepartureAirport, flight.ArrivalAirport, flight.DepartureDateTime, flight.ArrivalDateTime, flight.AircraftID, flight.BasePrice) VALUES
 ("BUD", "ATH", "2026-01-30 10:30:00", "2026-01-30 13:30:00", 1, 15000),
