@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="hu">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hűségprogram</title>
+    <!--!Bootstrap-->
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap-grid.min.css">
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap-utilities.min.css">
+    <!--?Popper: dropdowns, popovers, tooltips-->
+    <script src="../bootstrap/js/popper.min.js"></script>
+    <script src="../bootstrap/js/bootstrap.min.js"></script>
+    <!--<script src="../bootstrap/js/bootstrap.bundle.min.js"></script>-->
+    <!--!CSS-->
+    <link rel="stylesheet" href="../css/jquery-ui.min.css">
+    <link rel="stylesheet" href="../css/index.css" />
+    <link rel="stylesheet" href="../css/husegprogram.css" />
+    <!--!JavaScript-->
+    
+    <script src="../javascript/jquery-3.7.1.min.js"></script>
+    <script src="../javascript/jquery-ui.min.js"></script>
+    <script src="../javascript/husegprogram.js"></script>
+
+    <!-- Zalando Sans Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Zalando+Sans+Expanded:ital,wght@0,200..900;1,200..900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-lg navbar-light bg-danger">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <img src="logo">
+                Flyguys
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#rolunk">Rólunk</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#tervezes">Tervezés</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/husegprogram">Hűségprogram</a>
+                    </li>
+                </ul>
+                <form class="d-flex">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex">
+                        <li class="nav-item">
+                            <a class="nav-link" id="login_button" data-bs-toggle="modal" href="#monadModal">Bejelentkezés</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#lang">Magyar</a>
+                        </li>
+                    </ul>
+                </form>
+            </div>
+    </nav>
+
+    <main class="flex-grow-1">
+        <div class="container-fluid h-100 align-items-stretch d-flex flex-column">
+            <div class="row m-3 g-3 d-flex justify-content-around" id="row1">
+                <div id="userDiv" class="d-flex col-md-5 col-lg-5 pt-4 pb-4 p-2 rounded border border-danger text-center align-items-center justify-content-center" ></div>
+                <div id="nextLevelDiv" class="d-flex col-md-6 col-lg-6 pt-4 pb-4 p-2 rounded border border-danger text-center align-items-center justify-content-center"></div>
+            </div>
+            <div class="row mh-100 m-3 g-3 d-flex justify-content-evenly align-items-center" id="row2"></div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container-fluid" id="hatterkep">
+            <div class="row justify-content-around">
+                <div class="col-xl-2 col-lg-2 col-md-4" id="eltunes">
+                    <div>
+                        <h4>Rólunk</h4>
+                        <ul class="list-unstyled">
+                            <li>
+                                <a href="#" class="text-decoration-none">Vállalati információk</a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-decoration-none">Hírek</a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-decoration-none">Valami</a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-decoration-none">Valami</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                    <div>
+                        <h4>Szolgáltatásaink</h4>
+                        <ul class="list-unstyled">
+                            <li>
+                                <a href="#" class="text-decoration-none">Törzsvásárlói program</a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-decoration-none">Járat kereső</a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-decoration-none">Járataim</a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-decoration-none">Útvonaltervező</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                    <div>
+                        <h4>Elérhetőségeink</h4>
+                        <ul class="list-unstyled">
+                            <li>
+                                <p>+36305164050</p>
+                            </li>
+                            <li>
+                                <a href="mailto:ugyfelszolgalat@FlyGuys.com">ugyfelszolgalat@FlyGuys.com</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center">
+
+                <div class="copyright">
+                    <p><i>© FlyGuys. Minden jog fenntartva.</i></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div id="modal_frame">
+        <div class="modal fade" id="monadModal" tabindex="-1" aria-labelledby="monadModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" id="monadModal_content">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
