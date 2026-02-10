@@ -36,6 +36,10 @@ router.get('/helyfoglalas', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/helyfoglalas.html'));
 });
 
+router.get('/husegprogram', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/husegprogram.html'));
+});
+
 //!API endpoints
 app.use('/', router);
 const endpoints = require('./api/api.js');
