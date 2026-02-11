@@ -171,7 +171,26 @@ router.post('/logout', async (request, response) => {
     }
 });
 
-
+router.get('/husegprogram', async (request, response) => {
+    try {
+        if (!LoggedInCheck(request)) {
+            return response.status(220).json({
+                message: "Nem vagy bejelentkezve!"
+            })
+        }
+        else{
+            const user = await database.Husegprogram(request.session.user.id);
+            response.status(200).json({
+                message: "Siker",
+                result: user
+            })
+        }
+    } catch (error) {
+        response.status(500).json({
+            message: 'Ez a végpont nem működik.'
+        });
+    }
+});
 
 function LoggedInCheck(request) {
     let vissza = false;
@@ -186,6 +205,9 @@ function LoggedInCheck(request) {
     }
     return vissza;
 }
+
+
+
 
 
 

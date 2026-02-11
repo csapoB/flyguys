@@ -32,9 +32,17 @@ async function Login(email){
     return rows[0] || null;
 }
 
+//Hűségprogram
+async function Husegprogram(id){
+    const query = 'SELECT UserName, NumberOfFlights, LoyaltyName From UserAccount JOIN LoyaltyProgram ON UserAccount.UserID = LoyaltyProgram.UserID WHERE UserId = ?';
+    const [rows] = await pool.execute(query, [id]);
+    return rows;
+}
+
 //!Export
 module.exports = {
     Login,
     getUserById,
-    Register
+    Register,
+    Husegprogram
 };
