@@ -52,13 +52,22 @@
                         <a class="nav-link" href="/map">Tervezés</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#husegprogram">Hűségprogram</a>
+                        <a class="nav-link" href="/husegprogram">Hűségprogram</a>
                     </li>
                 </ul>
                 <form class="d-flex">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex">
                         <li class="nav-item">
                             <a class="nav-link" id="login_button" data-bs-toggle="modal" href="#monadModal">Bejelentkezés</a>
+                        </li>
+                        <li class="nav-item" style="display:none;">
+                            <a class="nav-link" id="admin_button" href="/admin">Admin</a>
+                        </li>
+                        <li class="nav-item" style="display:none;">
+                            <a class="nav-link" id="profile_button" href="/profil">Profilom</a>
+                        </li>
+                        <li class="nav-item" style="display:none;">
+                            <a class="nav-link" id="logout_button" href="#">Kijelentkezés</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#lang">Magyar</a>
@@ -99,13 +108,13 @@
                     </div>
                     <div id="departure_and_return_div" class="col-md-12 col-lg-4 border-end pe-0 ps-0">
                         <div class="container-fluid p-3">
-                            <div class="row ps-2 pe-2">
-                                <div id="departure_div" class="pt-1 col-lg-6 border rounded planner_div d-flex flex-column justify-content-center">
+                            <div id="departure_and_return_div_row" class="row d-flex flex-row justify-content-around">
+                                <div id="departure_div" class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center">
                                     <label class="planner_label" for="departure_input">Indulás</label>
                                     <input id="departure_input" name="departure" readonly="readonly" type="text" class="planner_input"
                                          aria-label="Indulás">
                                 </div>
-                                <div id="return_div" class="pt-1 col-lg-6 border rounded planner_div d-flex flex-column justify-content-center">
+                                <div id="return_div" class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center">
                                     <label class="planner_label" for="return_input">Visszaút</label>
                                     <input id="return_input" name="return" readonly="readonly" type="text" class="planner_input"
                                          aria-label="Visszaút">
@@ -186,8 +195,7 @@
                                 <p>+36305164050</p>
                             </li>
                             <li>
-                                <p><a href="#">ugyfelszolgalat@FlyGuys.com</a>
-                                </p>
+                                <a href="mailto:ugyfelszolgalat@FlyGuys.com">ugyfelszolgalat@FlyGuys.com</a>
                             </li>
                         </ul>
                     </div>
@@ -196,7 +204,7 @@
             <div class="d-flex justify-content-center">
 
                 <div class="copyright">
-                    <p><i>FlyGuys Minden jog fentartva.</i></p>
+                    <p><i>© FlyGuys. Minden jog fenntartva.</i></p>
                 </div>
             </div>
         </div>

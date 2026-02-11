@@ -8,7 +8,8 @@ USE FLYGUYS;
 -- FareClass Table
 CREATE TABLE IF NOT EXISTS FareClass (
 	ID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    Name VARCHAR(50) UNIQUE
+    Name VARCHAR(50) UNIQUE,
+    Multiplier DOUBLE NOT NULL
 );
 
 -- LoyaltyStatus Table
@@ -26,6 +27,8 @@ CREATE TABLE IF NOT EXISTS UserAccount (
     UserBirthDate DATE,
     NumberOfFlights INT,
     LoyaltyStatusID INT,
+    AdminStatus BOOLEAN DEFAULT 0,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (LoyaltyStatusID) REFERENCES LoyaltyStatus(ID)
 );
 
@@ -51,6 +54,7 @@ CREATE TABLE IF NOT EXISTS Flight (
     DepartureDateTime DATETIME NOT NULL,
     ArrivalDateTime DATETIME NOT NULL,
     AircraftID INT NOT NULL,
+    BasePrice INT NOT NULL,
     FOREIGN KEY (AircraftID) REFERENCES Aircraft(AircraftID),
     FOREIGN KEY (DepartureAirport) REFERENCES Airport(AirportCode),
     FOREIGN KEY (ArrivalAirport) REFERENCES Airport(AirportCode)
@@ -59,16 +63,20 @@ CREATE TABLE IF NOT EXISTS Flight (
 -- Reservation Table
 CREATE TABLE IF NOT EXISTS Reservation (
     ReservationID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    PassengerName VARCHAR(255) NOT NULL,
     PassengerID INT NOT NULL,
     FlightID INT NOT NULL,
     SeatNumber VARCHAR(10) NOT NULL,
     FareClassID INT NOT NULL,
-    ISCancelled BOOLEAN NOT NULL,
+    IsCancelled BOOLEAN NOT NULL,
+   -- Price INT NOT NULL,
     FOREIGN KEY (FlightID) REFERENCES Flight(FlightID),
     FOREIGN KEY (PassengerID) REFERENCES UserAccount(UserID),
     FOREIGN KEY (FareClassID) REFERENCES FareClass(ID)
 );
+
+CREATE VIEW Reservations_With_Prices AS 
+	SELECT reservation.*, flight.BasePrice*fareclass.Multiplier AS "Price"
+    	FROM reservation INNER JOIN flight ON reservation.FlightID = flight.FlightID INNER JOIN fareclass ON reservation.FareClassID = fareclass.ID; 
 
 INSERT INTO aircraft (aircraft.AircraftType, aircraft.NumberOfSeats) VALUES
 ("Airbus A220-100",125),
@@ -114,10 +122,16 @@ INSERT INTO airport (airport.AirportCode, airport.City, airport.Country) VALUES
 ("BAH","Manama","Bahrain"),
 ("BUD", "Budapest", "Hungary");
 
-INSERT INTO fareclass (fareclass.Name) VALUES 
-("First Class"),
-("Business Class"),
-("Economy Class");
+INSERT INTO fareclass (fareclass.Name, fareclass.Multiplier) VALUES 
+("First Class", 2.5),
+("Business Class", 1.75),
+("Economy Class", 1.0);
 
-INSERT INTO useraccount (useraccount.UserName, useraccount.UserPassword) VALUES
-("admin", "adminpassw");
+INSERT INTO useraccount (useraccount.UserName, useraccount.UserEmail, useraccount.UserPassword, useraccount.AdminStatus) VALUES
+("admin", "admin@admin", "$2b$10$nAETe84Wnqon6iMkr0LMmORd76sUgCcME/cmaN0D/t2MjEgok5kqK", 1);
+
+INSERT INTO flight (flight.DepartureAirport, flight.ArrivalAirport, flight.DepartureDateTime, flight.ArrivalDateTime, flight.AircraftID, flight.BasePrice) VALUES
+("BUD", "ATH", "2026-01-30 10:30:00", "2026-01-30 13:30:00", 1, 15000),
+("BUD", "MUC", "2026-01-30 15:40:00", "2026-01-30 16:55:00", 3, 8000),
+("ZRH", "FCO", "2026-02-01 8:10:00", "2026-02-01 9:45:00", 4, 30000),
+("CPH", "MAD", "2026-02-2 10:10:00", "2026-02-15 13:35:00", 2, 25000);
