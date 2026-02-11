@@ -125,7 +125,7 @@ router.get('/availablearrivalairportsfiltered', async (request, response) => {
 router.get('/availabledeparturedatesfiltered', async (request, response) => {
     try {
         
-        const result = await database.selectAvailableDepartureDateFiltered(((request.query.departureAirport == undefined) ? "" : request.query.departureAirport), ((request.query.arrivalAirport == undefined) ? "" : request.query.arrivalAirport));
+        const result = await database.selectAvailableDepartureDatesFiltered(((request.query.departureAirport == undefined) ? "" : request.query.departureAirport), ((request.query.arrivalAirport == undefined) ? "" : request.query.arrivalAirport));
         
         let departuredates = [];
         for (let i = 0; i < result.length; i++) {
@@ -134,6 +134,68 @@ router.get('/availabledeparturedatesfiltered', async (request, response) => {
 
         response.status(200).json({
             departuredates: departuredates
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/availablearrivaldatesfiltered', async (request, response) => {
+    try {
+        
+        const result = await database.selectAvailableArrivalDatesFiltered(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate);
+        
+        let arrivaldates = [];
+        for (let i = 0; i < result.length; i++) {
+            arrivaldates.push(result[i].ArrivalDate);
+        }
+
+        response.status(200).json({
+            arrivaldates: arrivaldates
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/availablereturndates', async (request, response) => {
+    try {
+        
+        const result = await database.selectAvailableReturnDates(request.query.departureAirport, request.query.arrivalAirport, request.query.destinationArrivalDate);
+        
+        let returndates = [];
+
+        for (let i = 0; i < result.length; i++) {
+            returndates.push(result[i].ReturnDate);
+        }
+
+        response.status(200).json({
+            returndates: returndates
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/swappableairportswithsamedeparturedates', async (request, response) => {
+    try {
+        
+        const result = await database.selectSwappableFlightssWithSameDepartureDates();
+        
+        let airports = [];
+        for (let i = 0; i < result.length; i++) {
+            airports.push(result[i].DepartureAirport)
+            
+        }      
+
+        response.status(200).json({
+            airports: airports
         });
     } catch (error) {
         response.status(500).json({

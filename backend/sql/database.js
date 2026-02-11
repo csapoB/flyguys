@@ -5,6 +5,7 @@ const pool = mysql.createPool({
     user: 'root',
     password: '',
     database: 'flyguys',
+    dateStrings : true,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
@@ -59,9 +60,30 @@ async function selectAvailableArrivalAirportsFilteredEng(departureAirport, depar
     return rows;
 }
 
-async function selectAvailableDepartureDateFiltered(departureAirport, arrivalAirport) {
+async function selectAvailableDepartureDatesFiltered(departureAirport, arrivalAirport) {
     const query = 'SELECT DISTINCT DepartureDate FROM available_flights_simplified WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ?;';
     const [rows] = await pool.execute(query, [`%${departureAirport}%`, `%${arrivalAirport}%`]);
+    return rows;
+}
+
+// minden paraméter kötelező
+async function selectAvailableReturnDates(departureAirport, arrivalAirport, destinationArrivalDate) {
+    const query = 'SELECT DISTINCT DATE(DepartureDate) AS "ReturnDate" FROM available_flights_simplified WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate >= ?;';
+    const [rows] = await pool.execute(query, [`${departureAirport}`, `${arrivalAirport}`, `${destinationArrivalDate}`]);
+    return rows;
+}
+
+async function selectAvailableArrivalDatesFiltered(departureAirport, arrivalAirport, departureDate) {
+    const query = 'SELECT DISTINCT DATE(ArrivalDateTime) AS "ArrivalDate" FROM available_flights WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DATE(DepartureDateTime) LIKE ?;';
+    const [rows] = await pool.execute(query, [`${departureAirport}`, `${arrivalAirport}`, `${departureDate}`]);
+    
+    return rows;
+}
+
+async function selectSwappableFlightssWithSameDepartureDates() {
+    const query = 'SELECT DISTINCT afs1.DepartureAirport FROM available_flights_simplified afs1, available_flights_simplified afs2 WHERE (afs1.DepartureAirport = afs2.ArrivalAirport AND afs1.ArrivalAirport = afs2.DepartureAirport) AND afs1.DepartureDate = afs2.DepartureDate;';
+    const [rows] = await pool.execute(query);
+    
     return rows;
 }
 
@@ -83,6 +105,9 @@ module.exports = {
     selectAvailableArrivalAirportsFilteredHun,
     selectAvailableDepartureAirportsFilteredEng,
     selectAvailableArrivalAirportsFilteredEng,
-    selectAvailableDepartureDateFiltered
+    selectAvailableDepartureDatesFiltered,
+    selectAvailableReturnDates,
+    selectAvailableArrivalDatesFiltered,
+    selectSwappableFlightssWithSameDepartureDates
     
 };

@@ -78,8 +78,8 @@
                             <div class="row d-flex flex-row justify-content-center ps-2 pe-2">
                                 <div id="origin_div" class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center" tabindex="-1">
                                     <label class="planner_label" for="origin_input" >Indulási hely</label>
-                                    <div class="d-flex flex-row airport_container">
-                                        <input id="origin_input" readonly="readonly" type="text" class="planner_input" name="origin" aria-label="Indulási hely" tabindex="1">
+                                    <div class="d-flex flex-row input_container">
+                                        <input id="origin_input" readonly="readonly" type="text" class="planner_input" aria-label="Indulási hely" tabindex="1">
                                     </div>
                                 </div>
                                 <div id="switcher_div_origin_destination" class="col-lg-2 p-0 d-flex justify-content-center">
@@ -93,8 +93,8 @@
                                 </div>
                                 <div id="destination_div" class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center" tabindex="-1">
                                     <label class="planner_label" for="destination_input">Érkezési hely</label>
-                                    <div class="d-flex flex-row airport_container">
-                                        <input id="destination_input" readonly="readonly" type="text" class="planner_input" name="destination"
+                                    <div class="d-flex flex-row input_container">
+                                        <input id="destination_input" readonly="readonly" type="text" class="planner_input" 
                                         aria-label="Érkezési hely" tabindex="3">
                                     </div>
                                     
@@ -107,9 +107,11 @@
                         <div class="container-fluid p-3">
                             <div class="row d-flex flex-row justify-content-center ps-2 pe-2">
                                 <div id="departure_div" class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center" tabindex="-1">
-                                    <label class="planner_label" for="departure" >Indulás</label>
-                                    <input id="departure_input" readonly="readonly" type="text" class="planner_input" name="departure"
-                                        aria-label="Indulás" tabindex="4">
+                                    <label class="planner_label" for="departure_input" >Indulás</label>
+                                    <div class="d-flex flex-row input_container">
+                                        <input id="departure_input" readonly="readonly" type="text" class="planner_input" aria-label="Indulás" tabindex="4">
+                                    </div>
+                                    
                                 </div>
                                 <div id="switcher_div_departure_return" class="col-lg-2 p-0 d-flex justify-content-center">
                                     <button type="button" class="d-flex align-items-center btn btn-outline-danger" tabindex="5">
@@ -119,9 +121,10 @@
                                     </button>
                                 </div>
                                 <div id="return_div" class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center" tabindex="-1">
-                                    <label class="planner_label" for="return">Visszaút</label>
-                                    <input id="return_input" readonly="readonly" type="text" class="planner_input" name="return"
-                                        aria-label="Visszaút" tabindex="6">
+                                    <label class="planner_label" for="return_input">Visszaút</label>
+                                    <div class="d-flex flex-row input_container">
+                                        <input id="return_input" readonly="readonly" type="text" class="planner_input" aria-label="Visszaút" tabindex="6">
+                                    </div>  
                                 </div>
                             </div>
                         </div>
