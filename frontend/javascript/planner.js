@@ -143,6 +143,9 @@ $(async function () {
             inputSwitcher($return);
 
 
+            origin[1].setContent({ ".popover-body": await airports_popover_contentGenerator("origin_input", "origin_popover", origin[1], (await (await fetch(`/api/${`availablearrivalairportsfiltered?departureAirport=${destination[0].data("code_of_selected_airport")}`}`, { method: "GET" })).json())) });
+            
+
         }
 
 

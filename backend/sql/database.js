@@ -87,6 +87,13 @@ async function selectSwappableFlightssWithSameDepartureDates() {
     return rows;
 }
 
+async function selectSwappableFlightssWithSameDepartureDates() {
+    const query = 'SELECT DISTINCT afs1.DepartureAirport FROM available_flights_simplified afs1, available_flights_simplified afs2 WHERE (afs1.DepartureAirport = afs2.ArrivalAirport AND afs1.ArrivalAirport = afs2.DepartureAirport) AND afs1.DepartureDate = afs2.DepartureDate;';
+    const [rows] = await pool.execute(query);
+    
+    return rows;
+}
+ 
 /*
 async function a() {
     const query = 'SELECT DepartureAirport, ArrivalAirport, DATE(DepartureDate) AS "aaa" FROM available_flights_simplified';
