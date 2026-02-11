@@ -28,12 +28,27 @@ router.get('/', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/index.html'));
 });
 
+//? Map
+router.get('/map', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/map.html'));
 router.get('/magazin', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/magazin.html'));
 });
 
 router.get('/helyfoglalas', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/helyfoglalas.html'));
+});
+
+router.get('/husegprogram', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/husegprogram.html'));
+});
+
+router.get('/profil', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/profile.html'));
+});
+
+router.get('/admin', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/admin.html'));
 });
 
 //!API endpoints

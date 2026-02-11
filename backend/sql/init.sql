@@ -7,7 +7,7 @@ USE FLYGUYS;
 
 -- FareClass Table
 CREATE TABLE IF NOT EXISTS FareClass (
-	FareClassID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	  FareClassID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     FareClassName VARCHAR(50) UNIQUE,
     Multiplier DOUBLE NOT NULL
 );
@@ -28,6 +28,8 @@ CREATE TABLE IF NOT EXISTS UserAccount (
     UserBirthDate DATE,
     NumberOfFlights INT,
     LoyaltyStatusID INT,
+    AdminStatus BOOLEAN DEFAULT 0,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (LoyaltyStatusID) REFERENCES LoyaltyStatus(LoyaltyStatusID)
 );
 
@@ -229,6 +231,8 @@ INSERT INTO fareclass (fareclass.FareClassName, fareclass.Multiplier) VALUES
 ("Business Class", 1.75),
 ("Economy Class", 1.0);
 
+INSERT INTO useraccount (useraccount.UserName, useraccount.UserEmail, useraccount.UserPassword, useraccount.AdminStatus) VALUES
+("admin", "admin@admin", "$2b$10$nAETe84Wnqon6iMkr0LMmORd76sUgCcME/cmaN0D/t2MjEgok5kqK", 1);
 
 INSERT INTO flight (flight.DepartureAirport, flight.ArrivalAirport, flight.DepartureDateTime, flight.ArrivalDateTime, flight.AircraftID, flight.BasePrice) VALUES
 ("BUD", "ATH", "2026-01-30 10:30:00", "2026-01-30 13:30:00", 1, 15000),
