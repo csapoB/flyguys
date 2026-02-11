@@ -186,7 +186,28 @@ router.get('/availablereturndates', async (request, response) => {
 router.get('/swappableairportswithsamedeparturedates', async (request, response) => {
     try {
         
-        const result = await database.selectSwappableFlightssWithSameDepartureDates();
+        const result = await database.selectSwappableFlightsWithSameDepartureDates(((request.query.departureDate == undefined) ? "" : request.query.departureDate));
+        
+        let airports = [];
+        for (let i = 0; i < result.length; i++) {
+            airports.push(result[i].DepartureAirport)
+            
+        }      
+
+        response.status(200).json({
+            airports: airports
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/swappableairports', async (request, response) => {
+    try {
+        
+        const result = await database.selectSwappableFlights();
         
         let airports = [];
         for (let i = 0; i < result.length; i++) {

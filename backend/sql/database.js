@@ -75,25 +75,26 @@ async function selectAvailableReturnDates(departureAirport, arrivalAirport, dest
 
 async function selectAvailableArrivalDatesFiltered(departureAirport, arrivalAirport, departureDate) {
     const query = 'SELECT DISTINCT DATE(ArrivalDateTime) AS "ArrivalDate" FROM available_flights WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DATE(DepartureDateTime) LIKE ?;';
-    const [rows] = await pool.execute(query, [`${departureAirport}`, `${arrivalAirport}`, `${departureDate}`]);
+    const [rows] = await pool.execute(query, [`%${departureAirport}%`, `%${arrivalAirport}%`, `%${departureDate}%`]);
     
     return rows;
 }
 
-async function selectSwappableFlightssWithSameDepartureDates() {
-    const query = 'SELECT DISTINCT afs1.DepartureAirport FROM available_flights_simplified afs1, available_flights_simplified afs2 WHERE (afs1.DepartureAirport = afs2.ArrivalAirport AND afs1.ArrivalAirport = afs2.DepartureAirport) AND afs1.DepartureDate = afs2.DepartureDate;';
+
+async function selectSwappableFlightsWithSameDepartureDates(departureDate) {
+    const query = 'SELECT DISTINCT afs1.DepartureAirport FROM available_flights_simplified afs1, available_flights_simplified afs2 WHERE (afs1.DepartureAirport = afs2.ArrivalAirport AND afs1.ArrivalAirport = afs2.DepartureAirport) AND (afs1.DepartureDate = afs2.DepartureDate) AND afs1.DepartureDate LIKE ?;';
+    const [rows] = await pool.execute(query, [`%${departureDate}%`]);
+    
+    return rows;
+}
+
+async function selectSwappableFlights() {
+    const query = 'SELECT DISTINCT afs1.DepartureAirport FROM available_flights_simplified afs1, available_flights_simplified afs2 WHERE (afs1.DepartureAirport = afs2.ArrivalAirport AND afs1.ArrivalAirport = afs2.DepartureAirport);';
     const [rows] = await pool.execute(query);
     
     return rows;
 }
 
-async function selectSwappableFlightssWithSameDepartureDates() {
-    const query = 'SELECT DISTINCT afs1.DepartureAirport FROM available_flights_simplified afs1, available_flights_simplified afs2 WHERE (afs1.DepartureAirport = afs2.ArrivalAirport AND afs1.ArrivalAirport = afs2.DepartureAirport) AND afs1.DepartureDate = afs2.DepartureDate;';
-    const [rows] = await pool.execute(query);
-    
-    return rows;
-}
- 
 /*
 async function a() {
     const query = 'SELECT DepartureAirport, ArrivalAirport, DATE(DepartureDate) AS "aaa" FROM available_flights_simplified';
@@ -115,6 +116,7 @@ module.exports = {
     selectAvailableDepartureDatesFiltered,
     selectAvailableReturnDates,
     selectAvailableArrivalDatesFiltered,
-    selectSwappableFlightssWithSameDepartureDates
+    selectSwappableFlightsWithSameDepartureDates,
+    selectSwappableFlights
     
 };

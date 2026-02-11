@@ -32,10 +32,10 @@ $(async function () {
         onSelect: async function (dateText, inst) {
 
             let $input_field = $(this);
-            console.log($input_field)
+
             if ($input_field.prev().length != 0) {
                 $input_field.prev().remove();
-                console.log($input_field)
+
             }
 
             let $delete_button = $("<span>", {
@@ -48,7 +48,7 @@ $(async function () {
                         $this_button.remove();
 
                         $input_field.val("");
-                        console.log($input_field)
+
 
                         available_departure_dates = (await (await fetch(`/api/availabledeparturedatesfiltered?departureAirport=${origin[0].data("code_of_selected_airport")}&arrivalAirport=${destination[0].data("code_of_selected_airport")}`, { method: "GET" })).json()).departuredates;
 
@@ -57,6 +57,8 @@ $(async function () {
                         destination[1].setContent({ ".popover-body": await airports_popover_contentGenerator("destination_input", "destination_popover", destination[1], (await (await fetch(`/api/${`availablearrivalairportsfiltered?departureAirport=${origin[0].data("code_of_selected_airport")}`}`, { method: "GET" })).json())) });
 
                         returnEnabler(available_return_dates);
+
+                        airportSwapperEnabler(origin[0], destination[0], $departure, $return);
 
                     }
                 }
@@ -69,6 +71,8 @@ $(async function () {
             destination[1].setContent({ ".popover-body": await airports_popover_contentGenerator("destination_input", "destination_popover", destination[1], (await (await fetch(`/api/${`availablearrivalairportsfiltered?departureAirport=${origin[0].data("code_of_selected_airport")}&departureDate=${dateText}`}`, { method: "GET" })).json())) });
 
             returnEnabler(available_return_dates);
+
+            airportSwapperEnabler(origin[0], destination[0], $departure, $return);
         }
     });
 
@@ -103,8 +107,10 @@ $(async function () {
 
                         let $this_button = $(this);
                         $this_button.remove();
-                        console.log($input_field)
+
                         $input_field.val("");
+
+                        airportSwapperEnabler(origin[0], destination[0], $departure, $return);
 
                     }
                 }
@@ -113,49 +119,65 @@ $(async function () {
             $input_field.parent().prepend($delete_button);
 
             origin[1].setContent({ ".popover-body": await airports_popover_contentGenerator("origin_input", "origin_popover", origin[1], (await (await fetch(`/api/${`availablearrivalairportsfiltered?departureAirport=${destination[0].data("code_of_selected_airport")}&departureDate=${$return.val()}`}`, { method: "GET" })).json())) });
+
+            airportSwapperEnabler(origin[0], destination[0], $departure, $return);
         }
     });
 
     inputSwitcher($return)
     $.datepicker.setDefaults($.datepicker.regional["hu"]);
     // Egyirányú, vagy oda-vissza gomb
-    let $switcher_div_departure_return = $("#switcher_div_departure_return");
-    turnOff($switcher_div_departure_return)
-    $switcher_div_departure_return.on("click", async function () {
+    let $switcher_departure_return = $("#switcher_departure_return");
+    turnOff($switcher_departure_return)
+    $switcher_departure_return.on("click", async function () {
         if (!$return.prop("disabled")) {
 
-            $switcher_div_departure_return.html("<button type=\"button\" class=\"d-flex align-items-center btn btn-outline-danger\" tabindex=\"5\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-arrow-right\" viewBox=\"0 0 16 16\"><path fill-rule=\"evenodd\" d=\"M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8\"/></svg></button>");
+            $switcher_departure_return.html("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-arrow-right\" viewBox=\"0 0 16 16\"><path fill-rule=\"evenodd\" d=\"M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8\"/></svg>");
 
             inputSwitcher($return);
             if ($return.prev().length != 0) {
-                console.log("aaa")
+
                 $return.prev().trigger("click");
             }
 
             origin[1].setContent({ ".popover-body": await airports_popover_contentGenerator("origin_input", "origin_popover", origin[1], (await (await fetch(`/api/${`availabledepartureairportsfiltered?arrivalAirport=${destination[0].data("code_of_selected_airport")}`}`, { method: "GET" })).json())) });
-            
+
 
 
         } else {
 
-            $switcher_div_departure_return.html("<button type=\"button\" class=\"d-flex align-items-center btn btn-outline-danger\" tabindex=\"5\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-arrow-left-right\" viewBox=\"0 0 16 16\"> <path fill-rule=\"evenodd\" d=\"M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5\" /></svg></button>");
+            $switcher_departure_return.html("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-arrow-left-right\" viewBox=\"0 0 16 16\"> <path fill-rule=\"evenodd\" d=\"M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5\" /></svg>");
 
             inputSwitcher($return);
 
 
             origin[1].setContent({ ".popover-body": await airports_popover_contentGenerator("origin_input", "origin_popover", origin[1], (await (await fetch(`/api/${`availablearrivalairportsfiltered?departureAirport=${destination[0].data("code_of_selected_airport")}`}`, { method: "GET" })).json())) });
-            
 
         }
-
-
-
 
     });
 
     // Repülőtér csere gomb
-    let $switcher_div_origin_destination = $("#switcher_div_origin_destination");
-    turnOff($switcher_div_origin_destination);
+    let $swapper_origin_destination = $("#swapper_origin_destination");
+    turnOff($swapper_origin_destination);
+    $swapper_origin_destination.on("click", async function () {
+
+        let saver_of_origin_code = origin[0].data("code_of_selected_airport");
+        let saver_of_origin_val = origin[0].val();
+        origin[0].data("code_of_selected_airport", destination[0].data("code_of_selected_airport"));
+        origin[0].val(destination[0].val());
+        destination[0].data("code_of_selected_airport", saver_of_origin_code);
+        destination[0].val(saver_of_origin_val);
+
+        origin[1].setContent({ ".popover-body": await airports_popover_contentGenerator("origin_input", "origin_popover", origin[1], (await (await fetch(`/api/${`availabledepartureairportsfiltered?arrivalAirport=${destination[0].data("code_of_selected_airport")}&departureDate=${$departure.val()}`}`, { method: "GET" })).json())) });
+
+        destination[1].setContent({ ".popover-body": await airports_popover_contentGenerator("destination_input", "destination_popover", destination[1], (await (await fetch(`/api/${`availablearrivalairportsfiltered?departureAirport=${origin[0].data("code_of_selected_airport")}&departureDate=${$departure.val()}`}`, { method: "GET" })).json())) });
+
+        available_departure_dates = (await (await fetch(`/api/availabledeparturedatesfiltered?departureAirport=${origin[0].data("code_of_selected_airport")}&arrivalAirport=${destination[0].data("code_of_selected_airport")}`, { method: "GET" })).json()).departuredates;
+
+        returnEnabler(available_return_dates);
+
+    });
 
     // Utasok popover
     let passengers = passengers_popoverInit("passengers_input", "passengers_popover");
@@ -175,6 +197,8 @@ $(async function () {
 
         returnEnabler(available_return_dates);
 
+        airportSwapperEnabler(origin[0], destination[0], $departure, $return);
+
     });
 
     destination[0].on("change", async function () {
@@ -184,6 +208,8 @@ $(async function () {
         available_departure_dates = (await (await fetch(`/api/availabledeparturedatesfiltered?departureAirport=${origin[0].data("code_of_selected_airport")}&arrivalAirport=${destination[0].data("code_of_selected_airport")}`, { method: "GET" })).json()).departuredates;
 
         returnEnabler(available_return_dates);
+
+        airportSwapperEnabler(origin[0], destination[0], $departure, $return);
 
     });
 });
@@ -634,7 +660,7 @@ function inputSwitcher($input) {
 
 }
 
-// az adott repteret választja kí, ha frissül a popover tartalma. Ha üres az input, akkor undefinedal tér vissza
+// az adott repteret választja ki, ha frissül a popover tartalma. Ha üres az input, akkor undefinedal tér vissza
 function airportSelector($popover_content_children, $selected_airport_code) {
 
     let indexes;
@@ -695,16 +721,16 @@ async function returnEnabler(available_return_dates) {
                     }
                 }
             }
-            
-            let $switcher_div_departure_return = $("#switcher_div_departure_return");
+
+            let $switcher_departure_return = $("#switcher_departure_return");
             if (return_dates.length > 0) {
-                switchFunc($switcher_div_departure_return);
+                switchFunc($switcher_departure_return);
                 available_return_dates.length = 0;
                 available_return_dates.push(...return_dates);
                 //console.log(available_return_dates);
 
             } else {
-                turnOff($switcher_div_departure_return);
+                turnOff($switcher_departure_return);
             }
         }
     } else {
@@ -713,7 +739,7 @@ async function returnEnabler(available_return_dates) {
             $return_input.prev().trigger("click");
         }
         inputDisabler($return_input);
-        turnOff($("#switcher_div_departure_return"));
+        turnOff($("#switcher_departure_return"));
     }
 }
 
@@ -735,19 +761,66 @@ function turnOff($element) {
             "opacity": 0.5
         });
 
-        if ($element.prop("id") == "switcher_div_departure_return") {
+        if ($element.prop("id") == "switcher_departure_return") {
 
-            $element.html("<button type=\"button\" class=\"d-flex align-items-center btn btn-outline-danger\" tabindex=\"5\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-arrow-right\" viewBox=\"0 0 16 16\"><path fill-rule=\"evenodd\" d=\"M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8\"/></svg></button>");
+            $element.html("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-arrow-right\" viewBox=\"0 0 16 16\"><path fill-rule=\"evenodd\" d=\"M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8\"/></svg>");
         }
     }
 }
-// Ha a departure is megvan adva, akkor aszerint is szűrni kell (külön sql query...)
-/*async function airportSwapperEnabler($origin_input, $destination_input, $departure, $return) {
-    let swappable_airports = (await (await fetch("/api/swappableairportswithsamedeparturedates", {method : "GET"})).json()).airports;
 
-    if (swappable_airports.includes($origin_input.data("code_of_selected_airport")) && swappable_airports.includes($destination_input.data("code_of_selected_airport"))) {
+function turnOn($element) {
+    if ($element.css("pointer-events") != "auto") {
+
+        $element.css({
+            "pointer-events": "auto",
+            "opacity": 1.0
+        });
+
+        if ($element.prop("id") == "switcher_departure_return") {
+
+            $element.html("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-arrow-right\" viewBox=\"0 0 16 16\"><path fill-rule=\"evenodd\" d=\"M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8\"/></svg>");
+        }
+    }
+}
+
+async function airportSwapperEnabler($origin_input, $destination_input, $departure, $return) {
+
+    let swappable_airports;
+    let $swapper_origin_destination = $("#swapper_origin_destination");
+    if ($departure.val() != "") {
+        swappable_airports = (await (await fetch(`/api/swappableairportswithsamedeparturedates?departureDate=${$departure.val()}`, { method: "GET" })).json()).airports;
         
+        console.log(swappable_airports);
+        if (swappable_airports.includes($origin_input.data("code_of_selected_airport")) && swappable_airports.includes($destination_input.data("code_of_selected_airport"))) {
+            console.log(swappable_airports);
+
+            if ($return.val() != "") {
+                if ((await (await fetch(`/api/availabledeparturedatesfiltered?departureAirport=${$origin_input.data("code_of_selected_airport")}&arrivalAirport=${$destination_input.data("code_of_selected_airport")}`)).json()).departuredates.includes($return.val())) {
+                    turnOn($swapper_origin_destination);
+                } else {
+                    turnOff($swapper_origin_destination);
+                }
+
+            } else {
+                turnOn($swapper_origin_destination);
+            }
+
+
+        } else {
+            turnOff($swapper_origin_destination);
+        }
+
+    } else {
+        swappable_airports = (await (await fetch(`/api/swappableairports`, { method: "GET" })).json()).airports;
+        if (swappable_airports.includes($origin_input.data("code_of_selected_airport")) && swappable_airports.includes($destination_input.data("code_of_selected_airport"))) {
+            turnOn($swapper_origin_destination);
+        } else {
+            turnOff($swapper_origin_destination);
+        }
+
     }
 
 
-}*/
+
+
+}
