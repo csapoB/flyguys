@@ -68,9 +68,11 @@ a:hover{
   background-color: var(--bs-backdrop-bg);
 }
 
-/*.popover{
-  max-width: 450px;
-}*/
+.popover{
+  max-width: 250px;
+  max-height: 450px;
+  overflow-y: scroll;
+}
 
 /*.planner_div:focus {
   border-color: #A4161A;
@@ -79,14 +81,18 @@ a:hover{
 
 .planner_input {
   padding: 0;
+  width: 100%;
   outline: none;
   border: none;
-  max-width: inherit;
   line-height: 1.5;
   font-size: 1rem;
 }
 .planner_label {
+  
   display: block;
   font-size: 12px;
   
+}
+.input_container{
+  width: 100%;
 }
