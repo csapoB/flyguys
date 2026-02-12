@@ -398,6 +398,7 @@ router.get('/husegprogram', async (request, response) => {
             })
         }
     } catch (error) {
+        console.log(error);
         response.status(500).json({
             message: 'Ez a végpont nem működik.'
         });
