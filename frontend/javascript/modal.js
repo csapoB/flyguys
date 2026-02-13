@@ -372,16 +372,15 @@ async function handleRegister(event) {
 
     // Születési dátum konvertálása mm/dd/yyyy formátumból YYYY-MM-DD formátumba
     const birthDateInput = $("#birth_date").val().trim();
+    console.log(birthDateInput)
     let birthDate = null;
 
     if (birthDateInput) {
-        const parts = birthDateInput.split('/');
-        if (parts.length === 3) {
+        const parts = birthDateInput.split('.');
             const mm = parts[0];
             const dd = parts[1];
             const yyyy = parts[2];
             birthDate = `${yyyy}-${mm}-${dd}`;
-        }
     }
 
     if (!userName.trim() || !email || !password) {
@@ -394,6 +393,7 @@ async function handleRegister(event) {
         return;
     }
     try {
+        console.log(userName.trim(), email, password, birthDate)
         const response = await fetch('/api/register', {
             method: 'POST',
             headers: {

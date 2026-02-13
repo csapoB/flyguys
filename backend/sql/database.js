@@ -126,7 +126,7 @@ async function Login(email){
 
 //Hűségprogram
 async function Husegprogram(id){
-    const query = 'SELECT UserName, NumberOfFlights, LoyaltyName From UserAccount JOIN LoyaltyProgram ON UserAccount.UserID = LoyaltyProgram.UserID WHERE UserId = ?';
+    const query = 'SELECT UserName, NumberOfFlights, LoyaltyStatusName From UserAccount INNER JOIN Loyaltystatus ON UserAccount.LoyaltyStatusID = Loyaltystatus.LoyaltyStatusID WHERE UserAccount.UserId = ?';
     const [rows] = await pool.execute(query, [id]);
     return rows;
 }

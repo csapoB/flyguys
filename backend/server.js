@@ -31,6 +31,8 @@ router.get('/', (request, response) => {
 //? Map
 router.get('/map', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/map.html'));
+});
+
 router.get('/magazin', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/magazin.html'));
 });
