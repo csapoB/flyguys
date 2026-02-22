@@ -106,16 +106,22 @@ CREATE VIEW IF NOT EXISTS airports_in_hungarian AS
 	SELECT airport.AirportCode, city.Hungarian, airport.UTCOffset AS "City", country.Hungarian AS "Country" 
     	FROM airport INNER JOIN city ON airport.CityID = city.CityID INNER JOIN country ON airport.CountryID = country.CountryID ORDER BY country.Hungarian ASC, city.Hungarian ASC;
 
-CREATE VIEW IF NOT EXISTS flights_without_ids AS
-    SELECT flight.DepartureAirport, flight.ArrivalAirport, flight.DepartureDateTime, flight.ArrivalDateTime, TIMEDIFF(flight.ArrivalDateTime, ADDTIME(flight.DepartureDateTime, SUBTIME(TIME(ABS(TIME(destination.UTCOffset))), TIME(ABS(TIME(origin.UTCOffset))))))  AS "FlightTime", flight.BasePrice FROM flight 
+CREATE VIEW IF NOT EXISTS flights_with_flight_time AS
+    SELECT flight.FlightID, flight.DepartureAirport, flight.ArrivalAirport, flight.DepartureDateTime, flight.ArrivalDateTime, TIMEDIFF(flight.ArrivalDateTime, ADDTIME(flight.DepartureDateTime, SUBTIME(TIME(ABS(TIME(destination.UTCOffset))), TIME(ABS(TIME(origin.UTCOffset))))))  AS "FlightTime", flight.BasePrice, flight.AircraftID FROM flight 
     INNER JOIN airport origin ON flight.DepartureAirport = origin.AirportCode INNER JOIN airport destination ON flight.ArrivalAirport = destination.AirportCode; 
 -- SELECT flight.DepartureAirport, flight.ArrivalAirport, flight.DepartureDateTime, flight.ArrivalDateTime, flight.BasePrice FROM flight;
 
 CREATE VIEW IF NOT EXISTS available_flights AS
-	SELECT flights_without_ids.* FROM flights_without_ids WHERE flights_without_ids.DepartureDateTime > NOW();
+	SELECT flights_with_flight_time.* FROM flights_with_flight_time WHERE flights_with_flight_time.DepartureDateTime > NOW();
 
 CREATE VIEW IF NOT EXISTS available_flights_simplified AS
 	SELECT available_flights.DepartureAirport, available_flights.ArrivalAirport, DATE(available_flights.DepartureDateTime) AS "DepartureDate" FROM available_flights;
+
+CREATE VIEW IF NOT EXISTS num_of_available_seats_on_flights AS
+    SELECT flights_with_flight_time.* , (aircraft.NumberOfSeats - COUNT(CASE WHEN reservation.IsCancelled = 0 THEN reservation.ReservationID END)) AS "NumOfAvailableSeats" FROM flights_with_flight_time INNER JOIN aircraft ON flights_with_flight_time.AircraftID = aircraft.AircraftID LEFT JOIN reservation ON flights_with_flight_time.FlightID = reservation.FlightID GROUP BY flights_with_flight_time.FlightID;
+
+CREATE VIEW IF NOT EXISTS num_of_available_seats_on_available_flights AS
+    SELECT available_flights.FlightID, available_flights.DepartureAirport, available_flights.ArrivalAirport, DATE(available_flights.DepartureDateTime) AS "DepartureDate", DATE(available_flights.ArrivalDateTime) AS "ArrivalDate", TIME_FORMAT(TIME(available_flights.DepartureDateTime), '%H:%i') AS "DepartureTime", TIME_FORMAT(TIME(available_flights.ArrivalDateTime), '%H:%i') AS "ArrivalTime", TIME_FORMAT(TIME(available_flights.FlightTime), '%H:%i') AS "FlightTime", available_flights.BasePrice, aircraft.AircraftType, (aircraft.NumberOfSeats - COUNT(CASE WHEN reservation.IsCancelled = 0 THEN reservation.ReservationID END)) AS "NumOfAvailableSeats" FROM available_flights INNER JOIN aircraft ON available_flights.AircraftID = aircraft.AircraftID LEFT JOIN reservation ON available_flights.FlightID = reservation.FlightID GROUP BY available_flights.FlightID;
 
 INSERT INTO loyaltystatus (loyaltystatus.LoyaltyStatusName, loyaltystatus.DiscountInPercentage) VALUES 
 ("Bronze", 1),
@@ -124,7 +130,7 @@ INSERT INTO loyaltystatus (loyaltystatus.LoyaltyStatusName, loyaltystatus.Discou
 ("Platinum", 10),
 ("Diamond", 15);
 
-INSERT INTO city (city.English, city.Hungarian) VALUES
+INSERT INTO city (city.English, city.Hungarian, city.GeographicCoordinates) VALUES
 ("London","London", "51°30′26″N 0°7′39″W"),
 ("Paris","Párizs", "48°51′24.12″N 2°21′7.92″E"),
 ("Amsterdam","Amszterdam", "52°22′22″N 4°53′37″E"),
@@ -249,5 +255,10 @@ INSERT INTO flight (flight.DepartureAirport, flight.ArrivalAirport, flight.Depar
 ("BUD", "MUC", "2026-02-13 14:40:00", "2026-02-13 15:55:00", 3, 9000),
 ("CPH", "MUC", "2026-02-13 14:05:00", "2026-02-13 15:40:00", 7, 22000),
 ("BUD", "ZRH", "2026-02-14 4:00:00", "2026-02-14 5:40:00", 6, 18000),
-("MUC", "BUD", "2026-02-18 19:00:00", "2026-02-18 20:15:00", 3, 20000); 
+("MUC", "BUD", "2026-02-18 19:00:00", "2026-02-18 20:15:00", 3, 20000),
+("MUC", "CPH", "2026-02-18 19:00:00", "2026-02-18 20:35:00", 7, 120000),
+("BUD", "ATH", "2026-02-25 10:30:00", "2026-02-25 13:30:00", 1, 15000),
+("BUD", "MUC", "2026-02-26 15:40:00", "2026-02-26 16:55:00", 3, 8000),
+("ZRH", "FCO", "2026-02-27 8:10:00", "2026-02-27 9:45:00", 4, 30000),
+("CPH", "MAD", "2026-02-28 10:10:00", "2026-02-28 13:35:00", 2, 25000);
 
