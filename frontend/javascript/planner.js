@@ -184,6 +184,25 @@ $(async function () {
     popoverManualTrigger(passengers[0].get(0), passengers[1]);
 
 
+    $("#search_flights").on("click", function (e) {
+        e.preventDefault();
+        
+        const fd = new FormData(document.getElementById("planner_form"));
+        
+        fd.set("origin", origin[0].data("code_of_selected_airport"));
+        fd.set("destination", destination[0].data("code_of_selected_airport"));
+        fd.set("departure", $departure.val());
+        fd.set("return", $return.val());
+        fd.set("passengers", passengers[0].data("num_of_passengers"))
+
+        const searchParams = new URLSearchParams(fd);
+        const queryString = searchParams.toString();
+
+        window.location.href = `/flights?${queryString}`;
+
+
+    });
+
     ///////// ON CHANGE /////////
 
     // A passengers_input kivvételével mindenhez eseménykezlőt írni !!!
@@ -212,6 +231,8 @@ $(async function () {
         airportSwapperEnabler(origin[0], destination[0], $departure, $return);
 
     });
+
+
 });
 
 
@@ -230,7 +251,7 @@ async function popoverInit(input_field_id, content_div_id) {
         placement: "bottom",
         trigger: "manual" // A popover mikor jelenjen meg. "manual": a fejlesztő írja meg hozzá a szabályrendszert
     });
-    popover.setContent({ ".popover-body": await airports_popover_contentGenerator(input_field_id, content_div_id, popover, (await (await fetch(`/api/${(input_field_id == "origin_input") ? "availabledepartureairportsfiltered" : "availablearrivalairportsfiltered"}`, { method: "GET" })).json())) }); // általános eljárás a két repülőteres popoverhez
+    popover.setContent({ ".popover-body": airports_popover_contentGenerator(input_field_id, content_div_id, popover, (await (await fetch(`/api/${(input_field_id == "origin_input") ? "availabledepartureairportsfiltered" : "availablearrivalairportsfiltered"}`, { method: "GET" })).json())) }); // általános eljárás a két repülőteres popoverhez
 
     return [$input_field, popover];
 }
@@ -306,8 +327,7 @@ function popoverManualTrigger(input_field, popover_obj) {
     });
 }
 
-async function airports_popover_contentGenerator(input_field_id, content_div_id, popover_obj, airports_data_from_api) {
-
+function airports_popover_contentGenerator(input_field_id, content_div_id, popover_obj, airports_data_from_api) {
 
     let $input_field = $("#" + input_field_id);
 
@@ -335,7 +355,7 @@ async function airports_popover_contentGenerator(input_field_id, content_div_id,
 
     for (let i = 0; i < available_airports_of_countries.length; i++) {
 
-        let $airports_frame = [];
+        let $airports_frame;
 
         if (i == available_airports_of_countries.length - 1) {
 
@@ -415,7 +435,7 @@ async function airports_popover_contentGenerator(input_field_id, content_div_id,
 
                 }
 
-
+                
                 if (flag_for_airport != undefined) {
 
                     if (($this_div.parent().index() != flag_for_airport[0] || $this_div.index() != flag_for_airport[1])) {
@@ -512,6 +532,9 @@ function passengers_popover_contentTemplate(content_div_id) {
 // A passenger popover tartalmának kialakításáért felel
 function passengersTemp(content_div) {
 
+    let $passengers_input = $("#passengers_input");
+    $passengers_input.data("num_of_passengers", 1);
+
     let $adults_div = $("<div>", {
         "class": "mt-2 pb-3 pt-2 mb-2 border-bottom"
     });
@@ -528,10 +551,11 @@ function passengersTemp(content_div) {
             "click": function () {
                 // A felnőttek számát csökkenti egyel, ha nagyobb, mint 0
                 let serv = parseInt($("#counter_adults").text());
-                if (serv > 0) {
+                if (serv > 1) {
                     serv--;
                     $("#counter_adults").text(serv);
                     $("#passengers_input").attr("value", $("#counter_adults").text() + " felnőtt, " + $("#counter_children").text() + " gyermek");
+                    $passengers_input.data("num_of_passengers", $passengers_input.data("num_of_passengers")-1);
 
                 }
             }
@@ -541,7 +565,7 @@ function passengersTemp(content_div) {
     let $counter_adults = $("<span>", {
         "id": "counter_adults",
         "class": "ms-1 me-1",
-        "text": "0"
+        "text": "1"
     });
 
     let $plus_adult = $("<span>", {
@@ -555,6 +579,7 @@ function passengersTemp(content_div) {
                     serv++;
                     $("#counter_adults").text(serv);
                     $("#passengers_input").attr("value", $("#counter_adults").text() + " felnőtt, " + $("#counter_children").text() + " gyermek");
+                    $passengers_input.data("num_of_passengers", $passengers_input.data("num_of_passengers")+1);
                 }
 
             }
@@ -587,6 +612,7 @@ function passengersTemp(content_div) {
                     serv--;
                     $("#counter_children").text(serv);
                     $("#passengers_input").attr("value", $("#counter_adults").text() + " felnőtt, " + $("#counter_children").text() + " gyermek");
+                    $passengers_input.data("num_of_passengers", $passengers_input.data("num_of_passengers")-1);
                 }
             }
         }
@@ -609,6 +635,7 @@ function passengersTemp(content_div) {
                     serv++;
                     $("#counter_children").text(serv);
                     $("#passengers_input").attr("value", $("#counter_adults").text() + " felnőtt, " + $("#counter_children").text() + " gyermek");
+                    $passengers_input.data("num_of_passengers", $passengers_input.data("num_of_passengers")+1);
                 }
             }
         }
@@ -789,7 +816,7 @@ async function airportSwapperEnabler($origin_input, $destination_input, $departu
     let $swapper_origin_destination = $("#swapper_origin_destination");
     if ($departure.val() != "") {
         swappable_airports = (await (await fetch(`/api/swappableairportswithsamedeparturedates?departureDate=${$departure.val()}`, { method: "GET" })).json()).airports;
-        
+
         console.log(swappable_airports);
         if (swappable_airports.includes($origin_input.data("code_of_selected_airport")) && swappable_airports.includes($destination_input.data("code_of_selected_airport"))) {
             console.log(swappable_airports);

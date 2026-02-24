@@ -226,15 +226,15 @@ INSERT INTO airport (airport.AirportCode, airport.CityID, airport.CountryID, air
 ("BUD", (SELECT CityID FROM city WHERE city.English LIKE "Budapest"), (SELECT CountryID FROM country WHERE country.English LIKE "Hungary"), "01:00:00");
 
 INSERT INTO aircraft (aircraft.AircraftType, aircraft.NumberOfSeats) VALUES
-("Airbus A220-100",125),
-("Airbus A220-100",125),
-("Airbus A220-100",125),
-("Boeing 737-900",185),
-("Boeing 737-900",185),
-("Boeing 737-900",185),
-("Boeing 737-900",185),
-("Boeing 737-900",185),
-("Boeing 737-900",185);
+("Airbus A220-100",126),
+("Airbus A220-100",126),
+("Airbus A220-100",126),
+("Boeing 737-900",180),
+("Boeing 737-900",180),
+("Boeing 737-900",180),
+("Boeing 737-900",180),
+("Boeing 737-900",180),
+("Boeing 737-900",180);
 
 INSERT INTO fareclass (fareclass.FareClassName, fareclass.Multiplier) VALUES 
 ("First Class", 2.5),
@@ -260,5 +260,7 @@ INSERT INTO flight (flight.DepartureAirport, flight.ArrivalAirport, flight.Depar
 ("BUD", "ATH", "2026-02-25 10:30:00", "2026-02-25 13:30:00", 1, 15000),
 ("BUD", "MUC", "2026-02-26 15:40:00", "2026-02-26 16:55:00", 3, 8000),
 ("ZRH", "FCO", "2026-02-27 8:10:00", "2026-02-27 9:45:00", 4, 30000),
-("CPH", "MAD", "2026-02-28 10:10:00", "2026-02-28 13:35:00", 2, 25000);
+("CPH", "MAD", "2026-02-28 10:10:00", "2026-02-28 13:35:00", 2, 25000),
+("CPH", "MAD", "2026-02-28 18:10:00", "2026-02-28 21:35:00", 6, 50000),
+("FCO", "ZRH", "2026-02-28 15:45:00", "2026-02-28 17:20:00", 5, 200000);
 

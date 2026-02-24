@@ -69,97 +69,103 @@
     <main class="flex-grow-1">
         <div class="container">
             <div class="border rounded">
-                <div class="row">
-                    <div id="origin_and_destination_div" class="col-md-12 col-lg-4 pe-0 border-end">
-                        <div class="container-fluid p-3">
-                            <div class="row d-flex flex-row justify-content-center ps-2 pe-2">
-                                <div id="origin_div"
-                                    class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center"
-                                    tabindex="-1">
-                                    <label class="planner_label" for="origin_input">Indulási hely</label>
-                                    <div class="d-flex flex-row input_container">
-                                        <input id="origin_input" readonly="readonly" type="text" class="planner_input"
-                                            aria-label="Indulási hely" tabindex="1">
+                <form id="planner_form" action="/flights" method="get">
+                    <div class="row">
+                        <div id="origin_and_destination_div" class="col-md-12 col-lg-4 pe-0 border-end">
+                            <div class="container-fluid p-3">
+                                <div class="row d-flex flex-row justify-content-center ps-2 pe-2">
+                                    <div id="origin_div"
+                                        class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center"
+                                        tabindex="-1">
+                                        <label class="planner_label" for="origin_input">Indulási hely</label>
+                                        <div class="d-flex flex-row input_container">
+                                            <input id="origin_input" readonly="readonly" type="text"
+                                                class="planner_input" name="origin" aria-label="Indulási hely"
+                                                tabindex="1">
+                                        </div>
                                     </div>
-                                </div>
-                                <div id="swapper_div_origin_destination"
-                                    class="col-lg-2 p-0 d-flex justify-content-center">
-                                    <button id="swapper_origin_destination" type="button"
-                                        class="d-flex align-items-center btn btn-outline-danger" tabindex="2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            fill="currentColor" class="bi bi-arrow-left-right" viewBox="0 0 16 16">
-                                            <path fill-rule="evenodd"
-                                                d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5" />
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div id="destination_div"
-                                    class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center"
-                                    tabindex="-1">
-                                    <label class="planner_label" for="destination_input">Érkezési hely</label>
-                                    <div class="d-flex flex-row input_container">
-                                        <input id="destination_input" readonly="readonly" type="text"
-                                            class="planner_input" aria-label="Érkezési hely" tabindex="3">
+                                    <div id="swapper_div_origin_destination"
+                                        class="col-lg-2 p-0 d-flex justify-content-center">
+                                        <button id="swapper_origin_destination" type="button"
+                                            class="d-flex align-items-center btn btn-outline-danger" tabindex="2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                fill="currentColor" class="bi bi-arrow-left-right" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd"
+                                                    d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5" />
+                                            </svg>
+                                        </button>
                                     </div>
+                                    <div id="destination_div"
+                                        class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center"
+                                        tabindex="-1">
+                                        <label class="planner_label" for="destination_input">Érkezési hely</label>
+                                        <div class="d-flex flex-row input_container">
+                                            <input id="destination_input" readonly="readonly" type="text"
+                                                class="planner_input" name="destination" aria-label="Érkezési hely"
+                                                tabindex="3">
+                                        </div>
 
 
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="departure_and_return_div" class="col-md-12 col-lg-4 border-end pe-0 ps-0">
-                        <div class="container-fluid p-3">
-                            <div class="row d-flex flex-row justify-content-center ps-2 pe-2">
-                                <div id="departure_div"
-                                    class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center"
-                                    tabindex="-1">
-                                    <label class="planner_label" for="departure_input">Indulás</label>
-                                    <div class="d-flex flex-row input_container">
-                                        <input id="departure_input" readonly="readonly" type="text"
-                                            class="planner_input" aria-label="Indulás" tabindex="4">
-                                    </div>
-
-                                </div>
-                                <div id="switcher_div_departure_return"
-                                    class="col-lg-2 p-0 d-flex justify-content-center">
-                                    <button id="switcher_departure_return" type="button"
-                                        class="d-flex align-items-center btn btn-outline-danger" tabindex="5">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
-                                            <path fill-rule="evenodd"
-                                                d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8" />
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div id="return_div"
-                                    class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center"
-                                    tabindex="-1">
-                                    <label class="planner_label" for="return_input">Visszaút</label>
-                                    <div class="d-flex flex-row input_container">
-                                        <input id="return_input" readonly="readonly" type="text" class="planner_input"
-                                            aria-label="Visszaút" tabindex="6">
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="passengers_and_search_div" class="col-md-12 col-lg-4 pe-0 ps-0">
-                        <div class="container-fluid p-3">
-                            <div class="row ps-2 pe-2">
-                                <div id="passengers_div"
-                                    class="pt-1 col-lg-6 border rounded planner_div d-flex flex-column justify-content-center">
-                                    <label class="planner_label" for="passengers_input">Utasok</label>
-                                    <input id="passengers_input" name="passengers" readonly="readonly" type="text"
-                                        class="planner_input" aria-label="Utasok" tabindex="7">
+                        <div id="departure_and_return_div" class="col-md-12 col-lg-4 border-end pe-0 ps-0">
+                            <div class="container-fluid p-3">
+                                <div class="row d-flex flex-row justify-content-center ps-2 pe-2">
+                                    <div id="departure_div"
+                                        class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center"
+                                        tabindex="-1">
+                                        <label class="planner_label" for="departure_input">Indulás</label>
+                                        <div class="d-flex flex-row input_container">
+                                            <input id="departure_input" readonly="readonly" type="text"
+                                                class="planner_input" name="departure" aria-label="Indulás"
+                                                tabindex="4">
+                                        </div>
+
+                                    </div>
+                                    <div id="switcher_div_departure_return"
+                                        class="col-lg-2 p-0 d-flex justify-content-center">
+                                        <button id="switcher_departure_return" type="button"
+                                            class="d-flex align-items-center btn btn-outline-danger" tabindex="5">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd"
+                                                    d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div id="return_div"
+                                        class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center"
+                                        tabindex="-1">
+                                        <label class="planner_label" for="return_input">Visszaút</label>
+                                        <div class="d-flex flex-row input_container">
+                                            <input id="return_input" readonly="readonly" type="text"
+                                                class="planner_input" name="return" aria-label="Visszaút" tabindex="6">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-lg-6 d-flex flex-column justify-content-center">
-                                    <button class="w-100 btn btn-danger" id="search_flights"
-                                        tabindex="8">Keresés</button>
+                            </div>
+                        </div>
+                        <div id="passengers_and_search_div" class="col-md-12 col-lg-4 pe-0 ps-0">
+                            <div class="container-fluid p-3">
+                                <div class="row ps-2 pe-2">
+                                    <div id="passengers_div"
+                                        class="pt-1 col-lg-6 border rounded planner_div d-flex flex-column justify-content-center">
+                                        <label class="planner_label" for="passengers_input">Utasok</label>
+                                        <input id="passengers_input" name="passengers" readonly="readonly" type="text"
+                                            class="planner_input" name="passengers" aria-label="Utasok" tabindex="7"
+                                            value="1 felnőtt, 0 gyermek">
+                                    </div>
+                                    <div class="col-lg-6 d-flex flex-column justify-content-center">
+                                        <button type="button" class="w-100 btn btn-danger" id="search_flights"
+                                            tabindex="8">Keresés</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
         <div class="container-fluid py-5" id="keret">
