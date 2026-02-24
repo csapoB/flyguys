@@ -53,6 +53,10 @@ router.get('/admin', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/admin.html'));
 });
 
+router.get('/flights', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/flights.html'));
+});
+
 //!API endpoints
 app.use('/', router);
 const endpoints = require('./api/api.js');

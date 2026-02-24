@@ -95,6 +95,13 @@ async function selectSwappableFlights() {
     return rows;
 }
 
+async function selectAvailableFlightsFiltered(departureAirport, arrivalAirport, departureDate, numOfPassengers) {
+    const query = 'SELECT num_of_available_seats_on_available_flights.* FROM num_of_available_seats_on_available_flights WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate LIKE ? AND NumOfAvailableSeats >= ?';
+    const [rows] = await pool.execute(query, [`${departureAirport}`, `${arrivalAirport}`, `${departureDate}`, `${numOfPassengers}`]);
+    
+    return rows;
+}
+
 /*
 async function a() {
     const query = 'SELECT DepartureAirport, ArrivalAirport, DATE(DepartureDate) AS "aaa" FROM available_flights_simplified';
@@ -149,6 +156,7 @@ module.exports = {
     selectAvailableReturnDates,
     selectAvailableArrivalDatesFiltered,
     selectSwappableFlightsWithSameDepartureDates,
-    selectSwappableFlights
+    selectSwappableFlights,
+    selectAvailableFlightsFiltered
   
 };

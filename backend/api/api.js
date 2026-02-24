@@ -48,7 +48,7 @@ router.get('/LoginCheck', async (request, response) => {
                 allapot: false
             })
         }
-        else{
+        else {
             response.status(200).json({
                 allapot: true,
                 admin: request.session.user.role == 1
@@ -65,10 +65,10 @@ router.get('/AdminCheck', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
             return response.status(220).json({
-                admin:false
+                admin: false
             })
         }
-        else{
+        else {
             response.status(200).json({
                 admin: request.session.user.role == 1
             })
@@ -83,7 +83,7 @@ router.get('/AdminCheck', async (request, response) => {
 router.get('/availabledepartureairports', async (request, response) => {
     try {
         const result = await database.selectAvailableDepartureAirports();
-        
+
         let airportcodes = [];
         for (let i = 0; i < result.length; i++) {
             airportcodes.push(result[i].DepartureAirport);
@@ -102,7 +102,7 @@ router.get('/availabledepartureairports', async (request, response) => {
 router.get('/availablearrivalairports', async (request, response) => {
     try {
         const result = await database.selectAvailableArrivalAirports();
-        
+
         let airportcodes = [];
         for (let i = 0; i < result.length; i++) {
             airportcodes.push(result[i].ArrivalAirport);
@@ -122,7 +122,7 @@ router.get('/availableflights', async (request, response) => {
     try {
         const result = await database.selectAvailableFlightsBasedOnParameters(((request.query.departureAirport == undefined) ? "" : request.query.departureAirport), ((request.query.arrivalAirport == undefined) ? "" : request.query.arrivalAirport), ((request.query.departureDate == undefined) ? "" : request.query.departureDate));
 
-        
+
         response.status(200).json({
             result: result
         });
@@ -136,7 +136,7 @@ router.get('/availableflights', async (request, response) => {
 router.get('/availabledepartureairportsfiltered', async (request, response) => {
     try {
         const result = await database.selectAvailableDepartureAirportsFilteredHun(((request.query.arrivalAirport == undefined) ? "" : request.query.arrivalAirport), ((request.query.departureDate == undefined) ? "" : request.query.departureDate));
-        
+
 
         response.status(200).json({
             results: result
@@ -151,7 +151,7 @@ router.get('/availabledepartureairportsfiltered', async (request, response) => {
 router.get('/availablearrivalairportsfiltered', async (request, response) => {
     try {
         const result = await database.selectAvailableArrivalAirportsFilteredHun(((request.query.departureAirport == undefined) ? "" : request.query.departureAirport), ((request.query.departureDate == undefined) ? "" : request.query.departureDate));
-        
+
         response.status(200).json({
             results: result
         });
@@ -164,9 +164,9 @@ router.get('/availablearrivalairportsfiltered', async (request, response) => {
 
 router.get('/availabledeparturedatesfiltered', async (request, response) => {
     try {
-        
+
         const result = await database.selectAvailableDepartureDatesFiltered(((request.query.departureAirport == undefined) ? "" : request.query.departureAirport), ((request.query.arrivalAirport == undefined) ? "" : request.query.arrivalAirport));
-        
+
         let departuredates = [];
         for (let i = 0; i < result.length; i++) {
             departuredates.push(result[i].DepartureDate);
@@ -184,9 +184,9 @@ router.get('/availabledeparturedatesfiltered', async (request, response) => {
 
 router.get('/availablearrivaldatesfiltered', async (request, response) => {
     try {
-        
+
         const result = await database.selectAvailableArrivalDatesFiltered(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate);
-        
+
         let arrivaldates = [];
         for (let i = 0; i < result.length; i++) {
             arrivaldates.push(result[i].ArrivalDate);
@@ -204,9 +204,9 @@ router.get('/availablearrivaldatesfiltered', async (request, response) => {
 
 router.get('/availablereturndates', async (request, response) => {
     try {
-        
+
         const result = await database.selectAvailableReturnDates(request.query.departureAirport, request.query.arrivalAirport, request.query.destinationArrivalDate);
-        
+
         let returndates = [];
 
         for (let i = 0; i < result.length; i++) {
@@ -225,14 +225,14 @@ router.get('/availablereturndates', async (request, response) => {
 
 router.get('/swappableairportswithsamedeparturedates', async (request, response) => {
     try {
-        
+
         const result = await database.selectSwappableFlightsWithSameDepartureDates(((request.query.departureDate == undefined) ? "" : request.query.departureDate));
-        
+
         let airports = [];
         for (let i = 0; i < result.length; i++) {
             airports.push(result[i].DepartureAirport)
-            
-        }      
+
+        }
 
         response.status(200).json({
             airports: airports
@@ -246,18 +246,39 @@ router.get('/swappableairportswithsamedeparturedates', async (request, response)
 
 router.get('/swappableairports', async (request, response) => {
     try {
-        
+
         const result = await database.selectSwappableFlights();
-        
+
         let airports = [];
         for (let i = 0; i < result.length; i++) {
             airports.push(result[i].DepartureAirport)
-            
-        }      
+
+        }
 
         response.status(200).json({
             airports: airports
         });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/flights', async (request, response) => {
+    try {
+
+        if (request.query.departureAirport == undefined || request.query.arrivalAirport == undefined || request.query.departureDate == undefined || request.query.numOfPassengers == undefined) {
+            response.status(400).json({
+                error: "A HTTP-GET lekérdezés nem megfelelő!"
+            });
+        } else {
+            const result = await database.selectAvailableFlightsFiltered(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfPassengers);
+
+            response.status(200).json({
+                flights: result
+            });
+        }
     } catch (error) {
         response.status(500).json({
             message: error
@@ -300,10 +321,10 @@ router.post('/login', async (request, response) => {
                     }
                     console.log(request.session.user)
                     if (request.session.user.role === 1) {
-                      response.status(201).json({
-                        message: 'Sikeres bejelentkezés',
-                        admin: true
-                    });  
+                        response.status(201).json({
+                            message: 'Sikeres bejelentkezés',
+                            admin: true
+                        });
                     }
                     response.status(201).json({
                         message: 'Sikeres bejelentkezés',
@@ -390,7 +411,7 @@ router.get('/husegprogram', async (request, response) => {
                 message: "Nem vagy bejelentkezve!"
             })
         }
-        else{
+        else {
             const user = await database.Husegprogram(request.session.user.id);
             response.status(200).json({
                 message: "Siker",
@@ -411,7 +432,7 @@ function LoggedInCheck(request) {
         if (Date.now() - request.session.user.timestamp > 600000) {
             request.session.destroy();
         }
-        else{
+        else {
             request.session.user.timestamp = Date.now();
             vissza = true;
         }
