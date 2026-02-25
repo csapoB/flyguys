@@ -13,7 +13,7 @@ $(async function () {
 
     if (origin == null || destination == null || departure == null || return_ == null || passengers == null) {
 
-        errorPageGenerator($flights_to, "HIBA : Az URL paraméterek közül valamennyi hibás.");
+        errorPageGenerator($flights_to, "HIBA : Az URL paraméterek közül valamelyik hibás.");
 
     } else {
 
@@ -33,7 +33,7 @@ $(async function () {
                     break;
                 default:
                     throw new Error("Hiba")
-                    
+
             }
 
             if (flights_to.length == 0) {
@@ -47,8 +47,11 @@ $(async function () {
                     let flights_back = await fetch(`/api/flights?departureAirport=${destination}&arrivalAirport=${origin}&departureDate=${return_}&numOfPassengers=${passengers}`);
 
                     switch (flights_back.status) {
+
                         case 200:
+
                             flights_back = (await flights_back.json()).flights;
+
                             if (flights_back.length != 0) {
 
                                 flightSelector(flights_to, $flights_to);
@@ -59,6 +62,7 @@ $(async function () {
                                 });
                                 $flights_frame.append($flights_back);
                                 flightSelector(flights_back, $flights_back);
+                                seatBookingButtonGenerator($flights_frame, passengers);
 
                             } else {
                                 infoPageGenerator($flights_to, "Sajnos, nincs a feltételeknek megfelelő járat.");
@@ -70,6 +74,7 @@ $(async function () {
                     }
                 } else {
                     flightSelector(flights_to, $flights_to);
+                    seatBookingButtonGenerator($flights_frame, passengers);
                 }
             }
 
@@ -86,24 +91,25 @@ $(async function () {
 function flightSelector(flights, $frame) {
     let $title = $("<h1>", {
         "class": "display-3",
-        "html": `${flights[0].DepartureAirport}<span class="ps-4 pe-4"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"48\" height=\"48\" fill=\"currentColor\" class=\"bi bi-arrow-right\" viewBox=\"0 0 16 16\"><path fill-rule=\"evenodd\" d=\"M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8\"/></svg></span>${flights[0].ArrivalAirport}`
+        "html": `${flights[0].DepartureCity} (${flights[0].DepartureAirport})<span class="ps-4 pe-4"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"48\" height=\"48\" fill=\"currentColor\" class=\"bi bi-arrow-right\" viewBox=\"0 0 16 16\"><path fill-rule=\"evenodd\" d=\"M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8\"/></svg></span>${flights[0].ArrivalCity} (${flights[0].ArrivalAirport})`
     });
     $frame.prepend($title);
 
     let $flights_button = $("<button>", {
-        "class": "btn btn-danger col-md-12 col-lg-12",
-        "text": "Válasszon járatot!"
+        "class": "btn btn-danger col-md-12 col-lg-12 flight",
+        "text": "Válasszon járatot!",
+        "type": "button"
     });
     // gomb megnyomása után megjelenik egy poopover, amiben felvannak sorolva a választható járatok (hasonló design, mint az indulási/érkezési hely popover-nél)
-    let flights_to_popover = new bootstrap.Popover($flights_button, {
+    let flights_popover = new bootstrap.Popover($flights_button, {
         html: true,
         container: "body",
         content: " ",
         placement: "bottom",
-        trigger: "click"
+        trigger: "manual"
     });
-    //popoverManualTrigger($flights_button.get(0), flights_to_popover);
-    flights_to_popover.setContent({ ".popover-body": flights_popover_contentGenerator($flights_button, flights_to_popover, flights) })
+    popoverManualTrigger($flights_button.get(0), flights_popover);
+    flights_popover.setContent({ ".popover-body": flights_popover_contentGenerator($flights_button, flights_popover, flights) })
 
     $frame.append($flights_button);
 
@@ -174,7 +180,6 @@ function flights_popover_contentGenerator($input_field, popover_obj, flights_dat
 
     let flag_for_flight; // változó, ami tárolja az előzőleg kiválasztott járat helyét 
 
-
     for (let i = 0; i < flights_data_from_api.length; i++) {
 
         let $flight_frame = $("<div>", {
@@ -196,7 +201,9 @@ function flights_popover_contentGenerator($input_field, popover_obj, flights_dat
                             let copy = $this_div.children().first().clone();
                             copy.removeClass("rounded border border-danger text-danger");
                             copy.children().first().removeClass("border rounded-1");
+
                             $input_field.html(copy);
+                            $input_field.data("flight_id", $this_div.data("flight_id"));
 
                             popover_obj.hide();
 
@@ -209,13 +216,19 @@ function flights_popover_contentGenerator($input_field, popover_obj, flights_dat
                         let copy = $this_div.children().first().clone();
                         copy.removeClass("rounded border border-danger text-danger");
                         copy.children().first().removeClass("border rounded-1");
+
                         $input_field.html(copy);
+                        $input_field.data("flight_id", $this_div.data("flight_id"));
 
                         popover_obj.hide();
 
                         flag_for_flight = $this_div.index();
                     }
-
+                    
+                    let $flight = $(".flight");
+                    if (($flight.length == 2 && (($.map($flight, function(x){return $(x).data("flight_id")})).length == 2)) || $flight.length == 1) { // azt vizsgálja, hogy mindegyik járatválasztó kivan-e töltve. Ha igen, akkor lehessen ülőhelyet foglalni, különben nem
+                        $("#seat_booking_button").prop("disabled", false);
+                    }
 
                 }
             }
@@ -225,13 +238,9 @@ function flights_popover_contentGenerator($input_field, popover_obj, flights_dat
 
         if (flights_data_from_api.length != 1 && i != flights_data_from_api.length - 1) {
 
-
             $flight_frame.addClass("pb-3");
 
-
         }
-
-
 
         let $flight_div = $("<div>", {
             "class": "d-flex justify-content-center",
@@ -262,13 +271,14 @@ function flights_popover_contentGenerator($input_field, popover_obj, flights_dat
                     </div>
                 </div>`
         });
-        //$flight_div.css({ userSelect: "none" }); // nem lehet kimásolni a szöveget
 
         $flight_frame.append($flight_div);
+        $flight_frame.data("flight_id", flights_data_from_api[i].FlightID);
 
         $popover_content.append($flight_frame);
 
     }
+
     return $popover_content;
 }
 
@@ -319,4 +329,47 @@ function infoPageGenerator($frame, message) {
     });
     $frame.append($plane_div);
     $frame.append($no_flights_div);
+}
+
+function seatBookingButtonGenerator($frame, passengers) {
+
+    let $seat_booking_button_frame = $("<div>", {
+        "class": "row d-flex justify-content-center"
+    });
+
+    let $seat_booking_button = $("<button>", {
+        "id" : "seat_booking_button",
+        "class": "btn btn-outline-danger col-md-5 col-lg-5",
+        "text": "Válasszon ülőhelyet!",
+        "type": "submit",
+        on: {
+            "click": function (e) {
+                e.preventDefault();
+
+                let flight_ids = $.map($(".flight"), function (x) { return $(x).data("flight_id") }); // a kiválasztott járatok azonosítóját beleteszi egy tömbbe 
+
+                const fd = new FormData(document.getElementById("flights_form"));
+
+                console.log(flight_ids);
+                console.log(passengers);
+
+                fd.set("flight_id_to", flight_ids[0]);
+                if (flight_ids.length == 2) {
+                    fd.set("flight_id_back", flight_ids[1]);
+                }
+                fd.set("num_of_passengers", passengers);
+
+                const searchParams = new URLSearchParams(fd);
+                const queryString = searchParams.toString();
+
+                window.location.href = `/helyfoglalas?${queryString}`;
+
+            }
+        }
+    });
+    $seat_booking_button.prop("disabled", true);
+
+    $seat_booking_button_frame.append($seat_booking_button);
+    $frame.append($seat_booking_button_frame);
+
 }

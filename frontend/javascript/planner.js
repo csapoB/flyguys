@@ -193,7 +193,7 @@ $(async function () {
         fd.set("destination", destination[0].data("code_of_selected_airport"));
         fd.set("departure", $departure.val());
         fd.set("return", $return.val());
-        fd.set("passengers", passengers[0].data("num_of_passengers"))
+        fd.set("passengers", passengers[0].data("num_of_passengers"));
 
         const searchParams = new URLSearchParams(fd);
         const queryString = searchParams.toString();
