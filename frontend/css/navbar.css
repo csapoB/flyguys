@@ -1,0 +1,53 @@
+/* navbar */
+  .custom-navbar {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 0.75rem 1.5rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+    max-width:1440px;
+    position: relative;
+  }
+
+  @media (max-width: 1440px) {
+    .custom-navbar {
+      width: 100%;
+    }
+  }
+
+  .navbar-brand {
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  /* Perfect center logo */
+  @media (min-width: 992px) {
+    .navbar-brand-centered {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+
+  .nav-link {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .nav-link:hover {
+    color: #000;
+  }
+
+  #login_button {
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.45rem 1.2rem;
+    font-weight: 500;
+  }
+
+  .navbar-toggler {
+    border: none;
+  }
+
+  .navbar-toggler:focus {
+    box-shadow: none;
+  }
