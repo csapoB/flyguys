@@ -136,7 +136,7 @@ CREATE VIEW IF NOT EXISTS num_of_available_seats_on_flights AS
     SELECT flights_with_flight_time.* , (aircraftmodel.NumberOfSeats - COUNT(CASE WHEN reservation.IsCancelled = 0 THEN reservation.ReservationID END)) AS "NumOfAvailableSeats" FROM flights_with_flight_time INNER JOIN aircraft ON flights_with_flight_time.AircraftID = aircraft.AircraftID INNER JOIN aircraftmodel ON aircraft.AircraftModelID = aircraftmodel.AircraftModelID LEFT JOIN reservation ON flights_with_flight_time.FlightID = reservation.FlightID GROUP BY flights_with_flight_time.FlightID;
 
 CREATE VIEW IF NOT EXISTS num_of_available_seats_on_available_flights AS
-    SELECT available_flights.FlightID, available_flights.DepartureAirport, available_flights.ArrivalAirport, DATE(available_flights.DepartureDateTime) AS "DepartureDate", DATE(available_flights.ArrivalDateTime) AS "ArrivalDate", TIME_FORMAT(TIME(available_flights.DepartureDateTime), '%H:%i') AS "DepartureTime", TIME_FORMAT(TIME(available_flights.ArrivalDateTime), '%H:%i') AS "ArrivalTime", TIME_FORMAT(TIME(available_flights.FlightTime), '%H:%i') AS "FlightTime", available_flights.BasePrice, aircraftmodel.AircraftModelName, (aircraftmodel.NumberOfSeats - COUNT(CASE WHEN reservation.IsCancelled = 0 THEN reservation.ReservationID END)) AS "NumOfAvailableSeats" FROM available_flights INNER JOIN aircraft ON available_flights.AircraftID = aircraft.AircraftID INNER JOIN aircraftmodel ON aircraft.AircraftModelID = aircraftmodel.AircraftModelID LEFT JOIN reservation ON available_flights.FlightID = reservation.FlightID GROUP BY available_flights.FlightID;
+    SELECT available_flights.FlightID, available_flights.DepartureAirport, available_flights.DepartureCity, available_flights.ArrivalAirport, available_flights.ArrivalCity, DATE(available_flights.DepartureDateTime) AS "DepartureDate", DATE(available_flights.ArrivalDateTime) AS "ArrivalDate", TIME_FORMAT(TIME(available_flights.DepartureDateTime), '%H:%i') AS "DepartureTime", TIME_FORMAT(TIME(available_flights.ArrivalDateTime), '%H:%i') AS "ArrivalTime", TIME_FORMAT(TIME(available_flights.FlightTime), '%H:%i') AS "FlightTime", available_flights.BasePrice, aircraftmodel.AircraftModelName, (aircraftmodel.NumberOfSeats - COUNT(CASE WHEN reservation.IsCancelled = 0 THEN reservation.ReservationID END)) AS "NumOfAvailableSeats" FROM available_flights INNER JOIN aircraft ON available_flights.AircraftID = aircraft.AircraftID INNER JOIN aircraftmodel ON aircraft.AircraftModelID = aircraftmodel.AircraftModelID LEFT JOIN reservation ON available_flights.FlightID = reservation.FlightID GROUP BY available_flights.FlightID;
 
 INSERT INTO loyaltystatus (loyaltystatus.LoyaltyStatusName, loyaltystatus.DiscountInPercentage) VALUES 
 ("Bronze", 1),
@@ -590,7 +590,25 @@ INSERT INTO flight (flight.DepartureAirport, flight.ArrivalAirport, flight.Depar
 ("ZRH", "FCO", "2026-02-27 8:10:00", "2026-02-27 9:45:00", 4, 30000),
 ("CPH", "MAD", "2026-02-28 10:10:00", "2026-02-28 13:35:00", 2, 25000),
 ("CPH", "MAD", "2026-02-28 18:10:00", "2026-02-28 21:35:00", 6, 50000),
-("FCO", "ZRH", "2026-02-28 15:45:00", "2026-02-28 17:20:00", 5, 200000);
+("FCO", "ZRH", "2026-02-28 15:45:00", "2026-02-28 17:20:00", 5, 200000),
+("BUD", "ATH", "2026-03-02 10:30:00", "2026-03-02 13:30:00", 1, 15000),
+("BUD", "MUC", "2026-03-03 15:40:00", "2026-03-03 16:55:00", 3, 8000),
+("ZRH", "FCO", "2026-03-04 8:10:00", "2026-03-04 9:45:00", 4, 30000),
+("CPH", "MAD", "2026-03-04 10:10:00", "2026-03-04 13:35:00", 2, 25000),
+("BUD", "ATH", "2026-03-07 11:30:00", "2026-03-07 14:30:00", 9, 16000),
+("BUD", "MUC", "2026-03-08 11:40:00", "2026-03-08 12:55:00", 8, 10000),
+("LHR", "ATH", "2026-03-10 07:40:00", "2026-03-10 13:20:00", 5, 40000),
+("BUD", "MUC", "2026-03-13 14:40:00", "2026-03-13 15:55:00", 3, 9000),
+("CPH", "MUC", "2026-03-13 14:05:00", "2026-03-13 15:40:00", 7, 22000),
+("BUD", "ZRH", "2026-03-14 4:00:00", "2026-03-14 5:40:00", 6, 18000),
+("MUC", "BUD", "2026-03-18 19:00:00", "2026-03-18 20:15:00", 3, 20000),
+("MUC", "CPH", "2026-03-18 19:00:00", "2026-03-18 20:35:00", 7, 120000),
+("BUD", "ATH", "2026-03-25 10:30:00", "2026-03-25 13:30:00", 1, 15000),
+("BUD", "MUC", "2026-03-26 15:40:00", "2026-03-26 16:55:00", 3, 8000),
+("ZRH", "FCO", "2026-03-27 8:10:00", "2026-03-27 9:45:00", 4, 30000),
+("CPH", "MAD", "2026-03-28 10:10:00", "2026-03-28 13:35:00", 2, 25000),
+("CPH", "MAD", "2026-03-28 18:10:00", "2026-03-28 21:35:00", 6, 50000),
+("FCO", "ZRH", "2026-03-28 15:45:00", "2026-03-28 17:20:00", 5, 200000);
 
 
 
