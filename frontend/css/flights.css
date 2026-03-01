@@ -1,0 +1,7 @@
+.popover{
+  --bs-popover-max-width : none;
+  width: 70%;
+  max-height: 450px;
+  overflow-y: scroll;
+}
+

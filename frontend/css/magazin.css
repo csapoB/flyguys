@@ -1,0 +1,11 @@
+.card-img-left{
+    height: 100%;
+    width: 100%;
+
+    object-fit: contain;
+}
+
+.card .col-md-4{
+    height: 250px;
+    overflow: hidden;
+}

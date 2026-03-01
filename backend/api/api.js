@@ -2,10 +2,12 @@ const express = require('express');
 const router = express.Router();
 const database = require('../sql/database.js');
 const fs = require('fs/promises');
+const bcrypt = require('bcryptjs'); //?npm install bcrypt
 
 //!Multer
 const multer = require('multer'); //?npm install multer
 const path = require('path');
+const session = require('express-session')
 
 const storage = multer.diskStorage({
     destination: (request, file, callback) => {
@@ -27,13 +29,31 @@ router.get('/test', (request, response) => {
 });
 
 //?GET /api/testsql
-router.get('/testsql', async (request, response) => {
+router.get('/airports', async (request, response) => {
     try {
-        const selectall = await database.selectall();
+        const airports = await database.selectAllAirportsInHungarian();
         response.status(200).json({
-            message: 'Ez a végpont működik.',
-            results: selectall
+            results: airports
         });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+router.get('/LoginCheck', async (request, response) => {
+    try {
+        if (!LoggedInCheck(request)) {
+            return response.status(220).json({
+                allapot: false
+            })
+        }
+        else {
+            response.status(200).json({
+                allapot: true,
+                admin: request.session.user.role == 1
+            })
+        }
     } catch (error) {
         response.status(500).json({
             message: 'Ez a végpont nem működik.'
@@ -41,8 +61,6 @@ router.get('/testsql', async (request, response) => {
     }
 });
 
-<<<<<<< Updated upstream
-=======
 router.get('/AdminCheck', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
@@ -308,12 +326,10 @@ router.post('/login', async (request, response) => {
                             admin: true
                         });
                     }
-                    else{
-                       response.status(201).json({
+                    response.status(201).json({
                         message: 'Sikeres bejelentkezés',
                         admin: false
-                    }); 
-                    }
+                    });
                 }
                 else {
                     response.status(400).json({
@@ -426,8 +442,4 @@ function LoggedInCheck(request) {
 
 
 
-
-
-
->>>>>>> Stashed changes
 module.exports = router;
