@@ -96,11 +96,19 @@ async function selectSwappableFlights() {
 }
 
 async function selectAvailableFlightsFiltered(departureAirport, arrivalAirport, departureDate, numOfPassengers) {
-    const query = 'SELECT num_of_available_seats_on_available_flights.* FROM num_of_available_seats_on_available_flights WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate LIKE ? AND NumOfAvailableSeats >= ?';
+    const query = 'SELECT num_of_available_seats_on_available_flights.* FROM num_of_available_seats_on_available_flights WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate LIKE ? AND NumOfAvailableSeats >= ?;';
     const [rows] = await pool.execute(query, [`${departureAirport}`, `${arrivalAirport}`, `${departureDate}`, `${numOfPassengers}`]);
     
     return rows;
 }
+
+async function selectAvailableSeatsOnFlight(flightId) {
+    const query = 'SELECT seat.RowID, seat.ColumnID, seat.FareClassID FROM seat INNER JOIN aircraft ON seat.AircraftModelID = aircraft.AircraftModelID INNER JOIN flight ON aircraft.AircraftID = flight.AircraftID LEFT JOIN not_cancelled_reservations ON flight.FlightID = not_cancelled_reservations.FlightID AND seat.RowID = not_cancelled_reservations.RowID AND seat.ColumnID = not_cancelled_reservations.ColumnID WHERE flight.FlightID = ? AND not_cancelled_reservations.FlightID IS NULL;';
+    const [rows] = await pool.execute(query, [flightId]);
+    
+    return rows;
+}
+
 
 /*
 async function a() {
@@ -157,6 +165,7 @@ module.exports = {
     selectAvailableArrivalDatesFiltered,
     selectSwappableFlightsWithSameDepartureDates,
     selectSwappableFlights,
-    selectAvailableFlightsFiltered
+    selectAvailableFlightsFiltered,
+    selectAvailableSeatsOnFlight
   
 };

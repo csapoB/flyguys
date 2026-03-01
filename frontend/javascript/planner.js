@@ -733,6 +733,8 @@ async function returnEnabler(available_return_dates) {
     let $destination_input = $("#destination_input");
     let $departure_input = $("#departure_input");
 
+    let $switcher_departure_return = $("#switcher_departure_return");
+
     if ($origin_input.val() != "" && $destination_input.val() != "" && $departure_input.val() != "") {
 
         let arrival_dates = (await (await fetch(`/api/availablearrivaldatesfiltered?departureAirport=${$origin_input.data("code_of_selected_airport")}&arrivalAirport=${$destination_input.data("code_of_selected_airport")}&departureDate=${$departure_input.val()}`, { method: "GET" })).json()).arrivaldates;
@@ -749,9 +751,9 @@ async function returnEnabler(available_return_dates) {
                 }
             }
 
-            let $switcher_departure_return = $("#switcher_departure_return");
+            
             if (return_dates.length > 0) {
-                switchFunc($switcher_departure_return);
+                turnOn($switcher_departure_return);
                 available_return_dates.length = 0;
                 available_return_dates.push(...return_dates);
                 //console.log(available_return_dates);
@@ -766,7 +768,7 @@ async function returnEnabler(available_return_dates) {
             $return_input.prev().trigger("click");
         }
         inputDisabler($return_input);
-        turnOff($("#switcher_departure_return"));
+        turnOff($switcher_departure_return);
     }
 }
 
@@ -817,9 +819,9 @@ async function airportSwapperEnabler($origin_input, $destination_input, $departu
     if ($departure.val() != "") {
         swappable_airports = (await (await fetch(`/api/swappableairportswithsamedeparturedates?departureDate=${$departure.val()}`, { method: "GET" })).json()).airports;
 
-        console.log(swappable_airports);
+        //console.log(swappable_airports);
         if (swappable_airports.includes($origin_input.data("code_of_selected_airport")) && swappable_airports.includes($destination_input.data("code_of_selected_airport"))) {
-            console.log(swappable_airports);
+            
 
             if ($return.val() != "") {
                 if ((await (await fetch(`/api/availabledeparturedatesfiltered?departureAirport=${$origin_input.data("code_of_selected_airport")}&arrivalAirport=${$destination_input.data("code_of_selected_airport")}`)).json()).departuredates.includes($return.val())) {
