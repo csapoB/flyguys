@@ -14,20 +14,20 @@ async function checkLoginStatus() {
 
         const data = await response.json();
         if (!data.allapot) {
-            $("#login_button").parent().show();
-            $("#profile_button").parent().hide();
-            $("#logout_button").parent().hide();
-            $("#admin_button").parent().hide();
+            $("#login_button").show();
+            $("#profile_button").hide();
+            $("#logout_button").hide();
+            $("#admin_button").hide();
         }
         else {
             if (data.admin) {
-                $("#admin_button").parent().show();
+                $("#admin_button").show();
             }
             else{
-                $("#profile_button").parent().show();
+                $("#profile_button").show();
             }
-            $("#login_button").parent().hide();
-            $("#logout_button").parent().show();
+            $("#login_button").hide();
+            $("#logout_button").show();
         }
     }
     catch(error){
@@ -47,10 +47,10 @@ async function handleLogout(event) {
     }
 
     // Navbar frissítése
-    $("#login_button").parent().show();
-    $("#profile_button").parent().hide();
-    $("#logout_button").parent().hide();
-    $("#admin_button").parent().hide();
+    $("#login_button").show();
+    $("#profile_button").hide();
+    $("#logout_button").hide();
+    $("#admin_button").hide();
 
     alert('Sikeres kijelentkezés!');
 }
@@ -342,11 +342,11 @@ async function handleLogin(event) {
             // Navbar frissítése - Bejelentkezés gomb elrejtése, Profilom gomb megjelenítése
 
             if (data.admin) {
-                $("#admin_button").parent().show();
+                $("#admin_button").show();
             }
-            $("#login_button").parent().hide();
-            $("#profile_button").parent().show();
-            $("#logout_button").parent().show();
+            $("#login_button").hide();
+            $("#profile_button").show();
+            $("#logout_button").show();
 
 
             // Modal bezárása

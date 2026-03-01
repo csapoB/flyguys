@@ -15,7 +15,7 @@
     <!--!CSS-->
     <link rel="stylesheet" href="../css/jquery-ui.min.css">
     <link rel="stylesheet" href="../css/index.css" />
-    <!--!JavaScript-->
+    <link rel="stylesheet" href="../css/navbar.css" />
 
     <script src="../javascript/jquery-3.7.1.min.js"></script>
     <script src="../javascript/jquery-ui.min.js"></script>
@@ -66,11 +66,13 @@
                     <a class="nav-link" href="/husegprogram">Hűségprogram</a>
                 </li>
             </ul>
-        </div>
-
-        <div class="d-none d-lg-flex gap-3 align-items-center ms-auto">
-            <a class="nav-link" href="#lang">Magyar</a>
-            <a class="btn btn-danger" id="login_button" data-bs-toggle="modal" href="#monadModal">Bejelentkezés</a>
+            <div class="d-flex flex-column flex-lg-row gap-2 align-items-start align-items-lg-center ms-lg-auto mt-2 mt-lg-0">
+                <a class="nav-link" href="#lang">Magyar</a>
+                <a class="btn btn-danger" id="login_button" data-bs-toggle="modal" href="#monadModal">Bejelentkezés</a>
+                <a class="btn btn-outline-dark" id="admin_button" href="/admin">Admin</a>
+                <a class="btn btn-outline-dark" id="profile_button" href="/profil">Profilom</a>
+                <a class="btn btn-danger" id="logout_button">Kijelentkezés</a>
+            </div>
         </div>
     </nav>
 

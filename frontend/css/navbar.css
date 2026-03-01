@@ -37,11 +37,15 @@
     color: #000;
   }
 
-  #login_button {
-    color: #fff;
+  #login_button, #logout_button, #admin_button, #profile_button {
+    display: none;
     border-radius: 999px;
     padding: 0.45rem 1.2rem;
     font-weight: 500;
+  }
+
+  #login_button, #logout_button {
+    color: #fff;
   }
 
   .navbar-toggler {
