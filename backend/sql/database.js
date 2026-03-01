@@ -103,7 +103,7 @@ async function selectAvailableFlightsFiltered(departureAirport, arrivalAirport, 
 }
 
 async function selectAvailableSeatsOnFlight(flightId) {
-    const query = 'SELECT seat.RowID, seat.ColumnID, seat.FareClassID FROM seat INNER JOIN aircraft ON seat.AircraftModelID = aircraft.AircraftModelID INNER JOIN flight ON aircraft.AircraftID = flight.AircraftID LEFT JOIN not_cancelled_reservations ON flight.FlightID = not_cancelled_reservations.FlightID AND seat.RowID = not_cancelled_reservations.RowID AND seat.ColumnID = not_cancelled_reservations.ColumnID WHERE flight.FlightID = ? AND not_cancelled_reservations.FlightID IS NULL;';
+    const query = 'SELECT seat.RowID, seat.ColumnID, seat.FareClassID, (flight.BasePrice*fareclass.Multiplier)*((100-(SELECT loyaltystatus.DiscountInPercentage FROM useraccount INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserID = 2))/100) AS "Price" FROM seat INNER JOIN fareclass ON seat.FareClassID = fareclass.FareClassID INNER JOIN aircraft ON seat.AircraftModelID = aircraft.AircraftModelID INNER JOIN flight ON aircraft.AircraftID = flight.AircraftID LEFT JOIN not_cancelled_reservations ON flight.FlightID = not_cancelled_reservations.FlightID AND seat.RowID = not_cancelled_reservations.RowID AND seat.ColumnID = not_cancelled_reservations.ColumnID WHERE flight.FlightID = 30 AND not_cancelled_reservations.FlightID IS NULL;';
     const [rows] = await pool.execute(query, [flightId]);
     
     return rows;
