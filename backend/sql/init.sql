@@ -1,26 +1,26 @@
 -- Database init
-CREATE DATABASE IF NOT EXISTS FLYGUYS
+CREATE DATABASE IF NOT EXISTS flyguys
 DEFAULT CHARACTER SET utf8
 COLLATE utf8_hungarian_ci;
 
-USE FLYGUYS;
+USE flyguys;
 
 -- FareClass Table
-CREATE TABLE IF NOT EXISTS FareClass (
+CREATE TABLE IF NOT EXISTS fareclass (
 	FareClassID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     FareClassName VARCHAR(50) UNIQUE,
     Multiplier DOUBLE NOT NULL
 );
 
 -- LoyaltyStatus Table
-CREATE TABLE IF NOT EXISTS LoyaltyStatus (
+CREATE TABLE IF NOT EXISTS loyaltystatus (
 	LoyaltyStatusID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     LoyaltyStatusName VARCHAR(50) UNIQUE,
     DiscountInPercentage INT(8) NOT NULL
 );
 
 -- UserAccount Table
-CREATE TABLE IF NOT EXISTS UserAccount (
+CREATE TABLE IF NOT EXISTS useraccount (
     UserID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     UserName VARCHAR(255) NOT NULL,
     UserEmail VARCHAR(255),
@@ -30,11 +30,11 @@ CREATE TABLE IF NOT EXISTS UserAccount (
     LoyaltyStatusID INT,
     AdminStatus BOOLEAN DEFAULT 0,
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (LoyaltyStatusID) REFERENCES LoyaltyStatus(LoyaltyStatusID)
+    FOREIGN KEY (LoyaltyStatusID) REFERENCES loyaltystatus(LoyaltyStatusID)
 );
 
 -- City Table
-CREATE TABLE IF NOT EXISTS City (
+CREATE TABLE IF NOT EXISTS city (
 	CityID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     Hungarian VARCHAR(100) NOT NULL,
     English VARCHAR(100) NOT NULL,
@@ -42,31 +42,49 @@ CREATE TABLE IF NOT EXISTS City (
 );
 
 -- Country Table
-CREATE TABLE IF NOT EXISTS Country (
+CREATE TABLE IF NOT EXISTS country (
 	CountryID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     Hungarian VARCHAR(100) NOT NULL,
     English VARCHAR(100) NOT NULL
 );
 
 -- Airport Table
-CREATE TABLE IF NOT EXISTS Airport (
+CREATE TABLE IF NOT EXISTS airport (
 	AirportCode VARCHAR(10) PRIMARY KEY NOT NULL,
     CityID INT NOT NULL,
     CountryID INT NOT NULL,
     UTCOffset TIME NOT NULL,
-    FOREIGN KEY (CityID) REFERENCES City(CityID),
-    FOREIGN KEY (CountryID) REFERENCES Country(CountryID)
+    FOREIGN KEY (CityID) REFERENCES city(CityID),
+    FOREIGN KEY (CountryID) REFERENCES country(CountryID)
 );
 
--- Aircraft Table
-CREATE TABLE IF NOT EXISTS Aircraft (
-    AircraftID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    AircraftType VARCHAR(50) NOT NULL,
+-- AircraftModel Table
+CREATE TABLE IF NOT EXISTS aircraftmodel (
+	AircraftModelID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    AircraftModelName VARCHAR(50) UNIQUE,
     NumberOfSeats INT NOT NULL
 );
 
+-- Aircraft Table
+CREATE TABLE IF NOT EXISTS aircraft (
+    AircraftID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    AircraftModelID INT NOT NULL,
+    FOREIGN KEY (AircraftModelID) REFERENCES aircraftmodel(AircraftModelID)
+);
+
+-- Seat Table
+CREATE TABLE IF NOT EXISTS seat (
+	RowID INT NOT NULL,
+    ColumnID CHAR(1) NOT NULL,
+    AircraftModelID INT NOT NULL,
+    FareClassID INT,
+    PRIMARY KEY (RowID, ColumnID, AircraftModelID),
+    FOREIGN KEY (FareClassID) REFERENCES fareclass(FareClassID),
+    FOREIGN KEY (AircraftModelID) REFERENCES aircraftmodel(AircraftModelID)
+);
+
 -- Flight Table
-CREATE TABLE IF NOT EXISTS Flight (
+CREATE TABLE IF NOT EXISTS flight (
     FlightID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     DepartureAirport VARCHAR(10) NOT NULL,
     ArrivalAirport VARCHAR(10) NOT NULL,
@@ -74,28 +92,26 @@ CREATE TABLE IF NOT EXISTS Flight (
     ArrivalDateTime DATETIME NOT NULL,
     AircraftID INT NOT NULL,
     BasePrice INT NOT NULL,
-    FOREIGN KEY (AircraftID) REFERENCES Aircraft(AircraftID),
-    FOREIGN KEY (DepartureAirport) REFERENCES Airport(AirportCode),
-    FOREIGN KEY (ArrivalAirport) REFERENCES Airport(AirportCode)
+    FOREIGN KEY (AircraftID) REFERENCES aircraft(AircraftID),
+    FOREIGN KEY (DepartureAirport) REFERENCES airport(AirportCode),
+    FOREIGN KEY (ArrivalAirport) REFERENCES airport(AirportCode)
 );
 
 -- Reservation Table
-CREATE TABLE IF NOT EXISTS Reservation (
+CREATE TABLE IF NOT EXISTS reservation (
     ReservationID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     PassengerID INT NOT NULL,
     FlightID INT NOT NULL,
-    SeatNumber VARCHAR(10) NOT NULL,
-    FareClassID INT NOT NULL,
+    RowID INT NOT NULL,
+    ColumnID CHAR(1) NOT NULL,
     IsCancelled BOOLEAN NOT NULL,
    -- Price INT NOT NULL,
-    FOREIGN KEY (FlightID) REFERENCES Flight(FlightID),
-    FOREIGN KEY (PassengerID) REFERENCES UserAccount(UserID),
-    FOREIGN KEY (FareClassID) REFERENCES FareClass(FareClassID)
+    FOREIGN KEY (FlightID) REFERENCES flight(FlightID),
+    FOREIGN KEY (PassengerID) REFERENCES useraccount(UserID)
 );
 
 CREATE VIEW IF NOT EXISTS reservations_with_prices AS 
-	SELECT reservation.*, (flight.BasePrice*fareclass.Multiplier)*((100-loyaltystatus.DiscountInPercentage)/100) AS "Price"
-    	FROM reservation INNER JOIN flight ON reservation.FlightID = flight.FlightID INNER JOIN fareclass ON reservation.FareClassID = fareclass.FareClassID INNER JOIN useraccount ON reservation.PassengerID = useraccount.UserID INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID;
+	SELECT reservation.ReservationID, reservation.PassengerID, reservation.FlightID, reservation.RowID, reservation.ColumnID, fareclass.FareClassID, (flight.BasePrice*fareclass.Multiplier)*((100-loyaltystatus.DiscountInPercentage)/100) AS "Price", reservation.IsCancelled FROM reservation INNER JOIN flight ON reservation.FlightID = flight.FlightID INNER JOIN aircraft ON flight.AircraftID = aircraft.AircraftID INNER JOIN seat ON reservation.RowID = seat.RowID AND reservation.ColumnID = seat.ColumnID AND aircraft.AircraftModelID = seat.AircraftModelID INNER JOIN fareclass ON seat.FareClassID = fareclass.FareClassID INNER JOIN useraccount ON reservation.PassengerID = useraccount.UserID INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID;
 
  
 CREATE VIEW IF NOT EXISTS airports_in_english AS
@@ -117,10 +133,10 @@ CREATE VIEW IF NOT EXISTS available_flights_simplified AS
 	SELECT available_flights.DepartureAirport, available_flights.ArrivalAirport, DATE(available_flights.DepartureDateTime) AS "DepartureDate" FROM available_flights;
 
 CREATE VIEW IF NOT EXISTS num_of_available_seats_on_flights AS
-    SELECT flights_with_flight_time.* , (aircraft.NumberOfSeats - COUNT(CASE WHEN reservation.IsCancelled = 0 THEN reservation.ReservationID END)) AS "NumOfAvailableSeats" FROM flights_with_flight_time INNER JOIN aircraft ON flights_with_flight_time.AircraftID = aircraft.AircraftID LEFT JOIN reservation ON flights_with_flight_time.FlightID = reservation.FlightID GROUP BY flights_with_flight_time.FlightID;
+    SELECT flights_with_flight_time.* , (aircraftmodel.NumberOfSeats - COUNT(CASE WHEN reservation.IsCancelled = 0 THEN reservation.ReservationID END)) AS "NumOfAvailableSeats" FROM flights_with_flight_time INNER JOIN aircraft ON flights_with_flight_time.AircraftID = aircraft.AircraftID INNER JOIN aircraftmodel ON aircraft.AircraftModelID = aircraftmodel.AircraftModelID LEFT JOIN reservation ON flights_with_flight_time.FlightID = reservation.FlightID GROUP BY flights_with_flight_time.FlightID;
 
 CREATE VIEW IF NOT EXISTS num_of_available_seats_on_available_flights AS
-    SELECT available_flights.FlightID, available_flights.DepartureAirport, available_flights.ArrivalAirport, DATE(available_flights.DepartureDateTime) AS "DepartureDate", DATE(available_flights.ArrivalDateTime) AS "ArrivalDate", TIME_FORMAT(TIME(available_flights.DepartureDateTime), '%H:%i') AS "DepartureTime", TIME_FORMAT(TIME(available_flights.ArrivalDateTime), '%H:%i') AS "ArrivalTime", TIME_FORMAT(TIME(available_flights.FlightTime), '%H:%i') AS "FlightTime", available_flights.BasePrice, aircraft.AircraftType, (aircraft.NumberOfSeats - COUNT(CASE WHEN reservation.IsCancelled = 0 THEN reservation.ReservationID END)) AS "NumOfAvailableSeats" FROM available_flights INNER JOIN aircraft ON available_flights.AircraftID = aircraft.AircraftID LEFT JOIN reservation ON available_flights.FlightID = reservation.FlightID GROUP BY available_flights.FlightID;
+    SELECT available_flights.FlightID, available_flights.DepartureAirport, available_flights.ArrivalAirport, DATE(available_flights.DepartureDateTime) AS "DepartureDate", DATE(available_flights.ArrivalDateTime) AS "ArrivalDate", TIME_FORMAT(TIME(available_flights.DepartureDateTime), '%H:%i') AS "DepartureTime", TIME_FORMAT(TIME(available_flights.ArrivalDateTime), '%H:%i') AS "ArrivalTime", TIME_FORMAT(TIME(available_flights.FlightTime), '%H:%i') AS "FlightTime", available_flights.BasePrice, aircraftmodel.AircraftModelName, (aircraftmodel.NumberOfSeats - COUNT(CASE WHEN reservation.IsCancelled = 0 THEN reservation.ReservationID END)) AS "NumOfAvailableSeats" FROM available_flights INNER JOIN aircraft ON available_flights.AircraftID = aircraft.AircraftID INNER JOIN aircraftmodel ON aircraft.AircraftModelID = aircraftmodel.AircraftModelID LEFT JOIN reservation ON available_flights.FlightID = reservation.FlightID GROUP BY available_flights.FlightID;
 
 INSERT INTO loyaltystatus (loyaltystatus.LoyaltyStatusName, loyaltystatus.DiscountInPercentage) VALUES 
 ("Bronze", 1),
@@ -224,21 +240,334 @@ INSERT INTO airport (airport.AirportCode, airport.CityID, airport.CountryID, air
 ("BAH",(SELECT CityID FROM city WHERE city.English LIKE "Manama"), (SELECT CountryID FROM country WHERE country.English LIKE "Bahrain"), "03:00:00"),
 ("BUD", (SELECT CityID FROM city WHERE city.English LIKE "Budapest"), (SELECT CountryID FROM country WHERE country.English LIKE "Hungary"), "01:00:00");
 
-INSERT INTO aircraft (aircraft.AircraftType, aircraft.NumberOfSeats) VALUES
-("Airbus A220-100",126),
-("Airbus A220-100",126),
-("Airbus A220-100",126),
-("Boeing 737-900",180),
-("Boeing 737-900",180),
-("Boeing 737-900",180),
-("Boeing 737-900",180),
-("Boeing 737-900",180),
-("Boeing 737-900",180);
+INSERT INTO aircraftmodel (aircraftmodel.AircraftModelName, aircraftmodel.NumberOfSeats) VALUES
+("Airbus A220-100", 126),
+("Boeing 737-900", 180);
+
+INSERT INTO aircraft (aircraft.AircraftModelID) VALUES
+((SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100")),
+((SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100")),
+((SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100")),
+((SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900")),
+((SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900")),
+((SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900")),
+((SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900")),
+((SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900")),
+((SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"));
 
 INSERT INTO fareclass (fareclass.FareClassName, fareclass.Multiplier) VALUES 
 ("First Class", 2.5),
 ("Business Class", 1.75),
 ("Economy Class", 1.0);
+
+INSERT INTO seat (seat.RowID, seat.ColumnID, seat.AircraftModelID, seat.FareClassID) VALUES
+(1, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "First Class")),
+(1, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "First Class")),
+(1, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "First Class")),
+(1, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "First Class")),
+(1, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "First Class")),
+(1, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "First Class")),
+(1, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "First Class")),
+(1, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "First Class")),
+(1, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "First Class")),
+(1, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "First Class")),
+(1, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "First Class")),
+(1, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "First Class")),
+(2, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(2, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(2, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(2, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(2, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(2, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(2, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(2, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(2, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(2, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(2, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(2, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(3, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(3, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(3, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(3, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(3, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(3, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(3, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(3, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(3, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(3, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(3, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(3, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Business Class")),
+(4, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(4, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(4, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(4, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(4, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(4, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(4, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(4, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(4, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(4, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(4, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(4, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(5, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(5, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(5, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(5, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(5, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(5, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(5, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(5, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(5, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(5, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(5, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(5, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(6, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(6, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(6, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(6, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(6, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(6, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(6, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(6, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(6, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(6, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(6, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(6, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(7, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(7, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(7, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(7, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(7, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(7, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(7, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(7, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(7, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(7, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(7, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(7, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(8, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(8, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(8, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(8, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(8, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(8, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(8, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(8, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(8, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(8, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(8, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(8, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(9, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(9, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(9, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(9, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(9, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(9, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(9, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(9, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(9, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(9, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(9, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(9, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(10, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(10, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(10, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(10, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(10, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(10, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(10, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(10, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(10, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(10, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(10, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(10, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(11, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(11, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(11, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(11, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(11, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(11, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(11, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(11, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(11, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(11, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(11, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(11, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(12, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(12, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(12, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(12, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(12, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(12, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(12, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(12, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(12, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(12, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(12, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(12, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(13, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(13, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(13, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(13, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(13, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(13, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(13, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(13, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(13, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(13, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(13, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(13, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(14, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(14, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(14, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(14, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(14, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(14, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(14, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(14, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(14, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(14, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(14, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(14, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(15, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(15, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(15, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(15, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(15, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(15, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(15, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(15, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(15, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(15, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(15, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(15, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(16, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(16, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(16, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(16, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(16, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(16, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(16, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(16, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(16, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(16, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(16, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(16, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(17, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(17, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(17, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(17, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(17, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(17, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(17, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(17, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(17, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(17, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(17, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(17, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(18, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(18, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(18, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(18, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(18, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(18, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(18, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(18, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(18, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(18, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(18, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(18, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(19, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(19, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(19, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(19, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(19, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(19, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(19, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(19, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(19, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(19, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(19, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(19, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(20, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(20, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(20, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(20, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(20, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(20, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(20, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(20, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(20, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(20, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(20, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(20, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(21, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(21, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(21, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(21, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(21, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(21, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(21, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(21, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(21, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(21, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(21, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Airbus A220-100"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(21, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(22, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(22, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(22, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(22, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(22, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(22, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(23, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(23, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(23, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(23, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(23, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(23, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(24, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(24, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(24, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(24, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(24, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(24, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(25, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(25, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(25, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(25, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(25, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(25, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(26, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(26, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(26, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(26, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(26, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(26, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(27, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(27, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(27, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(27, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(27, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(27, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(28, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(28, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(28, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(28, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(28, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(28, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(29, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(29, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(29, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(29, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(29, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(29, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(30, "A", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(30, "B", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(30, "C", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(30, "D", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(30, "E", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class")),
+(30, "F", (SELECT aircraftmodel.AircraftModelID FROM aircraftmodel WHERE aircraftmodel.AircraftModelName LIKE "Boeing 737-900"), (SELECT fareclass.FareClassID FROM fareclass WHERE fareclass.FareClassName LIKE "Economy Class"));
+
 
 INSERT INTO useraccount (useraccount.UserName, useraccount.UserEmail, useraccount.UserPassword, useraccount.AdminStatus) VALUES
 ("admin", "admin@admin", "$2b$10$nAETe84Wnqon6iMkr0LMmORd76sUgCcME/cmaN0D/t2MjEgok5kqK", 1);
@@ -262,4 +591,6 @@ INSERT INTO flight (flight.DepartureAirport, flight.ArrivalAirport, flight.Depar
 ("CPH", "MAD", "2026-02-28 10:10:00", "2026-02-28 13:35:00", 2, 25000),
 ("CPH", "MAD", "2026-02-28 18:10:00", "2026-02-28 21:35:00", 6, 50000),
 ("FCO", "ZRH", "2026-02-28 15:45:00", "2026-02-28 17:20:00", 5, 200000);
+
+
 
