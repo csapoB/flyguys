@@ -20,6 +20,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+
+
+
 //!Endpoints:
 //?GET /api/test
 router.get('/test', (request, response) => {
@@ -270,7 +273,7 @@ router.get('/flights', async (request, response) => {
 
         if (request.query.departureAirport == undefined || request.query.arrivalAirport == undefined || request.query.departureDate == undefined || request.query.numOfPassengers == undefined) {
             response.status(400).json({
-                error: "A HTTP-GET lekérdezés nem megfelelő!"
+                error: request.t("errors", {returnObjects : true}).bad_http_get_request
             });
         } else {
             const result = await database.selectAvailableFlightsFiltered(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfPassengers);
@@ -286,13 +289,11 @@ router.get('/flights', async (request, response) => {
     }
 });
 
-/*router.get('/a', async (request, response) => {
+router.get('/geterrors', (request, response) => {
     try {
-        
 
-        
         response.status(200).json({
-            result: await database.a()
+            errors: request.t("errors", {returnObjects : true})
         });
     } catch (error) {
         response.status(500).json({
@@ -300,7 +301,48 @@ router.get('/flights', async (request, response) => {
         });
     }
 });
-*/
+
+router.get('/getflights', (request, response) => {
+    try {
+
+        response.status(200).json({
+            flights: request.t("flights", {returnObjects : true})
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/getnavbar', (request, response) => {
+    try {
+
+        response.status(200).json({
+            navbar: request.t("navbar", {returnObjects : true})
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+/*router.get('/a', (request, response) => {
+    try {
+        
+        
+
+        response.status(200).json({
+            message : 
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});*/
+
 
 router.post('/login', async (request, response) => {
     try {

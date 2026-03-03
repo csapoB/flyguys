@@ -1,0 +1,53 @@
+{
+    "index" : {
+        "body" : {
+
+        },
+        "footer" : {
+            "title_about_us" : "About us",
+            "title_services" : "Services",
+            "title_contact" : "Contacts",
+            "company_infos" : "Company informations",
+            "news" : "News",
+            "loyalty_program" : "Loyalty Program",
+            "flight_search" : "Flight searcher",
+            "my_flights" : "My flights",
+            "travel_planner" : "Travel Planner",
+            "all_rights_reserved" : "© FlyGuys. All rights reserved."
+        }
+    },
+
+    "navbar" : {
+        "about_us" : "About us",
+        "planner" : "Travel Planner",
+        "loyalty_program" : "Loyalty Program",
+        "language" : "Magyar",
+        "log_in" : "Log in",
+        "admin" : "Admin",
+        "my_profile" : "My profile",
+        "log_out" : "Log out"
+
+    },
+
+    "planner" : {
+        "origin_label" : "Origin",
+        "destination_label" : "Destination",
+        "departure_label" : "Departure",
+        "return_label" : "Return",
+        "passengers_label" : "Passengers",
+        "search_flights_button" : "Search"
+    },
+
+    "flights" : {
+        "choose_flight" : "Choose a flight!",
+        "choose_seats" : "Choose seats!"
+    },
+
+    "errors" : {
+        "bad_http_get_request" : "The HTTP-GET request isn't proper!",
+        "no_flight_by_parameters" : "Unfortunately, there's no flight by the given parameters.",
+        "bad_url_parameter" : "ERROR : Some of the URL parameters are wrong.",
+        "server_error" : "Unfortunately, an error occured in the server. Please, próbálja try again later!"
+
+    }
+}

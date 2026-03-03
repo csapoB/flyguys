@@ -1,0 +1,53 @@
+{
+    "index" : {
+        "body" : {
+
+        },
+        "footer" : {
+            "title_about_us" : "Rólunk",
+            "title_services" : "Szolgáltatásaink",
+            "title_contact" : "Elérhetőségeink",
+            "company_infos" : "Vállalati információk",
+            "news" : "Hírek",
+            "loyalty_program" : "Törzsvásárlói program",
+            "flight_search" : "Járat kereső",
+            "my_flights" : "Járataim",
+            "travel_planner" : "Útvonaltervező",
+            "all_rights_reserved" : "© FlyGuys. Minden jog fenntartva."
+        }
+    },
+
+    "navbar" : {
+        "about_us" : "Rólunk",
+        "planner" : "Tervezés",
+        "loyalty_program" : "Hűségprogram",
+        "language" : "English",
+        "log_in" : "Bejelentkezés",
+        "admin" : "Admin",
+        "my_profile" : "Profilom",
+        "log_out" : "Kijelentkezés"
+
+    },
+
+    "planner" : {
+        "origin_label" : "Indulási hely",
+        "destination_label" : "Érkezési hely",
+        "departure_label" : "Indulás",
+        "return_label" : "Visszaút",
+        "passengers_label" : "Utasok",
+        "search_flights_button" : "Keresés"
+    },
+
+    "flights" : {
+        "choose_flight" : "Válasszon járatot",
+        "choose_seats" : "Válasszon ülőhelyet!"
+    },
+
+    "errors" : {
+        "bad_http_get_request" : "A HTTP-GET lekérdezés nem megfelelő!",
+        "no_flights_by_parameters" : "Sajnos, nincs a feltételeknek megfelelő járat.",
+        "bad_url_parameter" : "HIBA : Az URL paraméterek közül valamelyik hibás.",
+        "server_error" : "Sajnos, hiba történt a szerverben. Kérjük, próbálja meg újra később!"
+
+    }
+}

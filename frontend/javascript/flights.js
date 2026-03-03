@@ -1,5 +1,15 @@
 $(async function () {
 
+    let getnavbar = (await (await fetch("/api/getnavbar", { method: "GET" })).json()).navbar;
+    $("#about_us_nav").text(getnavbar.about_us);
+    $("#planner_nav").text(getnavbar.planner);
+    $("#loyalty_program_nav").text(getnavbar.loyalty_program);
+    $("#language_nav").text(getnavbar.language);
+    $("#login_button").text(getnavbar.log_in);
+    $("#admin_button").text(getnavbar.admin);
+    $("#profile_button").text(getnavbar.my_profile);
+    $("#logout_button").text(getnavbar.log_out);
+
     let $flights_frame = $("#flights_frame");
     let $flights_to = $("#flights_to");
 
@@ -13,13 +23,13 @@ $(async function () {
 
     if (origin == null || destination == null || departure == null || return_ == null || passengers == null) {
 
-        errorPageGenerator($flights_to, "HIBA : Az URL paraméterek közül valamelyik hibás.");
+        errorPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET" })).json()).errors.bad_url_parameter);
 
     } else {
 
         try {
 
-            let flights_to = await fetch(`/api/flights?departureAirport=${origin}&arrivalAirport=${destination}&departureDate=${departure}&numOfPassengers=${passengers}`);
+            let flights_to = await fetch(`/api/flights?departureAirport=${origin}&arrivalAirport=${destination}&departureDate=${departure}&numOfPassengers=${passengers}`, { method: "GET" });
 
             switch (flights_to.status) {
 
@@ -27,59 +37,62 @@ $(async function () {
 
                     flights_to = (await flights_to.json()).flights;
 
+                    if (flights_to.length == 0) {
+
+                        infoPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET" })).json()).errors.no_flights_by_parameters);
+
+                    } else {
+
+                        if (return_ != "") {
+
+                            let flights_back = await fetch(`/api/flights?departureAirport=${destination}&arrivalAirport=${origin}&departureDate=${return_}&numOfPassengers=${passengers}`, { method: "GET" });
+
+                            switch (flights_back.status) {
+
+                                case 200:
+
+                                    flights_back = (await flights_back.json()).flights;
+
+                                    if (flights_back.length != 0) {
+
+                                        await flightSelector(flights_to, $flights_to);
+
+                                        let $flights_back = $("<div>", {
+                                            "id": "flights_back",
+                                            "class": "row"
+                                        });
+                                        $flights_frame.append($flights_back);
+                                        await flightSelector(flights_back, $flights_back);
+                                        await seatBookingButtonGenerator($flights_frame, passengers);
+
+                                    } else {
+                                        infoPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET" })).json()).errors.no_flights_by_parameters);
+                                    }
+                                    break;
+
+                                default:
+                                    throw new Error("ERROR")
+                            }
+
+                        } else {
+                            await flightSelector(flights_to, $flights_to);
+                            await seatBookingButtonGenerator($flights_frame, passengers);
+                        }
+                    }
                     break;
                 case 400:
                     console.log((await flights_to.json()).error);
                     break;
                 default:
-                    throw new Error("Hiba")
+                    throw new Error("ERROR")
 
             }
 
-            if (flights_to.length == 0) {
 
-                infoPageGenerator($flights_to, "Sajnos, nincs a feltételeknek megfelelő járat.");
 
-            } else {
-
-                if (return_ != "") {
-
-                    let flights_back = await fetch(`/api/flights?departureAirport=${destination}&arrivalAirport=${origin}&departureDate=${return_}&numOfPassengers=${passengers}`);
-
-                    switch (flights_back.status) {
-
-                        case 200:
-
-                            flights_back = (await flights_back.json()).flights;
-
-                            if (flights_back.length != 0) {
-
-                                flightSelector(flights_to, $flights_to);
-
-                                let $flights_back = $("<div>", {
-                                    "id": "flights_back",
-                                    "class": "row"
-                                });
-                                $flights_frame.append($flights_back);
-                                flightSelector(flights_back, $flights_back);
-                                seatBookingButtonGenerator($flights_frame, passengers);
-
-                            } else {
-                                infoPageGenerator($flights_to, "Sajnos, nincs a feltételeknek megfelelő járat.");
-                            }
-                            break;
-
-                        default:
-                            throw new Error("Hiba")
-                    }
-                } else {
-                    flightSelector(flights_to, $flights_to);
-                    seatBookingButtonGenerator($flights_frame, passengers);
-                }
-            }
-
-        } catch {
-            errorPageGenerator($flights_to, "Sajnos hiba történt a szerverben. Kérjük, próbálja meg újra később!")
+        } catch (error) {
+            console.log(error)
+            errorPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET" })).json()).errors.server_error)
         }
 
 
@@ -88,7 +101,7 @@ $(async function () {
 
 });
 
-function flightSelector(flights, $frame) {
+async function flightSelector(flights, $frame) {
     let $title = $("<h1>", {
         "class": "display-3",
         "html": `${flights[0].DepartureCity} (${flights[0].DepartureAirport})<span class="ps-4 pe-4"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"48\" height=\"48\" fill=\"currentColor\" class=\"bi bi-arrow-right\" viewBox=\"0 0 16 16\"><path fill-rule=\"evenodd\" d=\"M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8\"/></svg></span>${flights[0].ArrivalCity} (${flights[0].ArrivalAirport})`
@@ -97,7 +110,7 @@ function flightSelector(flights, $frame) {
 
     let $flights_button = $("<button>", {
         "class": "btn btn-danger col-md-12 col-lg-12 flight",
-        "text": "Válasszon járatot!",
+        "text": (await (await fetch("/api/getflights", { method: "GET" })).json()).flights.choose_flight,
         "type": "button"
     });
     // gomb megnyomása után megjelenik egy poopover, amiben felvannak sorolva a választható járatok (hasonló design, mint az indulási/érkezési hely popover-nél)
@@ -224,9 +237,9 @@ function flights_popover_contentGenerator($input_field, popover_obj, flights_dat
 
                         flag_for_flight = $this_div.index();
                     }
-                    
+
                     let $flight = $(".flight");
-                    if (($flight.length == 2 && (($.map($flight, function(x){return $(x).data("flight_id")})).length == 2)) || $flight.length == 1) { // azt vizsgálja, hogy mindegyik járatválasztó kivan-e töltve. Ha igen, akkor lehessen ülőhelyet foglalni, különben nem
+                    if (($flight.length == 2 && (($.map($flight, function (x) { return $(x).data("flight_id") })).length == 2)) || $flight.length == 1) { // azt vizsgálja, hogy mindegyik járatválasztó kivan-e töltve. Ha igen, akkor lehessen ülőhelyet foglalni, különben nem
                         $("#seat_booking_button").prop("disabled", false);
                     }
 
@@ -331,16 +344,16 @@ function infoPageGenerator($frame, message) {
     $frame.append($no_flights_div);
 }
 
-function seatBookingButtonGenerator($frame, passengers) {
+async function seatBookingButtonGenerator($frame, passengers) {
 
     let $seat_booking_button_frame = $("<div>", {
         "class": "row d-flex justify-content-center"
     });
 
     let $seat_booking_button = $("<button>", {
-        "id" : "seat_booking_button",
+        "id": "seat_booking_button",
         "class": "btn btn-outline-danger col-md-5 col-lg-5",
-        "text": "Válasszon ülőhelyet!",
+        "text": (await (await fetch("/api/getflights", { method: "GET" })).json()).flights.choose_seats,
         "type": "submit",
         on: {
             "click": function (e) {

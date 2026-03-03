@@ -2,6 +2,10 @@
 const express = require('express'); //?npm install express
 const session = require('express-session'); //?npm install express-session
 const path = require('path');
+const i18next = require('i18next');
+const i18next_fs_backend = require('i18next-fs-backend');
+const i18next_http_middleware = require('i18next-http-middleware');
+
 
 //!Beállítások
 const app = express();
@@ -21,6 +25,18 @@ app.use(
         saveUninitialized: true
     })
 );
+
+i18next.use(i18next_fs_backend).use(i18next_http_middleware.LanguageDetector).init(
+    {
+        fallbackLng : 'en',
+        backend : {
+            loadPath : './locales/{{lng}}/translation.json'
+        }
+
+    }
+);
+
+app.use(i18next_http_middleware.handle(i18next));
 
 //!Routing
 //?Főoldal:
