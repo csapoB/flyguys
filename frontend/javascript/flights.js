@@ -1,14 +1,31 @@
+import { getNavbar } from "./locale.js";
+import { getFlights } from "./locale.js";
+import { getLocale } from "./locale.js";
+
 $(async function () {
 
-    let getnavbar = (await (await fetch("/api/getnavbar", { method: "GET" })).json()).navbar;
-    $("#about_us_nav").text(getnavbar.about_us);
-    $("#planner_nav").text(getnavbar.planner);
-    $("#loyalty_program_nav").text(getnavbar.loyalty_program);
-    $("#language_nav").text(getnavbar.language);
-    $("#login_button").text(getnavbar.log_in);
-    $("#admin_button").text(getnavbar.admin);
-    $("#profile_button").text(getnavbar.my_profile);
-    $("#logout_button").text(getnavbar.log_out);
+    let getlocale = await getLocale();
+
+    let url = window.location.href.split("/")
+    if (url[3] == "flights") {
+        url = url.splice(3, 0, [getlocale]);
+        let a = "";
+        for (let i = 0; i < url.length; i++) {
+            a += url[i] + "/"
+            
+        }
+        console.log(a);
+        history.pushState({}, "", "url"); 
+    }
+
+    await getNavbar();
+
+    let current_language = $("#language_nav").prop("data-lang-code");
+    
+
+    $("html").prop("lang", current_language);
+
+    let getflights = await getFlights($("#language_nav").prop("data-lang-code"));
 
     let $flights_frame = $("#flights_frame");
     let $flights_to = $("#flights_to");
@@ -29,7 +46,7 @@ $(async function () {
 
         try {
 
-            let flights_to = await fetch(`/api/flights?departureAirport=${origin}&arrivalAirport=${destination}&departureDate=${departure}&numOfPassengers=${passengers}`, { method: "GET" });
+            let flights_to = await fetch(`/api/${current_language}/flights?departureAirport=${origin}&arrivalAirport=${destination}&departureDate=${departure}&numOfPassengers=${passengers}`, { method: "GET" });
 
             switch (flights_to.status) {
 
@@ -45,7 +62,7 @@ $(async function () {
 
                         if (return_ != "") {
 
-                            let flights_back = await fetch(`/api/flights?departureAirport=${destination}&arrivalAirport=${origin}&departureDate=${return_}&numOfPassengers=${passengers}`, { method: "GET" });
+                            let flights_back = await fetch(`/api/${current_language}/flights?departureAirport=${destination}&arrivalAirport=${origin}&departureDate=${return_}&numOfPassengers=${passengers}`, { method: "GET" });
 
                             switch (flights_back.status) {
 
@@ -55,15 +72,15 @@ $(async function () {
 
                                     if (flights_back.length != 0) {
 
-                                        await flightSelector(flights_to, $flights_to);
+                                        await flightSelector(flights_to, $flights_to, getflights);
 
                                         let $flights_back = $("<div>", {
                                             "id": "flights_back",
                                             "class": "row"
                                         });
                                         $flights_frame.append($flights_back);
-                                        await flightSelector(flights_back, $flights_back);
-                                        await seatBookingButtonGenerator($flights_frame, passengers);
+                                        await flightSelector(flights_back, $flights_back, getflights);
+                                        await seatBookingButtonGenerator($flights_frame, passengers, getflights);
 
                                     } else {
                                         infoPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET" })).json()).errors.no_flights_by_parameters);
@@ -75,8 +92,8 @@ $(async function () {
                             }
 
                         } else {
-                            await flightSelector(flights_to, $flights_to);
-                            await seatBookingButtonGenerator($flights_frame, passengers);
+                            await flightSelector(flights_to, $flights_to, getflights);
+                            await seatBookingButtonGenerator($flights_frame, passengers, getflights);
                         }
                     }
                     break;
@@ -101,7 +118,7 @@ $(async function () {
 
 });
 
-async function flightSelector(flights, $frame) {
+async function flightSelector(flights, $frame, i18n_values) {
     let $title = $("<h1>", {
         "class": "display-3",
         "html": `${flights[0].DepartureCity} (${flights[0].DepartureAirport})<span class="ps-4 pe-4"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"48\" height=\"48\" fill=\"currentColor\" class=\"bi bi-arrow-right\" viewBox=\"0 0 16 16\"><path fill-rule=\"evenodd\" d=\"M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8\"/></svg></span>${flights[0].ArrivalCity} (${flights[0].ArrivalAirport})`
@@ -110,7 +127,7 @@ async function flightSelector(flights, $frame) {
 
     let $flights_button = $("<button>", {
         "class": "btn btn-danger col-md-12 col-lg-12 flight",
-        "text": (await (await fetch("/api/getflights", { method: "GET" })).json()).flights.choose_flight,
+        "text": i18n_values.choose_flight,
         "type": "button"
     });
     // gomb megnyomása után megjelenik egy poopover, amiben felvannak sorolva a választható járatok (hasonló design, mint az indulási/érkezési hely popover-nél)
@@ -344,7 +361,7 @@ function infoPageGenerator($frame, message) {
     $frame.append($no_flights_div);
 }
 
-async function seatBookingButtonGenerator($frame, passengers) {
+async function seatBookingButtonGenerator($frame, passengers, i18n_values) {
 
     let $seat_booking_button_frame = $("<div>", {
         "class": "row d-flex justify-content-center"
@@ -353,7 +370,7 @@ async function seatBookingButtonGenerator($frame, passengers) {
     let $seat_booking_button = $("<button>", {
         "id": "seat_booking_button",
         "class": "btn btn-outline-danger col-md-5 col-lg-5",
-        "text": (await (await fetch("/api/getflights", { method: "GET" })).json()).flights.choose_seats,
+        "text": i18n_values.choose_seats,
         "type": "submit",
         on: {
             "click": function (e) {

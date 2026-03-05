@@ -246,7 +246,9 @@ function regis_modal() {
         "type": "text",
         "placeholder": "Születési dátum"
     });
-    $birth_date.datepicker();
+    $birth_date.datepicker({
+        dateFormat: "yy-mm-dd",
+    });
 
     let $e_mail = $("<input/>", {
         "id": "new_usr_email",

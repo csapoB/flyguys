@@ -1,4 +1,6 @@
 {
+    "locale" : "hu",
+
     "index" : {
         "body" : {
 
@@ -21,7 +23,8 @@
         "about_us" : "Rólunk",
         "planner" : "Tervezés",
         "loyalty_program" : "Hűségprogram",
-        "language" : "English",
+        "language_code" : "hu",
+        "language" : "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 480\" height=\"24\" width=\"32\"><defs><clipPath><path d=\"M-85 0h682v512H-85z\"></path></clipPath></defs><g clip-path=\"url(#a)\" transform=\"translate(80) scale(.94)\"><path fill=\"#012169\" d=\"M-256 0H768v512H-256z\"></path><path fill=\"#fff\" d=\"M-256 0v57l910 455h114v-57L-141 0h-115zM768 0v57l-909 455h-115v-57L654 0h114z\"></path><path fill=\"#fff\" d=\"M171 0v512h170V0H171zm-427 171v170H768V171H-256z\"></path><path fill=\"#c8102e\" d=\"M-256 205v102H768V205H-256zM205 0v512h102V0H205zm-461 512L85 341h77l-342 171h-76zm0-512L85 171H9L-256 38V0zm606 171L692 0h76L427 171h-77zm418 341L427 341h76l265 133v38z\"></path></g></svg>",
         "log_in" : "Bejelentkezés",
         "admin" : "Admin",
         "my_profile" : "Profilom",
@@ -35,10 +38,22 @@
         "departure_label" : "Indulás",
         "return_label" : "Visszaút",
         "passengers_label" : "Utasok",
-        "search_flights_button" : "Keresés"
+        "search_flights_button" : "Keresés",
+        "passengers_input" : "1 felnőtt, 0 gyermek"
+
+    },
+
+    "planner_passengers_popover" : {
+        "adults_inc_dec" : "Felnőttek",
+        "children_inc_dec" : "Gyerekek",
+        "adult" : "felnőtt",
+        "adults" : "felnőtt",
+        "child" : "gyermek",
+        "children" : "gyermek"
     },
 
     "flights" : {
+        "title" : "Járatok",
         "choose_flight" : "Válasszon járatot",
         "choose_seats" : "Válasszon ülőhelyet!"
     },

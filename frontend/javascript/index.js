@@ -1,4 +1,38 @@
-document.addEventListener('DOMContentLoaded', function () {
+import { getNavbar } from "./locale.js";
+import { getIndex } from "./locale.js";
+import { getLocale } from "./locale.js";
+import { plannerInit } from "./planner.js";
+
+$(async function () {
+ 
+    let getlocale = await getLocale();
+
+    let language_nav = document.getElementById("language_nav");
+
+    if (window.location.href.split("/")[3] == "") {
+        
+        history.pushState({}, "", `/${getlocale}`);
+        language_nav.dataset.langCode = getlocale;
+        
+                
+    } else {
+
+        language_nav.dataset.langCode = window.location.href.split("/")[3];
+    }
+
+    console.log("a")
+    $("#language_nav").prop("href", language_nav.dataset.langCode == "hu" ? "/en" : "/hu");
+
+    let current_language = language_nav.dataset.langCode;
+
+    $("html").prop("lang", current_language);
+
+    await getNavbar(current_language);
+    await getIndex(current_language);
+    $.datepicker.setDefaults($.datepicker.regional[(current_language) == "hu" ? "hu" : "en-GB"]);
+
+    await plannerInit(current_language);
+
     document.getElementById('keret').appendChild(jaratok());
 });
 

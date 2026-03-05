@@ -7,7 +7,8 @@ const bcrypt = require('bcryptjs'); //?npm install bcrypt
 //!Multer
 const multer = require('multer'); //?npm install multer
 const path = require('path');
-const session = require('express-session')
+const session = require('express-session');
+const { default: i18next } = require('i18next');
 
 const storage = multer.diskStorage({
     destination: (request, file, callback) => {
@@ -83,7 +84,7 @@ router.get('/AdminCheck', async (request, response) => {
     }
 });
 
-router.get('/availabledepartureairports', async (request, response) => {
+/*router.get('/availabledepartureairports', async (request, response) => {
     try {
         const result = await database.selectAvailableDepartureAirports();
 
@@ -100,9 +101,9 @@ router.get('/availabledepartureairports', async (request, response) => {
             message: error
         });
     }
-});
+});*/
 
-router.get('/availablearrivalairports', async (request, response) => {
+/*router.get('/availablearrivalairports', async (request, response) => {
     try {
         const result = await database.selectAvailableArrivalAirports();
 
@@ -119,7 +120,7 @@ router.get('/availablearrivalairports', async (request, response) => {
             message: error
         });
     }
-});
+});*/
 
 router.get('/availableflights', async (request, response) => {
     try {
@@ -138,7 +139,13 @@ router.get('/availableflights', async (request, response) => {
 
 router.get('/availabledepartureairportsfiltered', async (request, response) => {
     try {
-        const result = await database.selectAvailableDepartureAirportsFilteredHun(((request.query.arrivalAirport == undefined) ? "" : request.query.arrivalAirport), ((request.query.departureDate == undefined) ? "" : request.query.departureDate));
+        let result;
+        if (request.get("Accept-Language") == "hu") {
+            result = await database.selectAvailableDepartureAirportsFilteredHun(((request.query.arrivalAirport == undefined) ? "" : request.query.arrivalAirport), ((request.query.departureDate == undefined) ? "" : request.query.departureDate));
+        } else {
+            result = await database.selectAvailableDepartureAirportsFilteredEn(((request.query.arrivalAirport == undefined) ? "" : request.query.arrivalAirport), ((request.query.departureDate == undefined) ? "" : request.query.departureDate));
+        }
+        
 
 
         response.status(200).json({
@@ -153,7 +160,12 @@ router.get('/availabledepartureairportsfiltered', async (request, response) => {
 
 router.get('/availablearrivalairportsfiltered', async (request, response) => {
     try {
-        const result = await database.selectAvailableArrivalAirportsFilteredHun(((request.query.departureAirport == undefined) ? "" : request.query.departureAirport), ((request.query.departureDate == undefined) ? "" : request.query.departureDate));
+        let result;
+        if (request.get("Accept-Language") == "hu") {
+            result = await database.selectAvailableArrivalAirportsFilteredHun(((request.query.departureAirport == undefined) ? "" : request.query.departureAirport), ((request.query.departureDate == undefined) ? "" : request.query.departureDate));
+        } else {
+            result = await database.selectAvailableArrivalAirportsFilteredEn(((request.query.departureAirport == undefined) ? "" : request.query.departureAirport), ((request.query.departureDate == undefined) ? "" : request.query.departureDate));
+        }
 
         response.status(200).json({
             results: result
@@ -268,7 +280,7 @@ router.get('/swappableairports', async (request, response) => {
     }
 });
 
-router.get('/flights', async (request, response) => {
+router.get('/hu/flights', async (request, response) => {
     try {
 
         if (request.query.departureAirport == undefined || request.query.arrivalAirport == undefined || request.query.departureDate == undefined || request.query.numOfPassengers == undefined) {
@@ -276,10 +288,31 @@ router.get('/flights', async (request, response) => {
                 error: request.t("errors", {returnObjects : true}).bad_http_get_request
             });
         } else {
-            const result = await database.selectAvailableFlightsFiltered(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfPassengers);
 
             response.status(200).json({
-                flights: result
+                flights: await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfPassengers)
+            });
+        }
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/en/flights', async (request, response) => {
+    try {
+
+        if (request.query.departureAirport == undefined || request.query.arrivalAirport == undefined || request.query.departureDate == undefined || request.query.numOfPassengers == undefined) {
+            i18next.changeLanguage("hu", (x, y) => {
+                response.status(400).json({
+                    error: request.t("errors", {returnObjects : true}).bad_http_get_request
+                });
+            });
+        } else {
+
+            response.status(200).json({
+                flights: await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfPassengers)
             });
         }
     } catch (error) {
@@ -320,6 +353,58 @@ router.get('/getnavbar', (request, response) => {
 
         response.status(200).json({
             navbar: request.t("navbar", {returnObjects : true})
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/getplanner', (request, response) => {
+    try {
+
+        response.status(200).json({
+            planner: request.t("planner", {returnObjects : true})
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/getplannerpassengerspopover', (request, response) => {
+    try {
+
+        response.status(200).json({
+            planner_passengers_popover: request.t("planner_passengers_popover", {returnObjects : true})
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/getindex', (request, response) => {
+    try {
+
+        response.status(200).json({
+            index: request.t("index", {returnObjects : true})
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/getlocale', (request, response) => {
+    try {
+
+        response.status(200).json({
+            locale: request.t("locale", {returnObjects : true})
         });
     } catch (error) {
         response.status(500).json({

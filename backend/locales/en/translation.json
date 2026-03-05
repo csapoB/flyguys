@@ -1,4 +1,7 @@
 {
+
+    "locale" : "en",
+
     "index" : {
         "body" : {
 
@@ -21,7 +24,8 @@
         "about_us" : "About us",
         "planner" : "Travel Planner",
         "loyalty_program" : "Loyalty Program",
-        "language" : "Magyar",
+        "language_code" : "en",
+        "language" : "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 480\" height=\"24\" width=\"32\"><g fill-rule=\"evenodd\"><path fill=\"#fff\" d=\"M640 480H0V0h640z\"></path><path fill=\"#388d00\" d=\"M640 480H0V320h640z\"></path><path fill=\"#d43516\" d=\"M640 160H0V0h640z\"></path></g></svg>",
         "log_in" : "Log in",
         "admin" : "Admin",
         "my_profile" : "My profile",
@@ -35,10 +39,22 @@
         "departure_label" : "Departure",
         "return_label" : "Return",
         "passengers_label" : "Passengers",
-        "search_flights_button" : "Search"
+        "search_flights_button" : "Search",
+        "passengers_input" : "1 adult, 0 children"
+
+    },
+
+    "planner_passengers_popover" : {
+        "adults_inc_dec" : "Adults",
+        "children_inc_dec" : "Children",
+        "adult" : "adult",
+        "adults" : "adults",
+        "child" : "child",
+        "children" : "children"
     },
 
     "flights" : {
+        "title" : "Flights",
         "choose_flight" : "Choose a flight!",
         "choose_seats" : "Choose seats!"
     },
@@ -47,7 +63,7 @@
         "bad_http_get_request" : "The HTTP-GET request isn't proper!",
         "no_flight_by_parameters" : "Unfortunately, there's no flight by the given parameters.",
         "bad_url_parameter" : "ERROR : Some of the URL parameters are wrong.",
-        "server_error" : "Unfortunately, an error occured in the server. Please, próbálja try again later!"
+        "server_error" : "Unfortunately, an error occured in the server. Please, try again later!"
 
     }
 }
