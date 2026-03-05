@@ -2,6 +2,10 @@
 const express = require('express'); //?npm install express
 const session = require('express-session'); //?npm install express-session
 const path = require('path');
+const i18next = require('i18next');
+const i18next_fs_backend = require('i18next-fs-backend');
+const i18next_http_middleware = require('i18next-http-middleware');
+
 
 //!Beállítások
 const app = express();
@@ -22,6 +26,18 @@ app.use(
     })
 );
 
+i18next.use(i18next_fs_backend).use(i18next_http_middleware.LanguageDetector).init(
+    {
+        fallbackLng : 'en',
+        backend : {
+            loadPath : './locales/{{lng}}/translation.json'
+        }
+
+    }
+);
+
+app.use(i18next_http_middleware.handle(i18next));
+
 //!Routing
 //?Főoldal:
 router.get('/', (request, response) => {
@@ -31,6 +47,8 @@ router.get('/', (request, response) => {
 //? Map
 router.get('/map', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/map.html'));
+});
+
 router.get('/magazin', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/magazin.html'));
 });
@@ -49,6 +67,10 @@ router.get('/profil', (request, response) => {
 
 router.get('/admin', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/admin.html'));
+});
+
+router.get('/flights', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/flights.html'));
 });
 
 //!API endpoints
