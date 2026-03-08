@@ -285,7 +285,7 @@ router.get('/hu/flights', async (request, response) => {
 
         if (request.query.departureAirport == undefined || request.query.arrivalAirport == undefined || request.query.departureDate == undefined || request.query.numOfPassengers == undefined) {
             response.status(400).json({
-                error: request.t("errors", {returnObjects : true}).bad_http_get_request
+                error: "A HTTP-GET lekérdezés nem megfelelő!"
             });
         } else {
 
@@ -304,11 +304,9 @@ router.get('/en/flights', async (request, response) => {
     try {
 
         if (request.query.departureAirport == undefined || request.query.arrivalAirport == undefined || request.query.departureDate == undefined || request.query.numOfPassengers == undefined) {
-            i18next.changeLanguage("hu", (x, y) => {
                 response.status(400).json({
-                    error: request.t("errors", {returnObjects : true}).bad_http_get_request
+                    error: "The HTTP-GET request isn't proper!"
                 });
-            });
         } else {
 
             response.status(200).json({
@@ -405,6 +403,19 @@ router.get('/getlocale', (request, response) => {
 
         response.status(200).json({
             locale: request.t("locale", {returnObjects : true})
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/getmodal', (request, response) => {
+    try {
+
+        response.status(200).json({
+            modal: request.t("modal", {returnObjects : true})
         });
     } catch (error) {
         response.status(500).json({

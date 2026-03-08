@@ -65,5 +65,16 @@
         "bad_url_parameter" : "ERROR : Some of the URL parameters are wrong.",
         "server_error" : "Unfortunately, an error occured in the server. Please, try again later!"
 
+    },
+
+    "modal" : {
+        "log_in" : "Log in",
+        "registration" : "Registration",
+        "email" : "E-mail",
+        "password" : "Password",
+        "no_account" : "Don't have an account? Sign up here:",
+        "first_name" : "First name",
+        "last_name" : "Last name",
+        "birth_date" : "Birth date"
     }
 }

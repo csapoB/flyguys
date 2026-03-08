@@ -64,5 +64,16 @@
         "bad_url_parameter" : "HIBA : Az URL paraméterek közül valamelyik hibás.",
         "server_error" : "Sajnos, hiba történt a szerverben. Kérjük, próbálja meg újra később!"
 
+    },
+    
+    "modal" : {
+        "log_in" : "Bejelentkezés",
+        "registration" : "Regisztráció",
+        "email" : "E-mail",
+        "password" : "Jelszó",
+        "no_account" : "Nincs még fiókod? Hozz létre egyet!",
+        "first_name" : "Keresztnév",
+        "last_name" : "Vezetéknév",
+        "birth_date" : "Születési dátum"
     }
 }

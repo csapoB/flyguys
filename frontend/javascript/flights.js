@@ -1,31 +1,31 @@
 import { getNavbar } from "./locale.js";
 import { getFlights } from "./locale.js";
 import { getLocale } from "./locale.js";
+import { modalInit } from "./modal.js";
 
 $(async function () {
 
     let getlocale = await getLocale();
 
-    let url = window.location.href.split("/")
-    if (url[3] == "flights") {
-        url = url.splice(3, 0, [getlocale]);
-        let a = "";
-        for (let i = 0; i < url.length; i++) {
-            a += url[i] + "/"
-            
-        }
-        console.log(a);
-        history.pushState({}, "", "url"); 
+    let language;
+
+    let old_url = window.location.href.split("/")
+    if (old_url[3].includes("flights")) {
+        old_url.splice(3, 0, getlocale);
+        let new_url = old_url.join("/")
+        history.pushState({}, "", new_url);
+        language = getlocale;
+
+    } else {
+        language = old_url[3];
     }
 
-    await getNavbar();
-
-    let current_language = $("#language_nav").prop("data-lang-code");
+    $("html").prop("lang", language);
     
+    await getNavbar(language, old_url);
+    await modalInit(language);
 
-    $("html").prop("lang", current_language);
-
-    let getflights = await getFlights($("#language_nav").prop("data-lang-code"));
+    let getflights = await getFlights(language);
 
     let $flights_frame = $("#flights_frame");
     let $flights_to = $("#flights_to");
@@ -40,13 +40,13 @@ $(async function () {
 
     if (origin == null || destination == null || departure == null || return_ == null || passengers == null) {
 
-        errorPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET" })).json()).errors.bad_url_parameter);
+        errorPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: {"Accept-Language" : "hu"} })).json()).errors.bad_url_parameter);
 
     } else {
 
         try {
 
-            let flights_to = await fetch(`/api/${current_language}/flights?departureAirport=${origin}&arrivalAirport=${destination}&departureDate=${departure}&numOfPassengers=${passengers}`, { method: "GET" });
+            let flights_to = await fetch(`/api/${language}/flights?departureAirport=${origin}&arrivalAirport=${destination}&departureDate=${departure}&numOfPassengers=${passengers}`, { method: "GET" });
 
             switch (flights_to.status) {
 
@@ -56,13 +56,13 @@ $(async function () {
 
                     if (flights_to.length == 0) {
 
-                        infoPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET" })).json()).errors.no_flights_by_parameters);
+                        infoPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: {"Accept-Language" : "hu"} })).json()).errors.no_flights_by_parameters);
 
                     } else {
 
                         if (return_ != "") {
 
-                            let flights_back = await fetch(`/api/${current_language}/flights?departureAirport=${destination}&arrivalAirport=${origin}&departureDate=${return_}&numOfPassengers=${passengers}`, { method: "GET" });
+                            let flights_back = await fetch(`/api/${language}/flights?departureAirport=${destination}&arrivalAirport=${origin}&departureDate=${return_}&numOfPassengers=${passengers}`, { method: "GET" });
 
                             switch (flights_back.status) {
 
@@ -83,7 +83,7 @@ $(async function () {
                                         await seatBookingButtonGenerator($flights_frame, passengers, getflights);
 
                                     } else {
-                                        infoPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET" })).json()).errors.no_flights_by_parameters);
+                                        infoPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: {"Accept-Language" : "hu"} })).json()).errors.no_flights_by_parameters);
                                     }
                                     break;
 
@@ -109,7 +109,7 @@ $(async function () {
 
         } catch (error) {
             console.log(error)
-            errorPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET" })).json()).errors.server_error)
+            errorPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: {"Accept-Language" : "hu"} })).json()).errors.server_error)
         }
 
 

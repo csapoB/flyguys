@@ -2,36 +2,46 @@ import { getNavbar } from "./locale.js";
 import { getIndex } from "./locale.js";
 import { getLocale } from "./locale.js";
 import { plannerInit } from "./planner.js";
+import { modalInit } from "./modal.js";
 
 $(async function () {
  
-    let getlocale = await getLocale();
+    let getlocale = await getLocale(); // megadja, hogy a böngésző nyelve magyar vagy angol (default) 
 
-    let language_nav = document.getElementById("language_nav");
+    let language;
 
-    if (window.location.href.split("/")[3] == "") {
+    let url_splitted = window.location.href.split("/");
+    if (url_splitted[3] == "") {
         
         history.pushState({}, "", `/${getlocale}`);
-        language_nav.dataset.langCode = getlocale;
+        language = getlocale;
         
                 
     } else {
 
-        language_nav.dataset.langCode = window.location.href.split("/")[3];
+        language = url_splitted[3];
     }
 
-    console.log("a")
-    $("#language_nav").prop("href", language_nav.dataset.langCode == "hu" ? "/en" : "/hu");
 
-    let current_language = language_nav.dataset.langCode;
+    $("html").prop("lang", language);
 
-    $("html").prop("lang", current_language);
+    await getNavbar(language, url_splitted);
+    await modalInit(language);
 
-    await getNavbar(current_language);
-    await getIndex(current_language);
-    $.datepicker.setDefaults($.datepicker.regional[(current_language) == "hu" ? "hu" : "en-GB"]);
+    let getindex = await getIndex(language);
+    $("#title_about_us_footer").text(getindex.footer.title_about_us);
+    $("#company_infos_footer").text(getindex.footer.company_infos);
+    $("#news_footer").text(getindex.footer.news);
+    $("#title_services_footer").text(getindex.footer.title_services);
+    $("#loyalty_program_footer").text(getindex.footer.loyalty_program);
+    $("#flight_search_footer").text(getindex.footer.flight_search);
+    $("#my_flights_footer").text(getindex.footer.my_flights);
+    $("#travel_planner_footer").text(getindex.footer.travel_planner);
+    $("#title_contact_footer").text(getindex.footer.title_contact);
+    $("#all_rights_reserved_footer").text(getindex.footer.all_rights_reserved);
+    
 
-    await plannerInit(current_language);
+    await plannerInit(language);
 
     document.getElementById('keret').appendChild(jaratok());
 });
