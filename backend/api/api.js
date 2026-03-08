@@ -2,10 +2,13 @@ const express = require('express');
 const router = express.Router();
 const database = require('../sql/database.js');
 const fs = require('fs/promises');
+const bcrypt = require('bcryptjs'); //?npm install bcrypt
 
 //!Multer
 const multer = require('multer'); //?npm install multer
 const path = require('path');
+const session = require('express-session');
+const { default: i18next } = require('i18next');
 
 const storage = multer.diskStorage({
     destination: (request, file, callback) => {
@@ -18,6 +21,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+
+
+
 //!Endpoints:
 //?GET /api/test
 router.get('/test', (request, response) => {
@@ -27,13 +33,31 @@ router.get('/test', (request, response) => {
 });
 
 //?GET /api/testsql
-router.get('/testsql', async (request, response) => {
+router.get('/airports', async (request, response) => {
     try {
-        const selectall = await database.selectall();
+        const airports = await database.selectAllAirportsInHungarian();
         response.status(200).json({
-            message: 'Ez a végpont működik.',
-            results: selectall
+            results: airports
         });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+router.get('/LoginCheck', async (request, response) => {
+    try {
+        if (!LoggedInCheck(request)) {
+            return response.status(220).json({
+                allapot: false
+            })
+        }
+        else {
+            response.status(200).json({
+                allapot: true,
+                admin: request.session.user.role == 1
+            })
+        }
     } catch (error) {
         response.status(500).json({
             message: 'Ez a végpont nem működik.'
@@ -41,8 +65,6 @@ router.get('/testsql', async (request, response) => {
     }
 });
 
-<<<<<<< Updated upstream
-=======
 router.get('/AdminCheck', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
@@ -62,7 +84,7 @@ router.get('/AdminCheck', async (request, response) => {
     }
 });
 
-router.get('/availabledepartureairports', async (request, response) => {
+/*router.get('/availabledepartureairports', async (request, response) => {
     try {
         const result = await database.selectAvailableDepartureAirports();
 
@@ -79,9 +101,9 @@ router.get('/availabledepartureairports', async (request, response) => {
             message: error
         });
     }
-});
+});*/
 
-router.get('/availablearrivalairports', async (request, response) => {
+/*router.get('/availablearrivalairports', async (request, response) => {
     try {
         const result = await database.selectAvailableArrivalAirports();
 
@@ -98,7 +120,7 @@ router.get('/availablearrivalairports', async (request, response) => {
             message: error
         });
     }
-});
+});*/
 
 router.get('/availableflights', async (request, response) => {
     try {
@@ -117,7 +139,13 @@ router.get('/availableflights', async (request, response) => {
 
 router.get('/availabledepartureairportsfiltered', async (request, response) => {
     try {
-        const result = await database.selectAvailableDepartureAirportsFilteredHun(((request.query.arrivalAirport == undefined) ? "" : request.query.arrivalAirport), ((request.query.departureDate == undefined) ? "" : request.query.departureDate));
+        let result;
+        if (request.get("Accept-Language") == "hu") {
+            result = await database.selectAvailableDepartureAirportsFilteredHun(((request.query.arrivalAirport == undefined) ? "" : request.query.arrivalAirport), ((request.query.departureDate == undefined) ? "" : request.query.departureDate));
+        } else {
+            result = await database.selectAvailableDepartureAirportsFilteredEn(((request.query.arrivalAirport == undefined) ? "" : request.query.arrivalAirport), ((request.query.departureDate == undefined) ? "" : request.query.departureDate));
+        }
+        
 
 
         response.status(200).json({
@@ -132,7 +160,12 @@ router.get('/availabledepartureairportsfiltered', async (request, response) => {
 
 router.get('/availablearrivalairportsfiltered', async (request, response) => {
     try {
-        const result = await database.selectAvailableArrivalAirportsFilteredHun(((request.query.departureAirport == undefined) ? "" : request.query.departureAirport), ((request.query.departureDate == undefined) ? "" : request.query.departureDate));
+        let result;
+        if (request.get("Accept-Language") == "hu") {
+            result = await database.selectAvailableArrivalAirportsFilteredHun(((request.query.departureAirport == undefined) ? "" : request.query.departureAirport), ((request.query.departureDate == undefined) ? "" : request.query.departureDate));
+        } else {
+            result = await database.selectAvailableArrivalAirportsFilteredEn(((request.query.departureAirport == undefined) ? "" : request.query.departureAirport), ((request.query.departureDate == undefined) ? "" : request.query.departureDate));
+        }
 
         response.status(200).json({
             results: result
@@ -247,18 +280,37 @@ router.get('/swappableairports', async (request, response) => {
     }
 });
 
-router.get('/flights', async (request, response) => {
+router.get('/hu/flights', async (request, response) => {
     try {
 
         if (request.query.departureAirport == undefined || request.query.arrivalAirport == undefined || request.query.departureDate == undefined || request.query.numOfPassengers == undefined) {
             response.status(400).json({
-                error: request.t("errors", {returnObjects : true}).bad_http_get_request
+                error: "A HTTP-GET lekérdezés nem megfelelő!"
             });
         } else {
-            const result = await database.selectAvailableFlightsFiltered(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfPassengers);
 
             response.status(200).json({
-                flights: result
+                flights: await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfPassengers)
+            });
+        }
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/en/flights', async (request, response) => {
+    try {
+
+        if (request.query.departureAirport == undefined || request.query.arrivalAirport == undefined || request.query.departureDate == undefined || request.query.numOfPassengers == undefined) {
+                response.status(400).json({
+                    error: "The HTTP-GET request isn't proper!"
+                });
+        } else {
+
+            response.status(200).json({
+                flights: await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfPassengers)
             });
         }
     } catch (error) {
@@ -299,6 +351,71 @@ router.get('/getnavbar', (request, response) => {
 
         response.status(200).json({
             navbar: request.t("navbar", {returnObjects : true})
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/getplanner', (request, response) => {
+    try {
+
+        response.status(200).json({
+            planner: request.t("planner", {returnObjects : true})
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/getplannerpassengerspopover', (request, response) => {
+    try {
+
+        response.status(200).json({
+            planner_passengers_popover: request.t("planner_passengers_popover", {returnObjects : true})
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/getindex', (request, response) => {
+    try {
+
+        response.status(200).json({
+            index: request.t("index", {returnObjects : true})
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/getlocale', (request, response) => {
+    try {
+
+        response.status(200).json({
+            locale: request.t("locale", {returnObjects : true})
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/getmodal', (request, response) => {
+    try {
+
+        response.status(200).json({
+            modal: request.t("modal", {returnObjects : true})
         });
     } catch (error) {
         response.status(500).json({
@@ -461,6 +578,7 @@ function LoggedInCheck(request) {
     return vissza;
 }
 
+
 router.get('/helyfoglalas', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
@@ -510,5 +628,4 @@ router.post('/helyfoglalas', async (request, response) => {
     }
 });
 
->>>>>>> Stashed changes
 module.exports = router;
