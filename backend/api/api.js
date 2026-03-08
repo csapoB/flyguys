@@ -499,7 +499,7 @@ router.post('/register', async (request, response) => {
         else {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
-            const register = await database.Register(nev, email, hashedPassword, szuldatum, 0);
+            const register = await database.Register(nev, email, hashedPassword, szuldatum, 0, 1);
             if (!register) {
                 return response.status(400).json({
                     message: 'Sikertelen regisztráció'
@@ -579,5 +579,53 @@ function LoggedInCheck(request) {
 }
 
 
+router.get('/helyfoglalas', async (request, response) => {
+    try {
+        if (!LoggedInCheck(request)) {
+            throw new Error("Nem vagy bejelentkezve!")
+        }
+        else {
+            let id = request.query.id;
+            if (!id) {
+                throw new Error("Nincs járat id")
+            }
+            const helyek = await database.selectAvailableSeatsOnFlight(id, request.session.user.id);
+            response.status(200).json({
+                helyek: helyek
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            message: error.message
+        });
+    }
+});
+
+router.post('/helyfoglalas', async (request, response) => {
+    try {
+        if (!LoggedInCheck(request)) {
+            throw new Error("Nem vagy bejelentkezve!")
+        }
+        else {
+            const{flightID, rowID, columnID} = request.body;
+            if (!flightID || !rowID || !columnID) {
+                throw new Error("Hiányzó adat.")
+            }
+            const siker = await database.SeatReservation(request.session.user.id, flightID, rowID, columnID);
+            if (!siker) {
+                throw new Error("Hiba az adatbázisban")
+            }
+            response.status(200).json({
+                siker: siker
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            message: error.message
+        });
+    }
+});
 
 module.exports = router;
