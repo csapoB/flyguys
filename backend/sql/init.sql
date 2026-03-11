@@ -106,7 +106,6 @@ CREATE TABLE IF NOT EXISTS reservation (
     ColumnID CHAR(1) NOT NULL,
     IsCancelled BOOLEAN NOT NULL,
     IsAdult BOOLEAN NOT NULL,
-   -- Price INT NOT NULL,
     FOREIGN KEY (FlightID) REFERENCES flight(FlightID),
     FOREIGN KEY (PassengerID) REFERENCES useraccount(UserID)
 );

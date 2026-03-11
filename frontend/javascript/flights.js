@@ -36,17 +36,18 @@ $(async function () {
     const destination = params.get("destination");
     const departure = params.get("departure");
     const return_ = params.get("return");
-    const passengers = params.get("passengers");
+    const adults = params.get("adults");
+    const children = params.get("children");
 
-    if (origin == null || destination == null || departure == null || return_ == null || passengers == null) {
+    if (origin == null || destination == null || departure == null || return_ == null || adults == null || children == null) {
 
-        errorPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: {"Accept-Language" : "hu"} })).json()).errors.bad_url_parameter);
+        errorPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: {"Accept-Language" : language} })).json()).errors.bad_url_parameter);
 
     } else {
 
         try {
 
-            let flights_to = await fetch(`/api/${language}/flights?departureAirport=${origin}&arrivalAirport=${destination}&departureDate=${departure}&numOfPassengers=${passengers}`, { method: "GET" });
+            let flights_to = await fetch(`/api/${language}/flights?departureAirport=${origin}&arrivalAirport=${destination}&departureDate=${departure}&numOfAdults=${adults}&numOfChildren=${children}`, { method: "GET" });
 
             switch (flights_to.status) {
 
@@ -56,13 +57,13 @@ $(async function () {
 
                     if (flights_to.length == 0) {
 
-                        infoPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: {"Accept-Language" : "hu"} })).json()).errors.no_flights_by_parameters);
+                        infoPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: {"Accept-Language" : language} })).json()).errors.no_flights_by_parameters);
 
                     } else {
 
                         if (return_ != "") {
 
-                            let flights_back = await fetch(`/api/${language}/flights?departureAirport=${destination}&arrivalAirport=${origin}&departureDate=${return_}&numOfPassengers=${passengers}`, { method: "GET" });
+                            let flights_back = await fetch(`/api/${language}/flights?departureAirport=${destination}&arrivalAirport=${origin}&departureDate=${return_}&numOfAdults=${adults}&numOfChildren=${children}`, { method: "GET" });
 
                             switch (flights_back.status) {
 
@@ -80,10 +81,10 @@ $(async function () {
                                         });
                                         $flights_frame.append($flights_back);
                                         await flightSelector(flights_back, $flights_back, getflights);
-                                        await seatBookingButtonGenerator($flights_frame, passengers, getflights);
+                                        await seatBookingButtonGenerator($flights_frame, adults, children, getflights);
 
                                     } else {
-                                        infoPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: {"Accept-Language" : "hu"} })).json()).errors.no_flights_by_parameters);
+                                        infoPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: {"Accept-Language" : language} })).json()).errors.no_flights_by_parameters);
                                     }
                                     break;
 
@@ -93,7 +94,7 @@ $(async function () {
 
                         } else {
                             await flightSelector(flights_to, $flights_to, getflights);
-                            await seatBookingButtonGenerator($flights_frame, passengers, getflights);
+                            await seatBookingButtonGenerator($flights_frame, adults, children, getflights);
                         }
                     }
                     break;
@@ -109,7 +110,7 @@ $(async function () {
 
         } catch (error) {
             console.log(error)
-            errorPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: {"Accept-Language" : "hu"} })).json()).errors.server_error)
+            errorPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: {"Accept-Language" : language} })).json()).errors.server_error)
         }
 
 
@@ -119,11 +120,21 @@ $(async function () {
 });
 
 async function flightSelector(flights, $frame, i18n_values) {
+    
+    let $date = $("<h1>", {
+        "class": "display-3 mb-4 d-flex justify-content-center",
+        "html": `<span class=\"pe-4\"><svg fill="currentColor" version=\"1.1" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"48\" height=\"48\" viewBox=\"0 0 371.656 371.656\" xml:space=\"preserve\"><g><g><g><path d=\"M37.833,212.348c-0.01,0.006-0.021,0.01-0.032,0.017c-4.027,2.093-5.776,6.929-4.015,11.114     c1.766,4.199,6.465,6.33,10.787,4.892l121.85-40.541l-22.784,37.207c-1.655,2.703-1.305,6.178,0.856,8.497     c2.161,2.318,5.603,2.912,8.417,1.449l23.894-12.416c0.686-0.356,1.309-0.823,1.844-1.383l70.785-73.941l87.358-45.582     c33.085-17.835,29.252-31.545,27.29-35.321c-1.521-2.928-4.922-6.854-12.479-8.93c-7.665-2.106-18.021-1.938-31.653,0.514     c-4.551,0.818-7.063,0.749-9.723,0.676c-9.351-0.256-15.694,0.371-47.188,16.736L90.788,164.851l-66.8-34.668     c-2.519-1.307-5.516-1.306-8.035,0.004l-11.256,5.85c-2.317,1.204-3.972,3.383-4.51,5.938c-0.538,2.556,0.098,5.218,1.732,7.253     l46.364,57.749L37.833,212.348z"/><path d="M355.052,282.501H28.948c-9.17,0-16.604,7.436-16.604,16.604s7.434,16.604,16.604,16.604h326.104     c9.17,0,16.604-7.434,16.604-16.604C371.655,289.934,364.222,282.501,355.052,282.501z\"/></g></g></g></svg></span>${flights[0].DepartureDate}`
+    });
+
+    $frame.prepend($date);
+
     let $title = $("<h1>", {
-        "class": "display-3",
+        "class": "display-3 d-flex justify-content-center",
         "html": `${flights[0].DepartureCity} (${flights[0].DepartureAirport})<span class="ps-4 pe-4"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"48\" height=\"48\" fill=\"currentColor\" class=\"bi bi-arrow-right\" viewBox=\"0 0 16 16\"><path fill-rule=\"evenodd\" d=\"M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8\"/></svg></span>${flights[0].ArrivalCity} (${flights[0].ArrivalAirport})`
     });
+    
     $frame.prepend($title);
+
 
     let $flights_button = $("<button>", {
         "class": "btn btn-danger col-md-12 col-lg-12 flight",
@@ -275,7 +286,7 @@ function flights_popover_contentGenerator($input_field, popover_obj, flights_dat
         let $flight_div = $("<div>", {
             "class": "d-flex justify-content-center",
             "html": `<div class="w-100 row pe-0 ps-0 mw-100 border rounded-1">
-                    <div class="d-flex align-items-center justify-content-around col-md-12 col-lg-12 col-xl-6">
+                    <div class="d-flex align-items-center justify-content-around col-sm-12 col-md-12 col-lg-12 col-xl-6">
                         <span class="fs-3">${flights_data_from_api[i].DepartureTime}</span>
                         <hr class="w-25">
                         <span>
@@ -289,10 +300,10 @@ function flights_popover_contentGenerator($input_field, popover_obj, flights_dat
                         <hr class="w-25">
                         <span class="fs-3">${flights_data_from_api[i].ArrivalTime}</span>
                     </div>
-                    <div class="d-flex align-items-center justify-content-center col-md-12 col-lg-12 col-xl-4">
-                        <span class="fs-3">${flights_data_from_api[i].BasePrice} HUF</span>
+                    <div class="d-flex align-items-center justify-content-center col-sm-12 col-md-12 col-lg-12 col-xl-4">
+                        <span class="fs-3">${flights_data_from_api[i].BasePrice}</span>
                     </div>
-                    <div class="d-flex align-items-center justify-content-center col-md-12 col-lg-12 col-xl-2">
+                    <div class="d-flex align-items-center justify-content-center col-sm-12 col-md-12 col-lg-12 col-xl-2">
                         <span class="fs-3">${flights_data_from_api[i].NumOfAvailableSeats}</span>
                         <span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-person-arms-up" viewBox="0 0 16 16"> <path d="M8 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/><path d="m5.93 6.704-.846 8.451a.768.768 0 0 0 1.523.203l.81-4.865a.59.59 0 0 1 1.165 0l.81 4.865a.768.768 0 0 0 1.523-.203l-.845-8.451A1.5 1.5 0 0 1 10.5 5.5L13 2.284a.796.796 0 0 0-1.239-.998L9.634 3.84a.7.7 0 0 1-.33.235c-.23.074-.665.176-1.304.176-.64 0-1.074-.102-1.305-.176a.7.7 0 0 1-.329-.235L4.239 1.286a.796.796 0 0 0-1.24.998l2.5 3.216c.317.316.475.758.43 1.204Z"/>
@@ -361,7 +372,7 @@ function infoPageGenerator($frame, message) {
     $frame.append($no_flights_div);
 }
 
-async function seatBookingButtonGenerator($frame, passengers, i18n_values) {
+async function seatBookingButtonGenerator($frame, adults, children, i18n_values) {
 
     let $seat_booking_button_frame = $("<div>", {
         "class": "row d-flex justify-content-center"
@@ -381,13 +392,14 @@ async function seatBookingButtonGenerator($frame, passengers, i18n_values) {
                 const fd = new FormData(document.getElementById("flights_form"));
 
                 console.log(flight_ids);
-                console.log(passengers);
+                
 
                 fd.set("flight_id_to", flight_ids[0]);
                 if (flight_ids.length == 2) {
                     fd.set("flight_id_back", flight_ids[1]);
                 }
-                fd.set("num_of_passengers", passengers);
+                fd.set("adults", adults);
+                fd.set("children", children)
 
                 const searchParams = new URLSearchParams(fd);
                 const queryString = searchParams.toString();
