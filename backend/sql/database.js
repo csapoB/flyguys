@@ -109,6 +109,12 @@ async function selectAvailableSeatsOnFlight(flightId) {
     return rows;
 }
 
+//Map pinek
+async function selectAvailableAirports() {
+    const query = 'SELECT airport.AirportCode, city.Hungarian, city.GeographicCoordinates FROM airport INNER JOIN city ON airport.CityID = city.CityID;';
+    const [rows] = await pool.execute(query);
+    return rows;
+}
 
 /*
 async function a() {
@@ -166,6 +172,7 @@ module.exports = {
     selectSwappableFlightsWithSameDepartureDates,
     selectSwappableFlights,
     selectAvailableFlightsFiltered,
-    selectAvailableSeatsOnFlight
+    selectAvailableSeatsOnFlight,
+    selectAvailableAirports
   
 };

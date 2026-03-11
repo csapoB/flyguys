@@ -273,7 +273,7 @@ router.get('/flights', async (request, response) => {
 
         if (request.query.departureAirport == undefined || request.query.arrivalAirport == undefined || request.query.departureDate == undefined || request.query.numOfPassengers == undefined) {
             response.status(400).json({
-                error: request.t("errors", {returnObjects : true}).bad_http_get_request
+                error: request.t("errors", { returnObjects: true }).bad_http_get_request
             });
         } else {
             const result = await database.selectAvailableFlightsFiltered(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfPassengers);
@@ -293,7 +293,7 @@ router.get('/geterrors', (request, response) => {
     try {
 
         response.status(200).json({
-            errors: request.t("errors", {returnObjects : true})
+            errors: request.t("errors", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({
@@ -306,7 +306,7 @@ router.get('/getflights', (request, response) => {
     try {
 
         response.status(200).json({
-            flights: request.t("flights", {returnObjects : true})
+            flights: request.t("flights", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({
@@ -319,7 +319,7 @@ router.get('/getnavbar', (request, response) => {
     try {
 
         response.status(200).json({
-            navbar: request.t("navbar", {returnObjects : true})
+            navbar: request.t("navbar", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({
@@ -468,6 +468,19 @@ router.get('/husegprogram', async (request, response) => {
     }
 });
 
+router.get('/map_pins', async (request, response) => {
+    try {
+        response.status(200).json({
+            pins: await database.selectAvailableAirports()
+        })
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            message: 'Ez a végpont nem működik.'
+        });
+    }
+});
+
 function LoggedInCheck(request) {
     let vissza = false;
     if (request.session && request.session.user && request.session.user.id && request.session.user.role !== undefined && request.session.user.timestamp) {
@@ -481,6 +494,8 @@ function LoggedInCheck(request) {
     }
     return vissza;
 }
+
+
 
 
 
