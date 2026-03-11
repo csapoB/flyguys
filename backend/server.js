@@ -40,8 +40,22 @@ app.use(i18next_http_middleware.handle(i18next));
 
 //!Routing
 //?Főoldal:
-router.get('/', (request, response) => {
+router.get('/', async (request, response) => {
+    
     response.sendFile(path.join(__dirname, '../frontend/html/index.html'));
+    
+});
+
+router.get('/en', async (request, response) => {
+    
+    response.sendFile(path.join(__dirname, '../frontend/html/index.html'));
+    
+});
+
+router.get('/hu', async (request, response) => {
+    
+    response.sendFile(path.join(__dirname, '../frontend/html/index.html'));
+    
 });
 
 //? Map
@@ -70,6 +84,14 @@ router.get('/admin', (request, response) => {
 });
 
 router.get('/flights', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/flights.html'));
+});
+
+router.get('/en/flights', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/flights.html'));
+});
+
+router.get('/hu/flights', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/flights.html'));
 });
 

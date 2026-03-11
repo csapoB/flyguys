@@ -1,139 +1,205 @@
-$(document).ready(function(){
-    ulesek_general(tesztadatok);
+﻿let kivalaszottUlesekOda = [];
+let kivalaszottUlesekVissza = [];
+let maxPassengers = 1;
+let isRoundTrip = false;
+
+const fareClassNames = {
+    1: { nev: 'First Class', badge: 'class-badge-first' },
+    2: { nev: 'Business Class', badge: 'class-badge-business' },
+    3: { nev: 'Economy Class', badge: 'class-badge-economy' }
+};
+
+$(document).ready(async function(){
+    let params = new URLSearchParams(document.location.search);
+    let flight_id_to = params.get("flight_id_to");
+    let flight_id_back = params.get("flight_id_back");
+    maxPassengers = parseInt(params.get("num_of_passengers")) || 1;
+    isRoundTrip = flight_id_back != null;
+
+    // Odaut
+    let odaAdatok = await getHelyek(flight_id_to);
+    if (odaAdatok && odaAdatok.length > 0) {
+        ulesek_general($('#helyek'), odaAdatok, 'oda');
+    }
+
+    // Visszaut
+    if (isRoundTrip) {
+        $('#visszaut_section').show();
+        $('#visszaut_card').show();
+        let visszaAdatok = await getHelyek(flight_id_back);
+        if (visszaAdatok && visszaAdatok.length > 0) {
+            ulesek_general($('#helyekvissza'), visszaAdatok, 'vissza');
+        }
+    } else {
+        $('#visszaut_section').hide();
+        $('#visszaut_card').hide();
+    }
+
+    $('#lefoglal').prop('disabled', true);
+    frissitAllapot();
+
+    $('#lefoglal').click(function(){
+        let msg = '=== Foglalás összesítő ===\n\n';
+        msg += 'Odaút kiválasztott helyek:\n';
+        let flight_id_to = params.get("flight_id_to");
+        kivalaszottUlesekOda.forEach(async function(u){
+            let sikeres = await helyFoglal(flight_id_to, u.hely[0], u.hely[1]);
+            if (sikeres) {
+                console.log("Sikeres foglalás")
+                let fc = fareClassNames[u.tipus];
+                alert('  • ' + u.hely + ' ülés (' + fc.nev + ') - ' + u.ar + ' Ft\n');
+            }
+        });
+        if (isRoundTrip) {
+            let flight_id_back = params.get("flight_id_back");
+            msg += '\nVisszaút kiválasztott helyek:\n';
+            kivalaszottUlesekVissza.forEach(async function(u){
+                let sikeres = await helyFoglal(flight_id_back, u.hely[0], u.hely[1]);
+                if (sikeres) {
+                console.log("Sikeres foglalás")
+                let fc = fareClassNames[u.tipus];
+                alert('  • ' + u.hely + ' ülés (' + fc.nev + ') - ' + u.ar + ' Ft\n');
+            }
+            });
+        }
+        let osszesen = 0;
+        kivalaszottUlesekOda.forEach(u => osszesen += u.ar);
+        kivalaszottUlesekVissza.forEach(u => osszesen += u.ar);
+        msg += '\nÖsszesen: ' + osszesen + ' Ft';
+        alert(msg);
+    })
 })
 
-let tesztadatok = [
-    { "oszlop": "A", "sor": 1, "ar": 7500, "nagylab": true },
-    { "oszlop": "B", "sor": 1, "ar": 7500, "nagylab": true },
-    { "oszlop": "C", "sor": 1, "ar": 7500, "nagylab": true },
-    { "oszlop": "D", "sor": 1, "ar": 7500, "nagylab": true },
-    { "oszlop": "E", "sor": 1, "ar": 7500, "nagylab": true },
-    { "oszlop": "F", "sor": 1, "ar": 7500, "nagylab": true },
-    
-    { "oszlop": "A", "sor": 2, "ar": 4500, "nagylab": false },
-    { "oszlop": "B", "sor": 2, "ar": 4500, "nagylab": false },
-    { "oszlop": "C", "sor": 2, "ar": 4500, "nagylab": false },
-    { "oszlop": "D", "sor": 2, "ar": 4500, "nagylab": false },
-    { "oszlop": "E", "sor": 2, "ar": 4500, "nagylab": false },
-    { "oszlop": "F", "sor": 2, "ar": 4500, "nagylab": false },
+async function helyFoglal(flightID, rowID, columnID){
+    try {
+        let vissza = await fetch("/api/helyfoglalas", {
+            method:"POST", 
+            headers:{'Content-Type': 'application/json'},
+            body: JSON.stringify({flightID, rowID, columnID})
+        });
+        let json = await vissza.json();
+        if (!json.siker) {
+            throw new Error("Hiba a feltöltésben");
+        }
+        return json.siker;
+    } catch (error) {
+        console.error(error.message);
+        return false;
+    }
+}
 
-    { "oszlop": "A", "sor": 3, "ar": 4500, "nagylab": false },
-    { "oszlop": "B", "sor": 3, "ar": 4500, "nagylab": false },
-    { "oszlop": "C", "sor": 3, "ar": 4500, "nagylab": false },
-    { "oszlop": "D", "sor": 3, "ar": 4500, "nagylab": false },
-    { "oszlop": "E", "sor": 3, "ar": 4500, "nagylab": false },
-    { "oszlop": "F", "sor": 3, "ar": 4500, "nagylab": false },
+async function getHelyek(id){
+    if (!id) {
+        console.error("Nincs flight_id megadva");
+        return null;
+    }
+    try {
+        let vissza = await fetch("/api/helyfoglalas?id="+id, {method:"GET"});
+        let json = await vissza.json();
+        if (!json.helyek) {
+            console.error(json.message || "Ismeretlen hiba");
+            return null;
+        }
+        return json.helyek;
+    } catch (error) {
+        console.error(error.message);
+        return null;
+    }
+}
 
-    { "oszlop": "A", "sor": 4, "ar": 4500, "nagylab": false },
-    { "oszlop": "B", "sor": 4, "ar": 4500, "nagylab": false },
-    { "oszlop": "C", "sor": 4, "ar": 4500, "nagylab": false },
-    { "oszlop": "D", "sor": 4, "ar": 4500, "nagylab": false },
-    { "oszlop": "E", "sor": 4, "ar": 4500, "nagylab": false },
-    { "oszlop": "F", "sor": 4, "ar": 4500, "nagylab": false },
-
-    { "oszlop": "A", "sor": 5, "ar": 4500, "nagylab": false },
-    { "oszlop": "B", "sor": 5, "ar": 4500, "nagylab": false },
-    { "oszlop": "C", "sor": 5, "ar": 4500, "nagylab": false },
-    { "oszlop": "D", "sor": 5, "ar": 4500, "nagylab": false },
-    { "oszlop": "E", "sor": 5, "ar": 4500, "nagylab": false },
-    { "oszlop": "F", "sor": 5, "ar": 4500, "nagylab": false },
-
-    { "oszlop": "A", "sor": 6, "ar": 4500, "nagylab": false },
-    { "oszlop": "B", "sor": 6, "ar": 4500, "nagylab": false },
-    { "oszlop": "C", "sor": 6, "ar": 4500, "nagylab": false },
-    { "oszlop": "D", "sor": 6, "ar": 4500, "nagylab": false },
-    { "oszlop": "E", "sor": 6, "ar": 4500, "nagylab": false },
-    { "oszlop": "F", "sor": 6, "ar": 4500, "nagylab": false },
-
-    { "oszlop": "A", "sor": 7, "ar": 4500, "nagylab": false },
-    { "oszlop": "B", "sor": 7, "ar": 4500, "nagylab": false },
-    { "oszlop": "C", "sor": 7, "ar": 4500, "nagylab": false },
-    { "oszlop": "D", "sor": 7, "ar": 4500, "nagylab": false },
-    { "oszlop": "E", "sor": 7, "ar": 4500, "nagylab": false },
-    { "oszlop": "F", "sor": 7, "ar": 4500, "nagylab": false },
-
-    { "oszlop": "A", "sor": 8, "ar": 4500, "nagylab": false },
-    { "oszlop": "B", "sor": 8, "ar": 4500, "nagylab": false },
-    { "oszlop": "C", "sor": 8, "ar": 4500, "nagylab": false },
-    { "oszlop": "D", "sor": 8, "ar": 4500, "nagylab": false },
-    { "oszlop": "E", "sor": 8, "ar": 4500, "nagylab": false },
-    { "oszlop": "F", "sor": 8, "ar": 4500, "nagylab": false },
-
-    { "oszlop": "A", "sor": 9, "ar": 4500, "nagylab": false },
-    { "oszlop": "B", "sor": 9, "ar": 4500, "nagylab": false },
-    { "oszlop": "C", "sor": 9, "ar": 4500, "nagylab": false },
-    { "oszlop": "D", "sor": 9, "ar": 4500, "nagylab": false },
-    { "oszlop": "E", "sor": 9, "ar": 4500, "nagylab": false },
-    { "oszlop": "F", "sor": 9, "ar": 4500, "nagylab": false },
-
-    { "oszlop": "A", "sor": 10, "ar": 6500, "nagylab": true },
-    { "oszlop": "B", "sor": 10, "ar": 6500, "nagylab": true },
-    { "oszlop": "C", "sor": 10, "ar": 6500, "nagylab": true },
-    { "oszlop": "D", "sor": 10, "ar": 6500, "nagylab": true },
-    { "oszlop": "E", "sor": 10, "ar": 6500, "nagylab": true },
-    { "oszlop": "F", "sor": 10, "ar": 6500, "nagylab": true }
-];
-
-let kivalaszottUlesek = [];
-
-//Ülések legenerálása tesztadatok alapján
-function ulesek_general(adatok){
-    let sorokszama = adatok[adatok.length-1].sor;
+// Ulesek legeneralasa
+function ulesek_general(hova, adatok, irany){
+    if (!adatok || adatok.length === 0) {
+        hova.append('<div class="alert alert-danger">Nem sikerült betölteni az ülőhelyeket.</div>');
+        return;
+    }
+    let sorokszama = adatok[adatok.length-1].RowID;
     for (let i = 0; i < sorokszama; i++) {
         let $sorDiv = $('<div class="d-flex justify-content-center mb-1"></div>');
         $sorDiv.append('<div class=sorszama>'+(i+1)+'</div>');
 
-
-        let x =i*6;
-        while(x<i*6+6){
+        let x = i * 6;
+        while(x < i * 6 + 6){
             let ulesAdat = adatok[x];
-            let ulesHelye = (i+1)+ulesAdat.oszlop;
-            let ulesAra = ulesAdat.ar
+            if (!ulesAdat) break;
+            let ulesHelye = (i+1) + ulesAdat.ColumnID;
+            let ulesAra = ulesAdat.Price;
 
-            let $hely;
-            if (ulesAdat.nagylab) {
-                $hely = $('<div class="ules nagylab">'+ulesAdat.oszlop+'</div>')
-            }
-            else{
-                $hely = $('<div class="ules">'+ulesAdat.oszlop+'</div>')
-            }
+            let $hely = $('<div class="ules tipus'+ ulesAdat.FareClassID+'">'+ ulesAdat.ColumnID+'</div>');
+
             $hely.click(function(){
+                let tomb = irany === 'oda' ? kivalaszottUlesekOda : kivalaszottUlesekVissza;
+
                 if ($hely.hasClass('kivalasztott')) {
                     $hely.removeClass('kivalasztott');
-                    kivalaszottUlesek = kivalaszottUlesek.filter(u => u.hely != ulesHelye)
+                    if (irany === 'oda') {
+                        kivalaszottUlesekOda = kivalaszottUlesekOda.filter(u => u.hely != ulesHelye);
+                    } else {
+                        kivalaszottUlesekVissza = kivalaszottUlesekVissza.filter(u => u.hely != ulesHelye);
+                    }
                 }
-                else{
-                    $hely.addClass('kivalasztott');
-                    kivalaszottUlesek.push({"hely": ulesHelye, "ar": ulesAra})
+                else {
+                    if (tomb.length < maxPassengers) {
+                        $hely.addClass('kivalasztott');
+                    if (irany === 'oda') {
+                        kivalaszottUlesekOda.push({"hely": ulesHelye, "ar": ulesAra, "tipus": ulesAdat.FareClassID});
+                    } else {
+                        kivalaszottUlesekVissza.push({"hely": ulesHelye, "ar": ulesAra, "tipus": ulesAdat.FareClassID});
+                    }
+                    }
                 }
-                megjelenitKijeloltek();
+                frissitAllapot();
             })
+
             $sorDiv.append($hely);
-            if (ulesAdat.oszlop =="C") {
+            if (ulesAdat.ColumnID == "C") {
                 $sorDiv.append('<div class="folyoso"></div>')
             }
             x++;
         }
-        $('#helyek').append($sorDiv);
+        hova.append($sorDiv);
     }
 }
 
-//A kiválaszottak ul lista lenullázása majd visszatöltése a jelenleg kiválaszottak alapján vagy ha nincs kiválasztva akkor azt írja bele
-function megjelenitKijeloltek(){
-    let $lista = $('#kivalasztottak');
-    let osszesen = 0;
-    $lista.empty();
+// Allapot frissitese
+function frissitAllapot(){
+    megjelenitKijeloltek($('#kivalasztottak_oda'), kivalaszottUlesekOda);
+    if (isRoundTrip) {
+        megjelenitKijeloltek($('#kivalasztottak_vissza'), kivalaszottUlesekVissza);
+    }
 
-    if (kivalaszottUlesek.length==0) {
-        $lista.append('<li class="list-group-item italic">Nincs kiválasztott hely!</li>');
-        $('#lefoglal').prop('disabled', true);
-    }
-    else{
-        for (let i = 0; i < kivalaszottUlesek.length; i++) {
-            $lista.append('<li class="list-group-item d-flex justify-content-between"><span>'+kivalaszottUlesek[i].hely+' ülés</span><span>'+kivalaszottUlesek[i].ar+' Ft</span></li>')
-            osszesen+=kivalaszottUlesek[i].ar
-        }
-        $('#lefoglal').prop('disabled', false);
-    }
+    // Osszes ar
+    let osszesen = 0;
+    kivalaszottUlesekOda.forEach(u => osszesen += u.ar);
+    kivalaszottUlesekVissza.forEach(u => osszesen += u.ar);
     $('#ar').text(osszesen);
+
+    // Szamlalo
+    $('#oda_szamlalo').text(kivalaszottUlesekOda.length + ' / ' + maxPassengers);
+    if (isRoundTrip) {
+        $('#vissza_szamlalo').text(kivalaszottUlesekVissza.length + ' / ' + maxPassengers);
+    }
+
+    // Lefoglalas gomb: pontosan num_of_passengers kell mindket iranyban
+    let odaOk = kivalaszottUlesekOda.length === maxPassengers;
+    let visszaOk = !isRoundTrip || kivalaszottUlesekVissza.length === maxPassengers;
+    $('#lefoglal').prop('disabled', !(odaOk && visszaOk));
+}
+
+function megjelenitKijeloltek($lista, ulesek){
+    $lista.empty();
+    if (ulesek.length == 0) {
+        $lista.append('<li class="list-group-item italic">Nincs kiválasztott hely!</li>');
+    }
+    else {
+        for (let i = 0; i < ulesek.length; i++) {
+            let fc = fareClassNames[ulesek[i].tipus];
+            $lista.append(
+                '<li class="list-group-item d-flex justify-content-between align-items-center">' +
+                '<span>' + ulesek[i].hely + ' ülés <span class="' + fc.badge + '">' + fc.nev + '</span></span>' +
+                '<span class="fw-bold">' + ulesek[i].ar + ' Ft</span>' +
+                '</li>'
+            );
+        }
+    }
 }

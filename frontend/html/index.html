@@ -21,9 +21,11 @@
     <script src="../javascript/jquery-3.7.1.min.js"></script>
     <script src="../javascript/jquery-ui.min.js"></script>
     <script src="../javascript/datepicker-hu.js"></script>
-    <script src="../javascript/index.js"></script>
-    <script src="../javascript/modal.js"></script>
-    <script src="../javascript/planner.js"></script>
+    <script src="../javascript/datepicker-en-GB.js"></script>
+    <script type="module" src="../javascript/locale.js"></script>
+    <script type="module" src="../javascript/index.js"></script>
+    <script type="module" src="../javascript/modal.js"></script>
+    <script type="module" src="../javascript/planner.js"></script>
     <script src="../javascript/plannerresizer.js"></script>
 
     <!-- Zalando Sans Font -->
@@ -59,7 +61,7 @@
                     </li>
                 </ul>
             <div class="d-flex flex-column flex-lg-row gap-2 align-items-start align-items-lg-center ms-lg-auto mt-2 mt-lg-0">
-                <a class="nav-link" href="#lang" id="language_nav">Magyar</a>
+                <a class="nav-link" data-lang-code="hu" href="/en" id="language_nav"><span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" height="24" width="32"><defs><clipPath><path d="M-85 0h682v512H-85z"></path></clipPath></defs><g clip-path="url(#a)" transform="translate(80) scale(.94)"><path fill="#012169" d="M-256 0H768v512H-256z"></path><path fill="#fff" d="M-256 0v57l910 455h114v-57L-141 0h-115zM768 0v57l-909 455h-115v-57L654 0h114z"></path><path fill="#fff" d="M171 0v512h170V0H171zm-427 171v170H768V171H-256z"></path><path fill="#c8102e" d="M-256 205v102H768V205H-256zM205 0v512h102V0H205zm-461 512L85 341h77l-342 171h-76zm0-512L85 171H9L-256 38V0zm606 171L692 0h76L427 171h-77zm418 341L427 341h76l265 133v38z"></path></g></svg></span></a>
                 <a class="btn btn-danger" id="login_button" data-bs-toggle="modal" href="#monadModal">Bejelentkezés</a>
                 <a class="btn btn-outline-dark" id="admin_button" href="/admin">Admin</a>
                 <a class="btn btn-outline-dark" id="profile_button" href="/profil">Profilom</a>
@@ -152,11 +154,10 @@
                         <div id="passengers_and_search_div" class="col-md-12 col-lg-4 pe-0 ps-0">
                             <div class="container-fluid p-3">
                                 <div class="row ps-2 pe-2">
-                                    <div id="passengers_div"
-                                        class="pt-1 col-lg-6 border rounded planner_div d-flex flex-column justify-content-center">
+                                    <div id="passengers_div" class="pt-1 col-lg-6 border rounded planner_div d-flex flex-column justify-content-center">
                                         <label id="passengers_label" class="planner_label" for="passengers_input">Utasok</label>
-                                        <input id="passengers_input" name="passengers" readonly="readonly" type="text"
-                                            class="planner_input" name="passengers" aria-label="Utasok" tabindex="7"
+                                        <input id="passengers_input" readonly="readonly" type="text"
+                                            class="planner_input" aria-label="Utasok" tabindex="7"
                                             value="1 felnőtt, 0 gyermek">
                                     </div>
                                     <div class="col-lg-6 d-flex flex-column justify-content-center">
