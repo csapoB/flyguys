@@ -289,7 +289,7 @@ router.get('/hu/flights', async (request, response) => {
             });
         } else {
 
-            let data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren);
+            let data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren);
             data.map(x => x.BasePrice = `${x.BasePrice} HUF`);
             response.status(200).json({
                 flights: data
