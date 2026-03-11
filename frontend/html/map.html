@@ -16,13 +16,18 @@
     <link rel="stylesheet" href="../css/jquery-ui.min.css">
     <link rel="stylesheet" href="../css/index.css" />
     <link rel="stylesheet" href="../css/navbar.css" />
+    <link rel="stylesheet" href="../css/map.css" />
 
     <script src="../javascript/jquery-3.7.1.min.js"></script>
     <script src="../javascript/jquery-ui.min.js"></script>
     <script type="module" src="../javascript/locale.js"></script>
     <script src="../javascript/modal.js"></script>
     <script src="../javascript/map.js"></script>
-    <script type="module" src="../javascript/planner.js"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGmwlN95_KmdNN5xAq2VO7qJCWSrNkuaA&map_ids=339ffbadd5c5008584bb6746&loading=async&callback=initMap">
+    </script>
+    <script src="../javascript/popover.js"></script>
+    <script src="../javascript/planner.js"></script>
     <script src="../javascript/plannerresizer.js"></script>
 
     <style>
@@ -260,7 +265,5 @@
         </div>
     </div>
 
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGmwlN95_KmdNN5xAq2VO7qJCWSrNkuaA&map_ids=339ffbadd5c5008584bb6746&loading=async&callback=initMap">
-        </script>
+    
 </body>

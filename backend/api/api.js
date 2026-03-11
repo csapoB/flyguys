@@ -572,6 +572,19 @@ router.get('/husegprogram', async (request, response) => {
     }
 });
 
+router.get('/map_pins', async (request, response) => {
+    try {
+        response.status(200).json({
+            pins: await database.selectAvailableAirports()
+        })
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            message: 'Ez a végpont nem működik.'
+        });
+    }
+});
+
 function LoggedInCheck(request) {
     let vissza = false;
     if (request.session && request.session.user && request.session.user.id && request.session.user.role !== undefined && request.session.user.timestamp) {
@@ -635,5 +648,7 @@ router.post('/helyfoglalas', async (request, response) => {
         });
     }
 });
+
+
 
 module.exports = router;
