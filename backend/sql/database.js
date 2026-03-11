@@ -18,24 +18,6 @@ async function selectAllAirportsInHungarian() {
     return rows;
 }
 
-async function selectAvailableDepartureAirports() {
-    const query = 'SELECT DISTINCT DepartureAirport FROM flights_without_ids WHERE DepartureDateTime > NOW();';
-    const [rows] = await pool.execute(query);
-    return rows;
-}
-
-async function selectAvailableArrivalAirports() {
-    const query = 'SELECT DISTINCT ArrivalAirport FROM flights_without_ids WHERE DepartureDateTime > NOW();';
-    const [rows] = await pool.execute(query);
-    return rows;
-}
-
-async function selectAvailableFlightsBasedOnParameters(departureAirport, arrivalAirport, departureDate) {
-    const query = 'SELECT * FROM available_flights_simplified WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate LIKE ?;';
-    const [rows] = await pool.execute(query, [`%${departureAirport}%`, `%${arrivalAirport}%`, `%${departureDate}%`]);
-    return rows;
-}
-
 async function selectAvailableDepartureAirportsFilteredHun(arrivalAirport, departureDate) {
     const query = 'SELECT DISTINCT DepartureAirport AS "AirportCode", (SELECT Hungarian FROM city INNER JOIN airport ON city.CityID = airport.CityId WHERE airport.AirportCode LIKE DepartureAirport) AS "City", (SELECT Hungarian FROM country INNER JOIN airport ON country.CountryID = airport.CountryId WHERE airport.AirportCode LIKE DepartureAirport) AS "Country" FROM available_flights_simplified WHERE ArrivalAirport LIKE ? AND DepartureDate LIKE ? ORDER BY Country ASC, City ASC;';
     const [rows] = await pool.execute(query, [`%${arrivalAirport}%`, `%${departureDate}%`]);
@@ -48,13 +30,13 @@ async function selectAvailableArrivalAirportsFilteredHun(departureAirport, depar
     return rows;
 }
 
-async function selectAvailableDepartureAirportsFilteredEng(arrivalAirport, departureDate) {
+async function selectAvailableDepartureAirportsFilteredEn(arrivalAirport, departureDate) {
     const query = 'SELECT DISTINCT DepartureAirport AS "AirportCode", (SELECT English FROM city INNER JOIN airport ON city.CityID = airport.CityId WHERE airport.AirportCode LIKE DepartureAirport) AS "City", (SELECT English FROM country INNER JOIN airport ON country.CountryID = airport.CountryId WHERE airport.AirportCode LIKE DepartureAirport) AS "Country" FROM available_flights_simplified WHERE ArrivalAirport LIKE ? AND DepartureDate LIKE ? ORDER BY Country ASC, City ASC;';
     const [rows] = await pool.execute(query, [`%${arrivalAirport}%`, `%${departureDate}%`]);
     return rows;
 }
 
-async function selectAvailableArrivalAirportsFilteredEng(departureAirport, departureDate) {
+async function selectAvailableArrivalAirportsFilteredEn(departureAirport, departureDate) {
     const query = 'SELECT DISTINCT ArrivalAirport AS "AirportCode", (SELECT English FROM city INNER JOIN airport ON city.CityID = airport.CityId WHERE airport.AirportCode LIKE ArrivalAirport) AS "City", (SELECT English FROM country INNER JOIN airport ON country.CountryID = airport.CountryId WHERE airport.AirportCode LIKE ArrivalAirport) AS "Country" FROM available_flights_simplified WHERE DepartureAirport LIKE ? AND DepartureDate LIKE ? ORDER BY Country ASC, City ASC;';
     const [rows] = await pool.execute(query, [`%${departureAirport}%`, `%${departureDate}%`]);
     return rows;
@@ -74,47 +56,48 @@ async function selectAvailableReturnDates(departureAirport, arrivalAirport, dest
 }
 
 async function selectAvailableArrivalDatesFiltered(departureAirport, arrivalAirport, departureDate) {
-    const query = 'SELECT DISTINCT DATE(ArrivalDateTime) AS "ArrivalDate" FROM available_flights WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DATE(DepartureDateTime) LIKE ?;';
+    const query = 'SELECT DISTINCT DATE(ArrivalDateTime) AS "ArrivalDate" FROM available_flights_hun WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DATE(DepartureDateTime) LIKE ?;';
     const [rows] = await pool.execute(query, [`%${departureAirport}%`, `%${arrivalAirport}%`, `%${departureDate}%`]);
     
     return rows;
 }
 
 
-async function selectSwappableFlightsWithSameDepartureDates(departureDate) {
-    const query = 'SELECT DISTINCT afs1.DepartureAirport FROM available_flights_simplified afs1, available_flights_simplified afs2 WHERE (afs1.DepartureAirport = afs2.ArrivalAirport AND afs1.ArrivalAirport = afs2.DepartureAirport) AND (afs1.DepartureDate = afs2.DepartureDate) AND afs1.DepartureDate LIKE ?;';
-    const [rows] = await pool.execute(query, [`%${departureDate}%`]);
+async function selectSwappableFlightsWithSameDepartureDates(departureAirport, arrivalAirport, departureDate) {
+    const query = 'SELECT DISTINCT afs1.DepartureAirport FROM available_flights_simplified afs1, available_flights_simplified afs2 WHERE (afs1.DepartureAirport LIKE ? AND afs2.DepartureAirport LIKE ?) AND (afs1.ArrivalAirport LIKE ? AND afs2.ArrivalAirport LIKE ?) AND afs1.DepartureDate LIKE ? AND afs2.DepartureDate LIKE ?;';
+    const [rows] = await pool.execute(query, [departureAirport, arrivalAirport, arrivalAirport, departureAirport, `%${departureDate}%`, `%${departureDate}%`]);
     
     return rows;
 }
 
-async function selectSwappableFlights() {
-    const query = 'SELECT DISTINCT afs1.DepartureAirport FROM available_flights_simplified afs1, available_flights_simplified afs2 WHERE (afs1.DepartureAirport = afs2.ArrivalAirport AND afs1.ArrivalAirport = afs2.DepartureAirport);';
-    const [rows] = await pool.execute(query);
+async function selectSwappableFlights(departureAirport, arrivalAirport) {
+    const query = 'SELECT DISTINCT afs1.DepartureAirport FROM available_flights_simplified afs1, available_flights_simplified afs2 WHERE (afs1.DepartureAirport LIKE ? AND afs2.DepartureAirport LIKE ?) AND (afs1.ArrivalAirport LIKE ? AND afs2.ArrivalAirport LIKE ?)';
+    const [rows] = await pool.execute(query, [departureAirport, arrivalAirport, arrivalAirport, departureAirport]);
     
     return rows;
 }
 
-async function selectAvailableFlightsFiltered(departureAirport, arrivalAirport, departureDate, numOfPassengers) {
-    const query = 'SELECT num_of_available_seats_on_available_flights.* FROM num_of_available_seats_on_available_flights WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate LIKE ? AND NumOfAvailableSeats >= ?;';
+async function selectAvailableFlightsFilteredHun(departureAirport, arrivalAirport, departureDate, numOfPassengers) {
+    const query = 'SELECT num_of_available_seats_on_available_flights_hun.* FROM num_of_available_seats_on_available_flights_hun WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate LIKE ? AND NumOfAvailableSeats >= ?;';
     const [rows] = await pool.execute(query, [`${departureAirport}`, `${arrivalAirport}`, `${departureDate}`, `${numOfPassengers}`]);
     
     return rows;
 }
 
-async function selectAvailableSeatsOnFlight(flightId) {
-    const query = 'SELECT seat.RowID, seat.ColumnID, seat.FareClassID, (flight.BasePrice*fareclass.Multiplier)*((100-(SELECT loyaltystatus.DiscountInPercentage FROM useraccount INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserID = 2))/100) AS "Price" FROM seat INNER JOIN fareclass ON seat.FareClassID = fareclass.FareClassID INNER JOIN aircraft ON seat.AircraftModelID = aircraft.AircraftModelID INNER JOIN flight ON aircraft.AircraftID = flight.AircraftID LEFT JOIN not_cancelled_reservations ON flight.FlightID = not_cancelled_reservations.FlightID AND seat.RowID = not_cancelled_reservations.RowID AND seat.ColumnID = not_cancelled_reservations.ColumnID WHERE flight.FlightID = 30 AND not_cancelled_reservations.FlightID IS NULL;';
-    const [rows] = await pool.execute(query, [flightId]);
+async function selectAvailableFlightsFilteredEn(departureAirport, arrivalAirport, departureDate, numOfPassengers) {
+    const query = 'SELECT num_of_available_seats_on_available_flights_en.* FROM num_of_available_seats_on_available_flights_en WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate LIKE ? AND NumOfAvailableSeats >= ?;';
+    const [rows] = await pool.execute(query, [`${departureAirport}`, `${arrivalAirport}`, `${departureDate}`, `${numOfPassengers}`]);
     
     return rows;
 }
 
-//Map pinek
-async function selectAvailableAirports() {
-    const query = 'SELECT airport.AirportCode, city.Hungarian, city.GeographicCoordinates FROM airport INNER JOIN city ON airport.CityID = city.CityID;';
-    const [rows] = await pool.execute(query);
+async function selectAvailableSeatsOnFlight(flightId, userId) {
+    const query = 'SELECT seat.RowID, seat.ColumnID, seat.FareClassID, (flight.BasePrice*fareclass.Multiplier)*((100-(SELECT loyaltystatus.DiscountInPercentage FROM useraccount INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserID = ?))/100) AS "Price", (CASE WHEN not_cancelled_reservations.FlightID IS NULL THEN FALSE ELSE TRUE END) AS "IsOccupied" FROM seat INNER JOIN fareclass ON seat.FareClassID = fareclass.FareClassID INNER JOIN aircraft ON seat.AircraftModelID = aircraft.AircraftModelID INNER JOIN flight ON aircraft.AircraftID = flight.AircraftID LEFT JOIN not_cancelled_reservations ON flight.FlightID = not_cancelled_reservations.FlightID AND seat.RowID = not_cancelled_reservations.RowID AND seat.ColumnID = not_cancelled_reservations.ColumnID WHERE flight.FlightID = ?;';
+    const [rows] = await pool.execute(query, [userId, flightId]);
+
     return rows;
 }
+
 
 /*
 async function a() {
@@ -152,6 +135,13 @@ async function Husegprogram(id){
     return rows;
 }
 
+//Helyfoglalas INSERT
+async function SeatReservation(PassengerID, flightID, rowID, columnID){
+    const query = 'INSERT INTO reservation (PassengerID, FlightID, RowID, ColumnID, IsCancelled) VALUES (?, ?, ?, ?, 0)';
+    const [rows] = await pool.execute(query, [PassengerID, flightID, rowID, columnID]);
+    return rows.affectedRows>0;
+}
+
 //!Export
 module.exports = {
     Login,
@@ -159,20 +149,17 @@ module.exports = {
     Register,
     Husegprogram,
     selectAllAirportsInHungarian,
-    selectAvailableDepartureAirports,
-    selectAvailableArrivalAirports,
-    selectAvailableFlightsBasedOnParameters,
     selectAvailableDepartureAirportsFilteredHun,
     selectAvailableArrivalAirportsFilteredHun,
-    selectAvailableDepartureAirportsFilteredEng,
-    selectAvailableArrivalAirportsFilteredEng,
+    selectAvailableDepartureAirportsFilteredEn,
+    selectAvailableArrivalAirportsFilteredEn,
     selectAvailableDepartureDatesFiltered,
     selectAvailableReturnDates,
     selectAvailableArrivalDatesFiltered,
     selectSwappableFlightsWithSameDepartureDates,
     selectSwappableFlights,
-    selectAvailableFlightsFiltered,
+    selectAvailableFlightsFilteredHun,
+    selectAvailableFlightsFilteredEn,
     selectAvailableSeatsOnFlight,
-    selectAvailableAirports
-  
+    SeatReservation
 };

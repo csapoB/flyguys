@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS reservation (
     RowID INT NOT NULL,
     ColumnID CHAR(1) NOT NULL,
     IsCancelled BOOLEAN NOT NULL,
-   -- Price INT NOT NULL,
+    IsAdult BOOLEAN NOT NULL,
     FOREIGN KEY (FlightID) REFERENCES flight(FlightID),
     FOREIGN KEY (PassengerID) REFERENCES useraccount(UserID)
 );
@@ -122,21 +122,31 @@ CREATE VIEW IF NOT EXISTS airports_in_hungarian AS
 	SELECT airport.AirportCode, city.Hungarian, airport.UTCOffset AS "City", country.Hungarian AS "Country" 
     	FROM airport INNER JOIN city ON airport.CityID = city.CityID INNER JOIN country ON airport.CountryID = country.CountryID ORDER BY country.Hungarian ASC, city.Hungarian ASC;
 
-CREATE VIEW IF NOT EXISTS flights_with_flight_time AS
+CREATE VIEW IF NOT EXISTS flights_with_flight_time_hun AS
     SELECT flight.FlightID, flight.DepartureAirport, origin_city.Hungarian AS "DepartureCity", flight.ArrivalAirport, destination_city.Hungarian AS "ArrivalCity", flight.DepartureDateTime, flight.ArrivalDateTime, TIMEDIFF(flight.ArrivalDateTime, ADDTIME(flight.DepartureDateTime, SUBTIME(TIME(ABS(TIME(destination.UTCOffset))), TIME(ABS(TIME(origin.UTCOffset))))))  AS "FlightTime", flight.BasePrice, flight.AircraftID FROM flight INNER JOIN airport origin ON flight.DepartureAirport = origin.AirportCode INNER JOIN airport destination ON flight.ArrivalAirport = destination.AirportCode INNER JOIN city origin_city ON origin.CityID = origin_city.CityID INNER JOIN city destination_city ON destination.CityID = destination_city.CityID; 
+
+CREATE VIEW IF NOT EXISTS flights_with_flight_time_en AS
+    SELECT flight.FlightID, flight.DepartureAirport, origin_city.English AS "DepartureCity", flight.ArrivalAirport, destination_city.English AS "ArrivalCity", flight.DepartureDateTime, flight.ArrivalDateTime, TIMEDIFF(flight.ArrivalDateTime, ADDTIME(flight.DepartureDateTime, SUBTIME(TIME(ABS(TIME(destination.UTCOffset))), TIME(ABS(TIME(origin.UTCOffset))))))  AS "FlightTime", flight.BasePrice, flight.AircraftID FROM flight INNER JOIN airport origin ON flight.DepartureAirport = origin.AirportCode INNER JOIN airport destination ON flight.ArrivalAirport = destination.AirportCode INNER JOIN city origin_city ON origin.CityID = origin_city.CityID INNER JOIN city destination_city ON destination.CityID = destination_city.CityID; 
 -- SELECT flight.DepartureAirport, flight.ArrivalAirport, flight.DepartureDateTime, flight.ArrivalDateTime, flight.BasePrice FROM flight;
 
-CREATE VIEW IF NOT EXISTS available_flights AS
-	SELECT flights_with_flight_time.* FROM flights_with_flight_time WHERE flights_with_flight_time.DepartureDateTime > NOW();
+CREATE VIEW IF NOT EXISTS available_flights_hun AS
+	SELECT flights_with_flight_time_hun.* FROM flights_with_flight_time WHERE flights_with_flight_time.DepartureDateTime > NOW();
+
+CREATE VIEW IF NOT EXISTS available_flights_en AS
+	SELECT flights_with_flight_time_en.* FROM flights_with_flight_time WHERE flights_with_flight_time.DepartureDateTime > NOW();
 
 CREATE VIEW IF NOT EXISTS available_flights_simplified AS
-	SELECT available_flights.DepartureAirport, available_flights.ArrivalAirport, DATE(available_flights.DepartureDateTime) AS "DepartureDate" FROM available_flights;
+	SELECT available_flights_hun.DepartureAirport, available_flights_hun.ArrivalAirport, DATE(available_flights_hun.DepartureDateTime) AS "DepartureDate" FROM available_flights_hun;
 
-CREATE VIEW IF NOT EXISTS num_of_available_seats_on_flights AS
-    SELECT flights_with_flight_time.* , (aircraftmodel.NumberOfSeats - COUNT(CASE WHEN reservation.IsCancelled = 0 THEN reservation.ReservationID END)) AS "NumOfAvailableSeats" FROM flights_with_flight_time INNER JOIN aircraft ON flights_with_flight_time.AircraftID = aircraft.AircraftID INNER JOIN aircraftmodel ON aircraft.AircraftModelID = aircraftmodel.AircraftModelID LEFT JOIN reservation ON flights_with_flight_time.FlightID = reservation.FlightID GROUP BY flights_with_flight_time.FlightID;
 
-CREATE VIEW IF NOT EXISTS num_of_available_seats_on_available_flights AS
-    SELECT available_flights.FlightID, available_flights.DepartureAirport, available_flights.DepartureCity, available_flights.ArrivalAirport, available_flights.ArrivalCity, DATE(available_flights.DepartureDateTime) AS "DepartureDate", DATE(available_flights.ArrivalDateTime) AS "ArrivalDate", TIME_FORMAT(TIME(available_flights.DepartureDateTime), '%H:%i') AS "DepartureTime", TIME_FORMAT(TIME(available_flights.ArrivalDateTime), '%H:%i') AS "ArrivalTime", TIME_FORMAT(TIME(available_flights.FlightTime), '%H:%i') AS "FlightTime", available_flights.BasePrice, aircraftmodel.AircraftModelID, (aircraftmodel.NumberOfSeats - COUNT(CASE WHEN reservation.IsCancelled = 0 THEN reservation.ReservationID END)) AS "NumOfAvailableSeats" FROM available_flights INNER JOIN aircraft ON available_flights.AircraftID = aircraft.AircraftID INNER JOIN aircraftmodel ON aircraft.AircraftModelID = aircraftmodel.AircraftModelID LEFT JOIN reservation ON available_flights.FlightID = reservation.FlightID GROUP BY available_flights.FlightID;
+-- CREATE VIEW IF NOT EXISTS num_of_available_seats_on_flights AS
+--    SELECT flights_with_flight_time.* , (aircraftmodel.NumberOfSeats - COUNT(CASE WHEN reservation.IsCancelled = 0 THEN reservation.ReservationID END)) AS "NumOfAvailableSeats" FROM flights_with_flight_time INNER JOIN aircraft ON flights_with_flight_time.AircraftID = aircraft.AircraftID INNER JOIN aircraftmodel ON aircraft.AircraftModelID = aircraftmodel.AircraftModelID LEFT JOIN reservation ON flights_with_flight_time.FlightID = reservation.FlightID GROUP BY flights_with_flight_time.FlightID;
+
+ CREATE VIEW IF NOT EXISTS num_of_available_seats_on_available_flights_hun AS
+    SELECT available_flights_hun.FlightID, available_flights_hun.DepartureAirport, available_flights_hun.DepartureCity, available_flights_hun.ArrivalAirport, available_flights_hun.ArrivalCity, DATE(available_flights_hun.DepartureDateTime) AS "DepartureDate", DATE(available_flights_hun.ArrivalDateTime) AS "ArrivalDate", TIME_FORMAT(TIME(available_flights_hun.DepartureDateTime), '%H:%i') AS "DepartureTime", TIME_FORMAT(TIME(available_flights_hun.ArrivalDateTime), '%H:%i') AS "ArrivalTime", TIME_FORMAT(TIME(available_flights_hun.FlightTime), '%H:%i') AS "FlightTime", available_flights_hun.BasePrice, aircraftmodel.AircraftModelID, (aircraftmodel.NumberOfSeats - COUNT(CASE WHEN reservation.IsCancelled = 0 THEN reservation.ReservationID END)) AS "NumOfAvailableSeats" FROM available_flights_hun INNER JOIN aircraft ON available_flights_hun.AircraftID = aircraft.AircraftID INNER JOIN aircraftmodel ON aircraft.AircraftModelID = aircraftmodel.AircraftModelID LEFT JOIN reservation ON available_flights_hun.FlightID = reservation.FlightID GROUP BY available_flights_hun.FlightID;
+
+ CREATE VIEW IF NOT EXISTS num_of_available_seats_on_available_flights_en AS
+    SELECT available_flights_en.FlightID, available_flights_en.DepartureAirport, available_flights_en.DepartureCity, available_flights_en.ArrivalAirport, available_flights_en.ArrivalCity, DATE(available_flights_en.DepartureDateTime) AS "DepartureDate", DATE(available_flights_en.ArrivalDateTime) AS "ArrivalDate", TIME_FORMAT(TIME(available_flights_en.DepartureDateTime), '%H:%i') AS "DepartureTime", TIME_FORMAT(TIME(available_flights_en.ArrivalDateTime), '%H:%i') AS "ArrivalTime", TIME_FORMAT(TIME(available_flights_en.FlightTime), '%H:%i') AS "FlightTime", available_flights_en.BasePrice, aircraftmodel.AircraftModelID, (aircraftmodel.NumberOfSeats - COUNT(CASE WHEN reservation.IsCancelled = 0 THEN reservation.ReservationID END)) AS "NumOfAvailableSeats" FROM available_flights_en INNER JOIN aircraft ON available_flights_en.AircraftID = aircraft.AircraftID INNER JOIN aircraftmodel ON aircraft.AircraftModelID = aircraftmodel.AircraftModelID LEFT JOIN reservation ON available_flights_en.FlightID = reservation.FlightID GROUP BY available_flights_en.FlightID;
 
 CREATE VIEW IF NOT EXISTS not_cancelled_reservations AS
 	SELECT reservations_with_prices.ReservationID, reservations_with_prices.PassengerID, reservations_with_prices.FlightID, reservations_with_prices.RowID, reservations_with_prices.ColumnID FROM reservations_with_prices WHERE !reservations_with_prices.IsCancelled;

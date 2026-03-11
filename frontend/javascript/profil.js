@@ -1,4 +1,10 @@
+import { getNavbar } from "./locale.js";
+import { modalInit } from "./modal.js";
 $(async function(){
+
+    await getNavbar("hu", "http://127.0.0.1:3000/profil".split("/"));
+    await modalInit("hu");
+
     try {
         const response = await fetch('api/LoginCheck', {
             method: 'GET',
