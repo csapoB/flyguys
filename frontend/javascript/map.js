@@ -23,7 +23,7 @@ async function initMap() {
 
 
     let contentString = $('<div>', {
-      html: `<h2>${pins[i].Hungarian}</h2><p>${pins[i].AirportCode}</p>`,
+      html: `<h2>${pins[i].Hungarian}</h2><p>(${pins[i].AirportCode})</p>`,
       class: 'pin-info'
     });
 
