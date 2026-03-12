@@ -98,6 +98,20 @@ async function selectAvailableSeatsOnFlight(flightId, userId) {
     return rows;
 }
 
+async function selectAvailableAirportsEn() {
+    const query = 'SELECT DISTINCT available_flights_en.DepartureAirport, available_flights_en.DepartureCity AS "CityName", city.GeographicCoordinates FROM available_flights_en INNER JOIN airport ON available_flights_en.DepartureAirport = airport.AirportCode INNER JOIN city ON airport.CityID = city.CityID;';
+    const [rows] = await pool.execute(query);
+
+    return rows;
+}
+
+async function selectAvailableAirportsHun() {
+    const query = 'SELECT DISTINCT available_flights_hun.DepartureAirport, available_flights_hun.DepartureCity AS "CityName", city.GeographicCoordinates FROM available_flights_hun INNER JOIN airport ON available_flights_hun.DepartureAirport = airport.AirportCode INNER JOIN city ON airport.CityID = city.CityID;';
+    const [rows] = await pool.execute(query);
+
+    return rows;
+}
+
 
 /*
 async function a() {
@@ -161,5 +175,7 @@ module.exports = {
     selectAvailableFlightsFilteredHun,
     selectAvailableFlightsFilteredEn,
     selectAvailableSeatsOnFlight,
-    SeatReservation
+    SeatReservation,
+    selectAvailableAirportsEn,
+    selectAvailableAirportsHun
 };
