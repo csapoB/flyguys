@@ -130,10 +130,10 @@ CREATE VIEW IF NOT EXISTS flights_with_flight_time_en AS
 -- SELECT flight.DepartureAirport, flight.ArrivalAirport, flight.DepartureDateTime, flight.ArrivalDateTime, flight.BasePrice FROM flight;
 
 CREATE VIEW IF NOT EXISTS available_flights_hun AS
-	SELECT flights_with_flight_time_hun.* FROM flights_with_flight_time WHERE flights_with_flight_time.DepartureDateTime > NOW();
+	SELECT flights_with_flight_time_hun.* FROM flights_with_flight_time_hun WHERE flights_with_flight_time_hun.DepartureDateTime > NOW();
 
 CREATE VIEW IF NOT EXISTS available_flights_en AS
-	SELECT flights_with_flight_time_en.* FROM flights_with_flight_time WHERE flights_with_flight_time.DepartureDateTime > NOW();
+	SELECT flights_with_flight_time_en.* FROM flights_with_flight_time_en WHERE flights_with_flight_time_en.DepartureDateTime > NOW();
 
 CREATE VIEW IF NOT EXISTS available_flights_simplified AS
 	SELECT available_flights_hun.DepartureAirport, available_flights_hun.ArrivalAirport, DATE(available_flights_hun.DepartureDateTime) AS "DepartureDate" FROM available_flights_hun;

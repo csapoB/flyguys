@@ -63,6 +63,14 @@ router.get('/map', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/map.html'));
 });
 
+router.get('/en/map', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/map.html'));
+});
+
+router.get('/hu/map', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/map.html'));
+});
+
 router.get('/magazin', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/magazin.html'));
 });

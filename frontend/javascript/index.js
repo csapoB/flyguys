@@ -28,19 +28,8 @@ $(async function () {
     await getNavbar(language, url_splitted);
     await modalInit(language);
 
-    let getindex = await getIndex(language);
-    $("#title_about_us_footer").text(getindex.footer.title_about_us);
-    $("#company_infos_footer").text(getindex.footer.company_infos);
-    $("#news_footer").text(getindex.footer.news);
-    $("#title_services_footer").text(getindex.footer.title_services);
-    $("#loyalty_program_footer").text(getindex.footer.loyalty_program);
-    $("#flight_search_footer").text(getindex.footer.flight_search);
-    $("#my_flights_footer").text(getindex.footer.my_flights);
-    $("#travel_planner_footer").text(getindex.footer.travel_planner);
-    $("#title_contact_footer").text(getindex.footer.title_contact);
-    $("#all_rights_reserved_footer").text(getindex.footer.all_rights_reserved);
+    await getIndex(language);
     
-
     await plannerInit(language);
 
     document.getElementById('keret').appendChild(jaratok());
