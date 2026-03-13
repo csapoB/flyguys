@@ -5,19 +5,20 @@
     "index" : {
         "body" : {
 
-        },
-        "footer" : {
-            "title_about_us" : "About us",
-            "title_services" : "Services",
-            "title_contact" : "Contacts",
-            "company_infos" : "Company informations",
-            "news" : "News",
-            "loyalty_program" : "Loyalty Program",
-            "flight_search" : "Flight searcher",
-            "my_flights" : "My flights",
-            "travel_planner" : "Travel Planner",
-            "all_rights_reserved" : "© FlyGuys. All rights reserved."
         }
+    },
+
+    "footer" : {
+        "title_about_us" : "About us",
+        "title_services" : "Services",
+        "title_contact" : "Contacts",
+        "company_infos" : "Company informations",
+        "news" : "News",
+        "loyalty_program" : "Loyalty Program",
+        "flight_search" : "Flight searcher",
+        "my_flights" : "My flights",
+        "travel_planner" : "Travel Planner",
+        "all_rights_reserved" : "© FlyGuys. All rights reserved."
     },
 
     "navbar" : {

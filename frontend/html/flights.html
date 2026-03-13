@@ -17,6 +17,7 @@
     <!--!CSS-->
     <link rel="stylesheet" href="../css/jquery-ui.min.css">
     <link rel="stylesheet" href="../css/navbar.css">
+    
     <link rel="stylesheet" href="../css/flights.css">
     <!--!JavaScript-->
     <script src="../javascript/jquery-3.7.1.min.js"></script>
@@ -26,7 +27,7 @@
     <script type="module" src="../javascript/locale.js"></script>
     <script type="module" src="../javascript/modal.js"></script>
     <script type="module" src="../javascript/flights.js"></script>
-
+    <script src="../javascript/flightsresizer.js"></script>
 
     <!-- Zalando Sans Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -56,7 +57,7 @@
                         <a id="about_us_nav" class="nav-link" href="#rolunk">Rólunk</a>
                     </li>
                     <li class="nav-item">
-                        <a id="planner_nav" class="nav-link" href="/map">Tervezés</a>
+                        <a id="planner_nav" class="nav-link" href="/hu/map">Tervezés</a>
                     </li>
                     <li class="nav-item">
                         <a id="loyalty_program_nav" class="nav-link" href="/husegprogram">Hűségprogram</a>
@@ -81,6 +82,63 @@
         </form>
     </main>
 
+    <footer>
+        <div class="container-fluid" id="hatterkep">
+            <div class="row justify-content-around">
+                <div class="col-xl-2 col-lg-2 col-md-4" id="eltunes">
+                    <div>
+                        <h4 id="title_about_us_footer">Rólunk</h4>
+                        <ul class="list-unstyled">
+                            <li>
+                                <a id="company_infos_footer" href="#" class="text-decoration-none">Vállalati információk</a>
+                            </li>
+                            <li>
+                                <a id="news_footer" href="#" class="text-decoration-none">Hírek</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                    <div>
+                        <h4 id="title_services_footer">Szolgáltatásaink</h4>
+                        <ul class="list-unstyled">
+                            <li>
+                                <a id="loyalty_program_footer" href="#" class="text-decoration-none">Törzsvásárlói program</a>
+                            </li>
+                            <li>
+                                <a id="flight_search_footer" href="#" class="text-decoration-none">Járat kereső</a>
+                            </li>
+                            <li>
+                                <a id="my_flights_footer" href="#" class="text-decoration-none">Járataim</a>
+                            </li>
+                            <li>
+                                <a id="travel_planner_footer" href="#" class="text-decoration-none">Útvonaltervező</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                    <div>
+                        <h4 id="title_contact_footer">Elérhetőségeink</h4>
+                        <ul class="list-unstyled">
+                            <li>
+                                <p>+36305164050</p>
+                            </li>
+                            <li>
+                                <a href="mailto:ugyfelszolgalat@FlyGuys.com">ugyfelszolgalat@FlyGuys.com</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center">
+
+                <div class="copyright">
+                    <p id="all_rights_reserved_footer"><i>© FlyGuys. Minden jog fenntartva.</i></p>
+                </div>
+            </div>
+        </div>
+    </footer>
     <div id="modal_frame">
         <div class="modal fade" id="monadModal" tabindex="-1" aria-labelledby="monadModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">

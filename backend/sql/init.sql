@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS flight (
     ArrivalDateTime DATETIME NOT NULL,
     AircraftID INT NOT NULL,
     BasePrice INT NOT NULL,
+    IsCancelled BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (AircraftID) REFERENCES aircraft(AircraftID),
     FOREIGN KEY (DepartureAirport) REFERENCES airport(AirportCode),
     FOREIGN KEY (ArrivalAirport) REFERENCES airport(AirportCode)

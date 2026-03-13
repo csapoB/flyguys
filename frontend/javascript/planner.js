@@ -216,7 +216,7 @@ export async function plannerInit(current_language) {
         const searchParams = new URLSearchParams(fd);
         const queryString = searchParams.toString();
 
-        window.location.href = `${current_language}/flights?${queryString}`;
+        window.location.href = `/${current_language}/flights?${queryString}`;
 
 
     });
@@ -253,7 +253,6 @@ export async function plannerInit(current_language) {
 
 
 }
-
 
 ///////// FÜGGVÉNYEK /////////
 
@@ -292,7 +291,7 @@ async function passengers_popoverInit(input_field_id, content_div_id) {
 }
 
 // Eseménykezelő a beviteli mezőhöz, valamint a popoverhez
-function popoverManualTrigger(input_field, popover_obj) {
+export function popoverManualTrigger(input_field, popover_obj) {
     let popover_div;
     input_field.addEventListener("click", function () {
 

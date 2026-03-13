@@ -393,11 +393,11 @@ router.get('/getplannerpassengerspopover', (request, response) => {
     }
 });
 
-router.get('/getindex', (request, response) => {
+router.get('/getfooter', (request, response) => {
     try {
 
         response.status(200).json({
-            index: request.t("index", { returnObjects: true })
+            footer: request.t("footer", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({

@@ -252,9 +252,6 @@ function regis_modal(i18next_values) {
         "type": "text",
         "placeholder": `${i18next_values.birth_date}`
     });
-    $birth_date.datepicker({
-        dateFormat: "yy-mm-dd",
-    });
 
     let $e_mail = $("<input/>", {
         "id": "new_usr_email",

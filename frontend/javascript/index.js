@@ -1,5 +1,5 @@
 import { getNavbar } from "./locale.js";
-import { getIndex } from "./locale.js";
+import { getFooter } from "./locale.js";
 import { getLocale } from "./locale.js";
 import { plannerInit } from "./planner.js";
 import { modalInit } from "./modal.js";
@@ -28,7 +28,7 @@ $(async function () {
     await getNavbar(language, url_splitted);
     await modalInit(language);
 
-    await getIndex(language);
+    await getFooter(language);
     
     await plannerInit(language);
 

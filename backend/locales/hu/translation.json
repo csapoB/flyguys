@@ -4,19 +4,21 @@
     "index" : {
         "body" : {
 
-        },
-        "footer" : {
-            "title_about_us" : "Rólunk",
-            "title_services" : "Szolgáltatásaink",
-            "title_contact" : "Elérhetőségeink",
-            "company_infos" : "Vállalati információk",
-            "news" : "Hírek",
-            "loyalty_program" : "Törzsvásárlói program",
-            "flight_search" : "Járat kereső",
-            "my_flights" : "Járataim",
-            "travel_planner" : "Útvonaltervező",
-            "all_rights_reserved" : "© FlyGuys. Minden jog fenntartva."
         }
+        
+    },
+
+    "footer" : {
+        "title_about_us" : "Rólunk",
+        "title_services" : "Szolgáltatásaink",
+        "title_contact" : "Elérhetőségeink",
+        "company_infos" : "Vállalati információk",
+        "news" : "Hírek",
+        "loyalty_program" : "Törzsvásárlói program",
+        "flight_search" : "Járat kereső",
+        "my_flights" : "Járataim",
+        "travel_planner" : "Útvonaltervező",
+        "all_rights_reserved" : "© FlyGuys. Minden jog fenntartva."
     },
 
     "navbar" : {

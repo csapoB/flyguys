@@ -2,7 +2,7 @@ import { getNavbar } from "./locale.js";
 import { getLocale } from "./locale.js";
 import { plannerInit } from "./planner.js";
 import { modalInit } from "./modal.js";
-import { getIndex } from "./locale.js";
+import { getFooter } from "./locale.js";
 
 
 
@@ -41,7 +41,7 @@ $(async function () {
 
   await plannerInit(language);
 
-  await getIndex(language);
+  await getFooter(language);
 
 });
 

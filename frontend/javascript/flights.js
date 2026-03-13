@@ -1,7 +1,9 @@
 import { getNavbar } from "./locale.js";
 import { getFlights } from "./locale.js";
 import { getLocale } from "./locale.js";
+import { getFooter } from "./locale.js";
 import { modalInit } from "./modal.js";
+import { popoverManualTrigger } from "./planner.js";
 
 $(async function () {
 
@@ -24,6 +26,7 @@ $(async function () {
     
     await getNavbar(language, old_url);
     await modalInit(language);
+    await getFooter(language);
 
     let getflights = await getFlights(language);
 
@@ -73,14 +76,14 @@ $(async function () {
 
                                     if (flights_back.length != 0) {
 
-                                        await flightSelector(flights_to, $flights_to, getflights);
+                                        await flightSelector(flights_to, $flights_to, language, getflights);
 
                                         let $flights_back = $("<div>", {
                                             "id": "flights_back",
                                             "class": "row"
                                         });
                                         $flights_frame.append($flights_back);
-                                        await flightSelector(flights_back, $flights_back, getflights);
+                                        await flightSelector(flights_back, $flights_back, language, getflights);
                                         await seatBookingButtonGenerator($flights_frame, adults, children, getflights);
 
                                     } else {
@@ -93,7 +96,7 @@ $(async function () {
                             }
 
                         } else {
-                            await flightSelector(flights_to, $flights_to, getflights);
+                            await flightSelector(flights_to, $flights_to, language, getflights);
                             await seatBookingButtonGenerator($flights_frame, adults, children, getflights);
                         }
                     }
@@ -119,18 +122,18 @@ $(async function () {
 
 });
 
-async function flightSelector(flights, $frame, i18n_values) {
+async function flightSelector(flights, $frame, language, i18n_values) {
     
     let $date = $("<h1>", {
         "class": "display-3 mb-4 d-flex justify-content-center",
-        "html": `<span class=\"pe-4\"><svg fill="currentColor" version=\"1.1" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"48\" height=\"48\" viewBox=\"0 0 371.656 371.656\" xml:space=\"preserve\"><g><g><g><path d=\"M37.833,212.348c-0.01,0.006-0.021,0.01-0.032,0.017c-4.027,2.093-5.776,6.929-4.015,11.114     c1.766,4.199,6.465,6.33,10.787,4.892l121.85-40.541l-22.784,37.207c-1.655,2.703-1.305,6.178,0.856,8.497     c2.161,2.318,5.603,2.912,8.417,1.449l23.894-12.416c0.686-0.356,1.309-0.823,1.844-1.383l70.785-73.941l87.358-45.582     c33.085-17.835,29.252-31.545,27.29-35.321c-1.521-2.928-4.922-6.854-12.479-8.93c-7.665-2.106-18.021-1.938-31.653,0.514     c-4.551,0.818-7.063,0.749-9.723,0.676c-9.351-0.256-15.694,0.371-47.188,16.736L90.788,164.851l-66.8-34.668     c-2.519-1.307-5.516-1.306-8.035,0.004l-11.256,5.85c-2.317,1.204-3.972,3.383-4.51,5.938c-0.538,2.556,0.098,5.218,1.732,7.253     l46.364,57.749L37.833,212.348z"/><path d="M355.052,282.501H28.948c-9.17,0-16.604,7.436-16.604,16.604s7.434,16.604,16.604,16.604h326.104     c9.17,0,16.604-7.434,16.604-16.604C371.655,289.934,364.222,282.501,355.052,282.501z\"/></g></g></g></svg></span>${flights[0].DepartureDate}`
+        "html": `<span class=\"pe-4\"><svg fill="#dc3545" version=\"1.1" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"48\" height=\"48\" viewBox=\"0 0 371.656 371.656\" xml:space=\"preserve\"><g><g><g><path d=\"M37.833,212.348c-0.01,0.006-0.021,0.01-0.032,0.017c-4.027,2.093-5.776,6.929-4.015,11.114     c1.766,4.199,6.465,6.33,10.787,4.892l121.85-40.541l-22.784,37.207c-1.655,2.703-1.305,6.178,0.856,8.497     c2.161,2.318,5.603,2.912,8.417,1.449l23.894-12.416c0.686-0.356,1.309-0.823,1.844-1.383l70.785-73.941l87.358-45.582     c33.085-17.835,29.252-31.545,27.29-35.321c-1.521-2.928-4.922-6.854-12.479-8.93c-7.665-2.106-18.021-1.938-31.653,0.514     c-4.551,0.818-7.063,0.749-9.723,0.676c-9.351-0.256-15.694,0.371-47.188,16.736L90.788,164.851l-66.8-34.668     c-2.519-1.307-5.516-1.306-8.035,0.004l-11.256,5.85c-2.317,1.204-3.972,3.383-4.51,5.938c-0.538,2.556,0.098,5.218,1.732,7.253     l46.364,57.749L37.833,212.348z"/><path d="M355.052,282.501H28.948c-9.17,0-16.604,7.436-16.604,16.604s7.434,16.604,16.604,16.604h326.104     c9.17,0,16.604-7.434,16.604-16.604C371.655,289.934,364.222,282.501,355.052,282.501z\"/></g></g></g></svg></span>${dateDeFormatter(flights[0].DepartureDate, language)}`
     });
 
     $frame.prepend($date);
 
-    let $title = $("<h1>", {
-        "class": "display-3 d-flex justify-content-center",
-        "html": `${flights[0].DepartureCity} (${flights[0].DepartureAirport})<span class="ps-4 pe-4"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"48\" height=\"48\" fill=\"currentColor\" class=\"bi bi-arrow-right\" viewBox=\"0 0 16 16\"><path fill-rule=\"evenodd\" d=\"M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8\"/></svg></span>${flights[0].ArrivalCity} (${flights[0].ArrivalAirport})`
+    let $title = $("<div>", {
+        "class": "display-3 d-flex justify-content-center align-items-center",
+        "html": `<div class=\"row w-100\"><span class=\"city_and_airport col-lg-12 col-xl-4 d-flex flex-column justify-content-center align-items-center\"><span>${flights[0].DepartureCity}</span><span>(${flights[0].DepartureAirport})</span></span><span class=\"d-flex justify-content-center align-items-center col-lg-12 col-xl-4 ps-1 pe-1\"><span><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"48\" height=\"48\" fill=\"currentColor\" class=\"bi bi-dash\" viewBox=\"0 0 16 16\"><path d=\"M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8\"/></svg> (<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" fill=\"#dc3545\" class=\"bi bi-clock\" viewBox=\"0 0 16 16\"><path d=\"M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z\"/><path d=\"M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0\"/></svg> ${flights[0].FlightTime}) <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"48\" height=\"48\" fill=\"currentColor\" class=\"bi bi-arrow-right\" viewBox=\"0 0 16 16\"><path fill-rule=\"evenodd\" d=\"M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8\"/></svg></span></span><span class=\"city_and_airport col-lg-12 col-xl-4 d-flex flex-column justify-content-center align-items-center\"><span>${flights[0].ArrivalCity}</span><span>(${flights[0].ArrivalAirport})</span></span></div>`
     });
     
     $frame.prepend($title);
@@ -153,65 +156,6 @@ async function flightSelector(flights, $frame, i18n_values) {
     flights_popover.setContent({ ".popover-body": flights_popover_contentGenerator($flights_button, flights_popover, flights) })
 
     $frame.append($flights_button);
-
-}
-
-
-function popoverManualTrigger(input_field, popover_obj) {
-
-    let popover_div;
-    input_field.addEventListener("click", function () {
-
-        if (popover_obj.tip == null) {
-
-            popover_obj.show();
-
-            popover_div = document.getElementById(popover_obj.tip.id); // Az popover_div id-ja minden megjelenésnél újragenerálódik => más lesz, mint az előző
-            popover_div.tabIndex = -1; // A tabindex beállítása azért szükséges, hogy az elemet (popover_div) a böngésző focusable-nek tekintse
-            popover_div.addEventListener("blur", (event) => {
-
-                if (event.relatedTarget == null) { // Ha az elem amire kattintottunk nem focusable, akkor lesz null az event.relatedTarget értéke
-                    popover_obj.hide();
-                } else {
-                    if (event.relatedTarget.id != input_field.id) { // Ha nem az input_fiealdbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
-                        popover_obj.hide();
-                    }
-                }
-            });
-        }
-    });
-
-    input_field.addEventListener("focus", function () {
-
-        if (popover_obj.tip == null) {
-
-            popover_obj.show();
-
-            popover_div = document.getElementById(popover_obj.tip.id); // Az popover_div id-ja minden megjelenésnél újragenerálódik => más lesz, mint az előző
-            popover_div.tabIndex = -1; // A tabindex beállítása azért szükséges, hogy az elemet (popover_div) a böngésző focusable-nek tekintse
-            popover_div.addEventListener("blur", (event) => {
-
-                if (event.relatedTarget == null) { // Ha az elem amire kattintottunk nem focusable, akkor lesz null az event.relatedTarget értéke
-                    popover_obj.hide();
-                } else {
-                    if (event.relatedTarget.id != input_field.id) { // Ha nem az input_fiealdbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
-                        popover_obj.hide();
-                    }
-                }
-            });
-        }
-    });
-
-    input_field.addEventListener("blur", (event) => {
-
-        if (event.relatedTarget == null) { // Ha az elem amire kattintottunk nem focusable, akkor lesz null az event.relatedTarget értéke
-            popover_obj.hide();
-        } else {
-            if (event.relatedTarget.id != popover_div.id) { // Ha nem a popover_divbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
-                popover_obj.hide();
-            }
-        }
-    });
 
 }
 
@@ -414,4 +358,16 @@ async function seatBookingButtonGenerator($frame, adults, children, i18n_values)
     $seat_booking_button_frame.append($seat_booking_button);
     $frame.append($seat_booking_button_frame);
 
+}
+
+function dateDeFormatter(dateText, language) {
+    let dateText_array = dateText.split("-");
+    let dateText_string;
+    if (language == "en") {
+        dateText_array.reverse();
+        dateText_string = dateText_array.join("/");
+    } else {
+        dateText_string = dateText_array.join(".") + ".";
+    }
+    return dateText_string;
 }
