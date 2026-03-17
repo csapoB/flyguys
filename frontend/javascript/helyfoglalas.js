@@ -1,4 +1,8 @@
-﻿let kivalaszottUlesekOda = [];
+﻿import { getNavbar } from "./locale.js";
+import { getLocale } from "./locale.js";
+import { modalInit } from "./modal.js";
+
+let kivalaszottUlesekOda = [];
 let kivalaszottUlesekVissza = [];
 let maxPassengers = 1;
 let isRoundTrip = false;
@@ -10,6 +14,28 @@ const fareClassNames = {
 };
 
 $(document).ready(async function(){
+
+    
+    let getlocale = await getLocale();
+
+    let language;
+
+    let old_url = window.location.href.split("/")
+    if (old_url[3].includes("helyfoglalas")) {
+        old_url.splice(3, 0, getlocale);
+        let new_url = old_url.join("/")
+        history.pushState({}, "", new_url);
+        language = getlocale;
+
+    } else {
+        language = old_url[3];
+    }
+
+    $("html").prop("lang", language);
+    
+    await getNavbar(language, old_url);
+    await modalInit(language);
+
     let params = new URLSearchParams(document.location.search);
     let flight_id_to = params.get("flight_id_to");
     let flight_id_back = params.get("flight_id_back");
