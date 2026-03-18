@@ -1,3 +1,5 @@
+
+
 .pin-info {
     display: flex;
     flex-direction: column;
@@ -20,3 +22,4 @@
 .pin-btn:hover {
     background-color: #c82333;
 }
+

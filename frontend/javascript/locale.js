@@ -1,7 +1,9 @@
 export async function getNavbar(lang, url_splitted) {
     let getnavbar = (await (await fetch("/api/getnavbar", { method: "GET", headers: { "Accept-Language": lang } })).json()).navbar;
     $("#about_us_nav").text(getnavbar.about_us);
-    $("#planner_nav").text(getnavbar.planner);
+    let $planner_nav = $("#planner_nav")
+    $planner_nav.text(getnavbar.planner);
+    $planner_nav.prop("href", `/${lang}/map`);
     $("#loyalty_program_nav").text(getnavbar.loyalty_program);
     let $language_nav = $("#language_nav");
     $language_nav.children().first().html(getnavbar.language);
@@ -22,18 +24,18 @@ export async function getPlanner(lang) {
 
 }
 
-export async function getIndex(lang) {
-    let getindex = (await (await fetch("/api/getindex", { method: "GET", headers: { "Accept-Language": lang } })).json()).index;
-    $("#title_about_us_footer").text(getindex.footer.title_about_us);
-    $("#company_infos_footer").text(getindex.footer.company_infos);
-    $("#news_footer").text(getindex.footer.news);
-    $("#title_services_footer").text(getindex.footer.title_services);
-    $("#loyalty_program_footer").text(getindex.footer.loyalty_program);
-    $("#flight_search_footer").text(getindex.footer.flight_search);
-    $("#my_flights_footer").text(getindex.footer.my_flights);
-    $("#travel_planner_footer").text(getindex.footer.travel_planner);
-    $("#title_contact_footer").text(getindex.footer.title_contact);
-    $("#all_rights_reserved_footer").text(getindex.footer.all_rights_reserved);
+export async function getFooter(lang) {
+    let getfooter = (await (await fetch("/api/getfooter", { method: "GET", headers: { "Accept-Language": lang } })).json()).footer;
+    $("#title_about_us_footer").text(getfooter.title_about_us);
+    $("#company_infos_footer").text(getfooter.company_infos);
+    $("#news_footer").text(getfooter.news);
+    $("#title_services_footer").text(getfooter.title_services);
+    $("#loyalty_program_footer").text(getfooter.loyalty_program);
+    $("#flight_search_footer").text(getfooter.flight_search);
+    $("#my_flights_footer").text(getfooter.my_flights);
+    $("#travel_planner_footer").text(getfooter.travel_planner);
+    $("#title_contact_footer").text(getfooter.title_contact);
+    $("#all_rights_reserved_footer").text(getfooter.all_rights_reserved);
 
 }
 
@@ -53,4 +55,8 @@ export async function getFlights(lang) {
 
 export async function getModal(lang) {
     return (await (await fetch("/api/getmodal", { method: "GET", headers: { "Accept-Language": lang } })).json()).modal;
+}
+
+export async function getMap(lang) {
+    return (await (await fetch("/api/getmap", { method: "GET", headers: { "Accept-Language": lang } })).json()).map;
 }

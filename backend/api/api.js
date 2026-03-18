@@ -393,11 +393,11 @@ router.get('/getplannerpassengerspopover', (request, response) => {
     }
 });
 
-router.get('/getindex', (request, response) => {
+router.get('/getfooter', (request, response) => {
     try {
 
         response.status(200).json({
-            index: request.t("index", { returnObjects: true })
+            footer: request.t("footer", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({
@@ -424,6 +424,19 @@ router.get('/getmodal', (request, response) => {
 
         response.status(200).json({
             modal: request.t("modal", { returnObjects: true })
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/getmap', (request, response) => {
+    try {
+
+        response.status(200).json({
+            map: request.t("map", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({
