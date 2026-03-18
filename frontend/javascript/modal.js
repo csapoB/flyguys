@@ -51,12 +51,9 @@ async function handleLogout(event) {
     }
 
     // Navbar frissítése
-    $("#login_button").show();
-    $("#profile_button").hide();
-    $("#logout_button").hide();
-    $("#admin_button").hide();
 
     alert('Sikeres kijelentkezés!');
+    location.reload();
 }
 
 function init_child_modal() {
@@ -347,13 +344,7 @@ async function handleLogin(event) {
 
             // Navbar frissítése - Bejelentkezés gomb elrejtése, Profilom gomb megjelenítése
 
-            if (data.admin) {
-                $("#admin_button").show();
-            }
-            $("#login_button").hide();
-            $("#profile_button").show();
-            $("#logout_button").show();
-
+            location.reload()
 
             // Modal bezárása
             const modal = bootstrap.Modal.getInstance(document.getElementById('monadModal'));
