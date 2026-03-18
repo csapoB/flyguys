@@ -432,6 +432,19 @@ router.get('/getmodal', (request, response) => {
     }
 });
 
+router.get('/getmap', (request, response) => {
+    try {
+
+        response.status(200).json({
+            map: request.t("map", { returnObjects: true })
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
 /*router.get('/a', (request, response) => {
     try {
         

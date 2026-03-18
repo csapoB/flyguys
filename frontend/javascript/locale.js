@@ -56,3 +56,7 @@ export async function getFlights(lang) {
 export async function getModal(lang) {
     return (await (await fetch("/api/getmodal", { method: "GET", headers: { "Accept-Language": lang } })).json()).modal;
 }
+
+export async function getMap(lang) {
+    return (await (await fetch("/api/getmap", { method: "GET", headers: { "Accept-Language": lang } })).json()).map;
+}
