@@ -1,5 +1,6 @@
 import { getPlanner } from "./locale.js";
 import { passengers_popoverInit } from "./planner.js";
+import { popoverManualTrigger } from "./planner.js";
 import { inputSwitcher } from "./planner.js";
 import { airportSelector } from "./planner.js";
 import { returnEnabler } from "./planner.js";
@@ -36,10 +37,24 @@ export async function plannerMapInit(current_language) {
         1 - Popover objektum
     */
     // Repülőtér popoverek
-    let origin = await popoverInit("origin_input", "origin_popover");
-    popoverManualTrigger(origin[0].get(0) /*vissza alakítja hagyományos DOM elemmé*/, origin[1]);
-    let destination = await popoverInit("destination_input", "destination_popover");
-    popoverManualTrigger(destination[0].get(0), destination[1]);
+    let origin = await popoverInit("origin_input", "origin_popover", "body");
+    origin[0].on("marker:click", async function (event, code) {
+        (bootstrap.Popover.getInstance($(this))).dispose();
+        let new_popover = await popoverInit("origin_input", "origin_popover", "#hidden_container", "");
+        new_popover[1].show();
+        let i = 0;
+        while ($("#origin_popover").children().eq(i).children().eq(1).data("code") != code){
+            i++;
+        }
+        $("#origin_popover").children().eq(i).children().eq(1).trigger("click");
+
+        $("#hidden_container").html("");
+        origin = await popoverInit("origin_input", "origin_popover", "body", code);
+        console.log(origin[0].data("code_of_selected_airport"))
+    });
+    // popoverManualTrigger(origin[0].get(0) /*vissza alakítja hagyományos DOM elemmé*/, origin[1]);
+    let destination = await popoverInit("destination_input", "destination_popover", "body");
+    // popoverManualTrigger(destination[0].get(0), destination[1]);
     // Datepickerek
     let $departure = $("#departure_input");
     let available_departure_dates = (await (await fetch("/api/availabledeparturedatesfiltered", { method: "GET" })).json()).departuredates
@@ -263,6 +278,23 @@ export async function plannerMapInit(current_language) {
 }
 
 ///////// FÜGGVÉNYEK /////////
+
+async function popoverInit(input_field_id, content_div_id, container_id, code_of_selected_airport) {
+
+    let $input_field = $("#" + input_field_id);
+    $input_field.data("code_of_selected_airport", code_of_selected_airport);
+
+    let popover = new bootstrap.Popover($input_field, {
+        html: true, // A popover ne csak szöveget de HTML kódot is tudjon tárolni
+        container: container_id,
+        content: " ", // helyfoglaló, mivel az "airports_popover_contentGenerator()" függvény egy attribútuma a popover objektum, ami csak inicializálás után addható át argumentumként 
+        placement: "bottom",
+        trigger: "click" // A popover mikor jelenjen meg. "manual": a fejlesztő írja meg hozzá a szabályrendszert
+    });
+    popover.setContent({ ".popover-body": airports_popover_contentGenerator(input_field_id, content_div_id, popover, (await (await fetch(`/api/${(input_field_id == "origin_input") ? "availabledepartureairportsfiltered" : "availablearrivalairportsfiltered"}`, { method: "GET", headers : {"Accept-Language" : document.getElementById("language_nav").dataset.langCode} })).json())) }); // általános eljárás a két repülőteres popoverhez
+
+    return [$input_field, popover];
+}
 
 
 function airports_popover_contentGenerator(input_field_id, content_div_id, popover_obj, airports_data_from_api) {

@@ -3,6 +3,7 @@ import { getLocale } from "./locale.js";
 import { getFooter } from "./locale.js";
 import { getMap } from "./locale.js";
 import { modalInit } from "./modal.js";
+import { plannerMapInit } from "./plannermap.js";
 
 $(async function () {
 
@@ -35,6 +36,8 @@ $(async function () {
   await getNavbar(language, old_url);
   await modalInit(language);
 
+  await plannerMapInit(language);
+
   await getFooter(language);
 
 });
@@ -56,12 +59,12 @@ async function initMap(language) {
 
   for (let i = 0; i < pins.length; i++) {
     let cordinates = pins[i].GeographicCoordinates.split(',').map(x => parseFloat(x));
-    let marker = new AdvancedMarkerElement({
+    let origin_marker = new AdvancedMarkerElement({
       position: { lat: cordinates[0], lng: cordinates[1] },
       map: map
     });
-    marker.id = `marker_${i}`;
-    marker.tabIndex = -1;
+    origin_marker.id = `marker_${i}`;
+    origin_marker.tabIndex = -1;
 
     let contentString = $('<div>', {
       html: `<h2>${pins[i].CityName}</h2><p>(${pins[i].DepartureAirport})</p>`,
@@ -72,8 +75,9 @@ async function initMap(language) {
       text: getmap.choose_button,
       class: 'pin-btn',
       on: {
-        click: () => {
-          console.log('működik');
+        "click": () => {
+          $("#origin_input").trigger("marker:click", [pins[i].DepartureAirport]);
+          (bootstrap.Popover.getInstance(origin_marker)).hide();
         }
       }
     });
@@ -87,7 +91,7 @@ async function initMap(language) {
     markerElement.setAttribute("data-bs-content", "This is a Bootstrap Popover on a Map Marker!");
     markerElement.setAttribute("title", "Marker Details");
     */
-    let marker_popover = new bootstrap.Popover(marker, {
+    let marker_popover = new bootstrap.Popover(origin_marker, {
       html: true, // A popover ne csak szöveget de HTML kódot is tudjon tárolni
       container: "body",
       content: contentString,
@@ -95,9 +99,9 @@ async function initMap(language) {
       trigger: "manual" // A popover mikor jelenjen meg. "manual": a fejlesztő írja meg hozzá a szabályrendszert
     });
 
-    console.log(marker);
+    console.log(origin_marker);
 
-    markerPopoverManualTrigger(marker, marker_popover);
+    markerPopoverManualTrigger(origin_marker, marker_popover);
   }
 
 
