@@ -16,12 +16,14 @@
     <link rel="stylesheet" href="../css/jquery-ui.min.css">
     <link rel="stylesheet" href="../css/index.css" />
     <link rel="stylesheet" href="../css/navbar.css" />
+    <link rel="stylesheet" href="../css/map.css" />
 
     <script src="../javascript/jquery-3.7.1.min.js"></script>
     <script src="../javascript/jquery-ui.min.js"></script>
     <script type="module" src="../javascript/locale.js"></script>
-    <script src="../javascript/modal.js"></script>
-    <script src="../javascript/map.js"></script>
+    <script type="module" src="../javascript/modal.js"></script>
+    <script type="module" src="../javascript/map.js"></script>
+
     <script type="module" src="../javascript/planner.js"></script>
     <script src="../javascript/plannerresizer.js"></script>
 
@@ -41,6 +43,7 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
+    
     <nav class="navbar navbar-expand-lg custom-navbar align-self-center w-100 mt-3">
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
@@ -57,17 +60,35 @@
 
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex">
                 <li class="nav-item">
-                    <a class="nav-link" href="#rolunk">Rólunk</a>
+                    <a id="about_us_nav" class="nav-link" href="#rolunk">Rólunk</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/map">Tervezés</a>
+                    <a id="planner_nav" class="nav-link" href="/map">Tervezés</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/husegprogram">Hűségprogram</a>
+                    <a id="loyalty_program_nav" class="nav-link" href="/husegprogram">Hűségprogram</a>
                 </li>
             </ul>
-            <div class="d-flex flex-column flex-lg-row gap-2 align-items-start align-items-lg-center ms-lg-auto mt-2 mt-lg-0">
-                <a class="nav-link" href="#lang">Magyar</a>
+            <div
+                class="d-flex flex-column flex-lg-row gap-2 align-items-start align-items-lg-center ms-lg-auto mt-2 mt-lg-0">
+                <a class="nav-link" data-lang-code="hu" href="/en/map" id="language_nav"><span><svg
+                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" height="24" width="32">
+                            <defs>
+                                <clipPath>
+                                    <path d="M-85 0h682v512H-85z"></path>
+                                </clipPath>
+                            </defs>
+                            <g clip-path="url(#a)" transform="translate(80) scale(.94)">
+                                <path fill="#012169" d="M-256 0H768v512H-256z"></path>
+                                <path fill="#fff"
+                                    d="M-256 0v57l910 455h114v-57L-141 0h-115zM768 0v57l-909 455h-115v-57L654 0h114z">
+                                </path>
+                                <path fill="#fff" d="M171 0v512h170V0H171zm-427 171v170H768V171H-256z"></path>
+                                <path fill="#c8102e"
+                                    d="M-256 205v102H768V205H-256zM205 0v512h102V0H205zm-461 512L85 341h77l-342 171h-76zm0-512L85 171H9L-256 38V0zm606 171L692 0h76L427 171h-77zm418 341L427 341h76l265 133v38z">
+                                </path>
+                            </g>
+                        </svg></span></a>
                 <a class="btn btn-danger" id="login_button" data-bs-toggle="modal" href="#monadModal">Bejelentkezés</a>
                 <a class="btn btn-outline-dark" id="admin_button" href="/admin">Admin</a>
                 <a class="btn btn-outline-dark" id="profile_button" href="/profil">Profilom</a>
@@ -87,7 +108,8 @@
                                     <div id="origin_div"
                                         class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center"
                                         tabindex="-1">
-                                        <label class="planner_label" for="origin_input">Indulási hely</label>
+                                        <label id="origin_label" class="planner_label" for="origin_input">Indulási
+                                            hely</label>
                                         <div class="d-flex flex-row input_container">
                                             <input id="origin_input" readonly="readonly" type="text"
                                                 class="planner_input" name="origin" aria-label="Indulási hely"
@@ -108,7 +130,8 @@
                                     <div id="destination_div"
                                         class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center"
                                         tabindex="-1">
-                                        <label class="planner_label" for="destination_input">Érkezési hely</label>
+                                        <label id="destination_label" class="planner_label"
+                                            for="destination_input">Érkezési hely</label>
                                         <div class="d-flex flex-row input_container">
                                             <input id="destination_input" readonly="readonly" type="text"
                                                 class="planner_input" name="destination" aria-label="Érkezési hely"
@@ -126,7 +149,8 @@
                                     <div id="departure_div"
                                         class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center"
                                         tabindex="-1">
-                                        <label class="planner_label" for="departure_input">Indulás</label>
+                                        <label id="departure_label" class="planner_label"
+                                            for="departure_input">Indulás</label>
                                         <div class="d-flex flex-row input_container">
                                             <input id="departure_input" readonly="readonly" type="text"
                                                 class="planner_input" name="departure" aria-label="Indulás"
@@ -148,7 +172,8 @@
                                     <div id="return_div"
                                         class="pt-1 col-lg-5 border rounded planner_div d-flex flex-column justify-content-center"
                                         tabindex="-1">
-                                        <label class="planner_label" for="return_input">Visszaút</label>
+                                        <label id="return_label" class="planner_label"
+                                            for="return_input">Visszaút</label>
                                         <div class="d-flex flex-row input_container">
                                             <input id="return_input" readonly="readonly" type="text"
                                                 class="planner_input" name="return" aria-label="Visszaút" tabindex="6">
@@ -162,7 +187,8 @@
                                 <div class="row ps-2 pe-2">
                                     <div id="passengers_div"
                                         class="pt-1 col-lg-6 border rounded planner_div d-flex flex-column justify-content-center">
-                                        <label class="planner_label" for="passengers_input">Utasok</label>
+                                        <label id="passengers_label" class="planner_label"
+                                            for="passengers_input">Utasok</label>
                                         <input id="passengers_input" name="passengers" readonly="readonly" type="text"
                                             class="planner_input" name="passengers" aria-label="Utasok" tabindex="7"
                                             value="1 felnőtt, 0 gyermek">
@@ -192,13 +218,14 @@
             <div class="row justify-content-around">
                 <div class="col-xl-2 col-lg-2 col-md-4" id="eltunes">
                     <div>
-                        <h4>Rólunk</h4>
+                        <h4 id="title_about_us_footer">Rólunk</h4>
                         <ul class="list-unstyled">
                             <li>
-                                <a href="#" class="text-decoration-none">Vállalati információk</a>
+                                <a id="company_infos_footer" href="#" class="text-decoration-none">Vállalati
+                                    információk</a>
                             </li>
                             <li>
-                                <a href="#" class="text-decoration-none">Hírek</a>
+                                <a id="news_footer" href="#" class="text-decoration-none">Hírek</a>
                             </li>
                             <li>
                                 <a href="#" class="text-decoration-none">Valami</a>
@@ -211,33 +238,33 @@
                 </div>
                 <div class="col-6 col-xl-3 col-lg-3 col-md-4 col-sm-4">
                     <div>
-                        <h4>Szolgáltatásaink</h4>
+                        <h4 id="title_services_footer">Szolgáltatásaink</h4>
                         <ul class="list-unstyled">
                             <li>
-                                <a href="#" class="text-decoration-none">Törzsvásárlói program</a>
+                                <a id="loyalty_program_footer" href="#" class="text-decoration-none">Törzsvásárlói
+                                    program</a>
                             </li>
                             <li>
-                                <a href="#" class="text-decoration-none">Járat kereső</a>
+                                <a id="flight_search_footer" href="#" class="text-decoration-none">Járat kereső</a>
                             </li>
                             <li>
-                                <a href="#" class="text-decoration-none">Járataim</a>
+                                <a id="my_flights_footer" href="#" class="text-decoration-none">Járataim</a>
                             </li>
                             <li>
-                                <a href="#" class="text-decoration-none">Útvonaltervező</a>
+                                <a id="travel_planner_footer" href="#" class="text-decoration-none">Útvonaltervező</a>
                             </li>
                         </ul>
                     </div>
                 </div>
                 <div class="col-6 col-xl-3 col-lg-3 col-md-4 col-sm-4">
                     <div>
-                        <h4>Elérhetőségeink</h4>
+                        <h4 id="title_contact_footer">Elérhetőségeink</h4>
                         <ul class="list-unstyled">
                             <li>
                                 <p>+36305164050</p>
                             </li>
                             <li>
-                                <p><a href="#">ugyfelszolgalat@FlyGuys.com</a>
-                                </p>
+                                <a href="mailto:ugyfelszolgalat@FlyGuys.com">ugyfelszolgalat@FlyGuys.com</a>
                             </li>
                         </ul>
                     </div>
@@ -246,7 +273,7 @@
             <div class="d-flex justify-content-center">
 
                 <div class="copyright">
-                    <p><i>FlyGuys Minden jog fentartva.</i></p>
+                    <p id="all_rights_reserved_footer"><i>© FlyGuys. Minden jog fenntartva.</i></p>
                 </div>
             </div>
         </div>
@@ -260,7 +287,7 @@
         </div>
     </div>
 
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGmwlN95_KmdNN5xAq2VO7qJCWSrNkuaA&map_ids=339ffbadd5c5008584bb6746&loading=async&callback=initMap">
-        </script>
+    
 </body>
+
+</html>

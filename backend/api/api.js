@@ -145,7 +145,7 @@ router.get('/availabledepartureairportsfiltered', async (request, response) => {
         } else {
             result = await database.selectAvailableDepartureAirportsFilteredEn(((request.query.arrivalAirport == undefined) ? "" : request.query.arrivalAirport), ((request.query.departureDate == undefined) ? "" : request.query.departureDate));
         }
-        
+
 
 
         response.status(200).json({
@@ -241,7 +241,7 @@ router.get('/availablereturndates', async (request, response) => {
 router.get('/swappableairportswithsamedeparturedates', async (request, response) => {
     try {
 
-        const result = await database.selectSwappableFlightsWithSameDepartureDates(((request.query.departureDate == undefined) ? "" : request.query.departureDate));
+        const result = await database.selectSwappableFlightsWithSameDepartureDates(request.query.departureAirport, request.query.arrivalAirport, ((request.query.departureDate == undefined) ? "" : request.query.departureDate));
 
         let airports = [];
         for (let i = 0; i < result.length; i++) {
@@ -262,7 +262,7 @@ router.get('/swappableairportswithsamedeparturedates', async (request, response)
 router.get('/swappableairports', async (request, response) => {
     try {
 
-        const result = await database.selectSwappableFlights();
+        const result = await database.selectSwappableFlights(request.query.departureAirport, request.query.arrivalAirport);
 
         let airports = [];
         for (let i = 0; i < result.length; i++) {
@@ -283,15 +283,18 @@ router.get('/swappableairports', async (request, response) => {
 router.get('/hu/flights', async (request, response) => {
     try {
 
-        if (request.query.departureAirport == undefined || request.query.arrivalAirport == undefined || request.query.departureDate == undefined || request.query.numOfPassengers == undefined) {
+        if (request.query.departureAirport == undefined || request.query.arrivalAirport == undefined || request.query.departureDate == undefined || request.query.numOfAdults == undefined || request.query.numOfChildren == undefined) {
             response.status(400).json({
                 error: "A HTTP-GET lekérdezés nem megfelelő!"
             });
         } else {
 
+            let data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren);
+            data.map(x => x.BasePrice = `${x.BasePrice} HUF`);
             response.status(200).json({
-                flights: await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfPassengers)
+                flights: data
             });
+
         }
     } catch (error) {
         response.status(500).json({
@@ -303,14 +306,19 @@ router.get('/hu/flights', async (request, response) => {
 router.get('/en/flights', async (request, response) => {
     try {
 
-        if (request.query.departureAirport == undefined || request.query.arrivalAirport == undefined || request.query.departureDate == undefined || request.query.numOfPassengers == undefined) {
-                response.status(400).json({
-                    error: "The HTTP-GET request isn't proper!"
-                });
+        if (request.query.departureAirport == undefined || request.query.arrivalAirport == undefined || request.query.departureDate == undefined || request.query.numOfAdults == undefined || request.query.numOfChildren == undefined) {
+            response.status(400).json({
+                error: "The HTTP-GET request isn't proper!"
+            });
         } else {
 
+
+            let current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+            let data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren);
+            data.map(x => x.BasePrice = `${Math.round(x.BasePrice * current_eur_exch_rate)} EUR`);
+
             response.status(200).json({
-                flights: await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfPassengers)
+                flights: data
             });
         }
     } catch (error) {
@@ -324,7 +332,7 @@ router.get('/geterrors', (request, response) => {
     try {
 
         response.status(200).json({
-            errors: request.t("errors", {returnObjects : true})
+            errors: request.t("errors", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({
@@ -337,7 +345,7 @@ router.get('/getflights', (request, response) => {
     try {
 
         response.status(200).json({
-            flights: request.t("flights", {returnObjects : true})
+            flights: request.t("flights", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({
@@ -350,7 +358,7 @@ router.get('/getnavbar', (request, response) => {
     try {
 
         response.status(200).json({
-            navbar: request.t("navbar", {returnObjects : true})
+            navbar: request.t("navbar", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({
@@ -363,7 +371,7 @@ router.get('/getplanner', (request, response) => {
     try {
 
         response.status(200).json({
-            planner: request.t("planner", {returnObjects : true})
+            planner: request.t("planner", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({
@@ -376,7 +384,7 @@ router.get('/getplannerpassengerspopover', (request, response) => {
     try {
 
         response.status(200).json({
-            planner_passengers_popover: request.t("planner_passengers_popover", {returnObjects : true})
+            planner_passengers_popover: request.t("planner_passengers_popover", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({
@@ -389,7 +397,7 @@ router.get('/getindex', (request, response) => {
     try {
 
         response.status(200).json({
-            index: request.t("index", {returnObjects : true})
+            index: request.t("index", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({
@@ -402,7 +410,7 @@ router.get('/getlocale', (request, response) => {
     try {
 
         response.status(200).json({
-            locale: request.t("locale", {returnObjects : true})
+            locale: request.t("locale", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({
@@ -415,7 +423,7 @@ router.get('/getmodal', (request, response) => {
     try {
 
         response.status(200).json({
-            modal: request.t("modal", {returnObjects : true})
+            modal: request.t("modal", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({
@@ -564,6 +572,26 @@ router.get('/husegprogram', async (request, response) => {
     }
 });
 
+router.get('/map_pins', async (request, response) => {
+    try {
+        if ((request.get("Accept-Language") == "hu")) {
+            response.status(200).json({
+                pins: await database.selectAvailableAirportsHun()
+            });
+        } else {
+            response.status(200).json({
+                pins: await database.selectAvailableAirportsEn()
+            });
+        }
+
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            message: 'Ez a végpont nem működik.'
+        });
+    }
+});
+
 function LoggedInCheck(request) {
     let vissza = false;
     if (request.session && request.session.user && request.session.user.id && request.session.user.role !== undefined && request.session.user.timestamp) {
@@ -633,5 +661,7 @@ router.post('/helyfoglalas', async (request, response) => {
         });
     }
 });
+
+
 
 module.exports = router;

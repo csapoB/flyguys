@@ -63,6 +63,14 @@ router.get('/map', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/map.html'));
 });
 
+router.get('/en/map', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/map.html'));
+});
+
+router.get('/hu/map', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/map.html'));
+});
+
 router.get('/magazin', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/magazin.html'));
 });
@@ -93,6 +101,18 @@ router.get('/en/flights', (request, response) => {
 
 router.get('/hu/flights', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/flights.html'));
+});
+
+router.get('/helyfoglalas', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/helyfoglalas.html'));
+});
+
+router.get('/en/helyfoglalas', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/helyfoglalas.html'));
+});
+
+router.get('/hu/helyfoglalas', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/helyfoglalas.html'));
 });
 
 //!API endpoints
