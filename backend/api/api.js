@@ -638,7 +638,6 @@ router.post('/helyfoglalas', async (request, response) => {
         else {
             const { flightID, rowID, columnID, isAdult } = request.body;
             const parsedIsAdult = Number(isAdult);
-
             if (!Number.isInteger(parsedIsAdult) || (parsedIsAdult !== 0 && parsedIsAdult !== 1)) {
                 throw new Error("Hibás az isAdult")
             }

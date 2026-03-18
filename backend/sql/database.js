@@ -94,7 +94,6 @@ async function selectAvailableFlightsFilteredEn(departureAirport, arrivalAirport
 async function selectAvailableSeatsOnFlight(flightId, userId) {
     const query = 'SELECT seat.RowID, seat.ColumnID, seat.FareClassID, (flight.BasePrice*fareclass.Multiplier)*((100-(SELECT loyaltystatus.DiscountInPercentage FROM useraccount INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserID = ?))/100) AS "Price", (CASE WHEN not_cancelled_reservations.FlightID IS NULL THEN FALSE ELSE TRUE END) AS "IsOccupied" FROM seat INNER JOIN fareclass ON seat.FareClassID = fareclass.FareClassID INNER JOIN aircraft ON seat.AircraftModelID = aircraft.AircraftModelID INNER JOIN flight ON aircraft.AircraftID = flight.AircraftID LEFT JOIN not_cancelled_reservations ON flight.FlightID = not_cancelled_reservations.FlightID AND seat.RowID = not_cancelled_reservations.RowID AND seat.ColumnID = not_cancelled_reservations.ColumnID WHERE flight.FlightID = ?;';
     const [rows] = await pool.execute(query, [userId, flightId]);
-    console.log(rows);
     return rows;
 }
 
@@ -151,7 +150,6 @@ async function Husegprogram(id){
 
 //Helyfoglalas INSERT
 async function SeatReservation(PassengerID, flightID, rowID, columnID, adult){
-    console.log(flightID, rowID, columnID, adult)
     let lekerdezes = 'SELECT ReservationID FROM reservation WHERE FlightID = ? AND RowID = ? AND ColumnID = ? AND NOT IsCancelled'
     const [sorok] = await pool.execute(lekerdezes, [flightID, rowID, columnID]);
     let vissza = false;
