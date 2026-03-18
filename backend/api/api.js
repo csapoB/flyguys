@@ -649,13 +649,18 @@ router.post('/helyfoglalas', async (request, response) => {
             throw new Error("Nem vagy bejelentkezve!")
         }
         else {
-            const { flightID, rowID, columnID } = request.body;
+            const { flightID, rowID, columnID, isAdult } = request.body;
+            const parsedIsAdult = Number(isAdult);
+            if (!Number.isInteger(parsedIsAdult) || (parsedIsAdult !== 0 && parsedIsAdult !== 1)) {
+                throw new Error("Hibás az isAdult")
+            }
+
             if (!flightID || !rowID || !columnID) {
                 throw new Error("Hiányzó adat.")
             }
-            const siker = await database.SeatReservation(request.session.user.id, flightID, rowID, columnID);
+            const siker = await database.SeatReservation(request.session.user.id, flightID, rowID, columnID, parsedIsAdult);
             if (!siker) {
-                throw new Error("Hiba az adatbázisban")
+                throw new Error("Ez a hely már foglalva van")
             }
             response.status(200).json({
                 siker: siker

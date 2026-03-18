@@ -1,6 +1,11 @@
-﻿let kivalaszottUlesekOda = [];
+﻿import { getNavbar } from "./locale.js";
+import { getLocale } from "./locale.js";
+import { modalInit } from "./modal.js";
+
+let kivalaszottUlesekOda = [];
 let kivalaszottUlesekVissza = [];
 let maxPassengers = 1;
+let childrens = 0
 let isRoundTrip = false;
 
 const fareClassNames = {
@@ -9,11 +14,34 @@ const fareClassNames = {
     3: { nev: 'Economy Class', badge: 'class-badge-economy' }
 };
 
-$(document).ready(async function(){
+$(document).ready(async function () {
+
+
+    let getlocale = await getLocale();
+
+    let language;
+
+    let old_url = window.location.href.split("/")
+    if (old_url[3].includes("helyfoglalas")) {
+        old_url.splice(3, 0, getlocale);
+        let new_url = old_url.join("/")
+        history.pushState({}, "", new_url);
+        language = getlocale;
+
+    } else {
+        language = old_url[3];
+    }
+
+    $("html").prop("lang", language);
+
+    await getNavbar(language, old_url);
+    await modalInit(language);
+
     let params = new URLSearchParams(document.location.search);
     let flight_id_to = params.get("flight_id_to");
     let flight_id_back = params.get("flight_id_back");
-    maxPassengers = parseInt(params.get("num_of_passengers")) || 1;
+    childrens = parseInt(params.get("children")) || 0;
+    maxPassengers = (parseInt(params.get("adults")) || 1) + childrens;
     isRoundTrip = flight_id_back != null;
 
     // Odaut
@@ -38,44 +66,62 @@ $(document).ready(async function(){
     $('#lefoglal').prop('disabled', true);
     frissitAllapot();
 
-    $('#lefoglal').click(function(){
-        let msg = '=== Foglalás összesítő ===\n\n';
-        msg += 'Odaút kiválasztott helyek:\n';
+    $('#lefoglal').click(function () {
         let flight_id_to = params.get("flight_id_to");
-        kivalaszottUlesekOda.forEach(async function(u){
-            let sikeres = await helyFoglal(flight_id_to, u.hely[0], u.hely[1]);
-            if (sikeres) {
-                console.log("Sikeres foglalás")
-                let fc = fareClassNames[u.tipus];
-                alert('  • ' + u.hely + ' ülés (' + fc.nev + ') - ' + u.ar + ' Ft\n');
+        let childleft = childrens;
+        kivalaszottUlesekOda.forEach(async function (u) {
+            let isAdult;
+            if (childleft > 0) {
+                isAdult = 0;
+                childleft = childleft - 1;
             }
+            else {
+                isAdult = 1;
+            }
+            if (u.hely.length > 2) {
+                await helyFoglal(flight_id_to, u.hely[0] + u.hely[1], u.hely[2], isAdult);
+            }
+            else {
+                await helyFoglal(flight_id_to, u.hely[0], u.hely[1], isAdult);
+            }
+            childleft--;
         });
         if (isRoundTrip) {
             let flight_id_back = params.get("flight_id_back");
-            msg += '\nVisszaút kiválasztott helyek:\n';
-            kivalaszottUlesekVissza.forEach(async function(u){
-                let sikeres = await helyFoglal(flight_id_back, u.hely[0], u.hely[1]);
-                if (sikeres) {
-                console.log("Sikeres foglalás")
-                let fc = fareClassNames[u.tipus];
-                alert('  • ' + u.hely + ' ülés (' + fc.nev + ') - ' + u.ar + ' Ft\n');
-            }
+            childleft = childrens;
+            kivalaszottUlesekVissza.forEach(async function (u) {
+                let isAdult;
+                if (childleft > 0) {
+                    isAdult = 0;
+                    childleft = childleft - 1;
+                }
+                else {
+                    isAdult = 1;
+                }
+                if (u.hely.length > 2) {
+                    await helyFoglal(flight_id_back, u.hely[0] + u.hely[1], u.hely[2], isAdult);
+                }
+                else {
+                    await helyFoglal(flight_id_back, u.hely[0], u.hely[1], isAdult);
+                }
             });
         }
         let osszesen = 0;
         kivalaszottUlesekOda.forEach(u => osszesen += u.ar);
         kivalaszottUlesekVissza.forEach(u => osszesen += u.ar);
-        msg += '\nÖsszesen: ' + osszesen + ' Ft';
-        alert(msg);
+        alert("Sikeres foglalás! 5 másodperc múlva átirányítunk.");
+        setTimeout(function () {
+            window.location.replace('/');
+        }, 5000);
     })
 })
 
-async function helyFoglal(flightID, rowID, columnID){
+async function helyFoglal(flightID, rowID, columnID, isAdult) {
     try {
         let vissza = await fetch("/api/helyfoglalas", {
-            method:"POST", 
-            headers:{'Content-Type': 'application/json'},
-            body: JSON.stringify({flightID, rowID, columnID})
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ flightID, rowID, columnID, isAdult })
         });
         let json = await vissza.json();
         if (!json.siker) {
@@ -83,18 +129,18 @@ async function helyFoglal(flightID, rowID, columnID){
         }
         return json.siker;
     } catch (error) {
-        console.error(error.message);
+        console.log(error.message);
         return false;
     }
 }
 
-async function getHelyek(id){
+async function getHelyek(id) {
     if (!id) {
         console.error("Nincs flight_id megadva");
         return null;
     }
     try {
-        let vissza = await fetch("/api/helyfoglalas?id="+id, {method:"GET"});
+        let vissza = await fetch("/api/helyfoglalas?id=" + id, { method: "GET" });
         let json = await vissza.json();
         if (!json.helyek) {
             console.error(json.message || "Ismeretlen hiba");
@@ -108,48 +154,53 @@ async function getHelyek(id){
 }
 
 // Ulesek legeneralasa
-function ulesek_general(hova, adatok, irany){
+function ulesek_general(hova, adatok, irany) {
     if (!adatok || adatok.length === 0) {
         hova.append('<div class="alert alert-danger">Nem sikerült betölteni az ülőhelyeket.</div>');
         return;
     }
-    let sorokszama = adatok[adatok.length-1].RowID;
+    let sorokszama = adatok[adatok.length - 1].RowID;
     for (let i = 0; i < sorokszama; i++) {
         let $sorDiv = $('<div class="d-flex justify-content-center mb-1"></div>');
-        $sorDiv.append('<div class=sorszama>'+(i+1)+'</div>');
+        $sorDiv.append('<div class=sorszama>' + (i + 1) + '</div>');
 
         let x = i * 6;
-        while(x < i * 6 + 6){
+        while (x < i * 6 + 6) {
             let ulesAdat = adatok[x];
-            if (!ulesAdat) break;
-            let ulesHelye = (i+1) + ulesAdat.ColumnID;
+            let ulesHelye = ulesAdat.RowID + ulesAdat.ColumnID;
             let ulesAra = ulesAdat.Price;
 
-            let $hely = $('<div class="ules tipus'+ ulesAdat.FareClassID+'">'+ ulesAdat.ColumnID+'</div>');
+            let $hely = $('<div class="ules tipus' + ulesAdat.FareClassID + '">' + ulesAdat.ColumnID + '</div>');
+            if (ulesAdat.IsOccupied == 0) {
+                $hely.click(function () {
+                    let tomb = irany === 'oda' ? kivalaszottUlesekOda : kivalaszottUlesekVissza;
 
-            $hely.click(function(){
-                let tomb = irany === 'oda' ? kivalaszottUlesekOda : kivalaszottUlesekVissza;
-
-                if ($hely.hasClass('kivalasztott')) {
-                    $hely.removeClass('kivalasztott');
-                    if (irany === 'oda') {
-                        kivalaszottUlesekOda = kivalaszottUlesekOda.filter(u => u.hely != ulesHelye);
-                    } else {
-                        kivalaszottUlesekVissza = kivalaszottUlesekVissza.filter(u => u.hely != ulesHelye);
+                    if ($hely.hasClass('kivalasztott')) {
+                        $hely.removeClass('kivalasztott');
+                        if (irany === 'oda') {
+                            kivalaszottUlesekOda = kivalaszottUlesekOda.filter(u => u.hely != ulesHelye);
+                        } else {
+                            kivalaszottUlesekVissza = kivalaszottUlesekVissza.filter(u => u.hely != ulesHelye);
+                        }
                     }
-                }
-                else {
-                    if (tomb.length < maxPassengers) {
-                        $hely.addClass('kivalasztott');
-                    if (irany === 'oda') {
-                        kivalaszottUlesekOda.push({"hely": ulesHelye, "ar": ulesAra, "tipus": ulesAdat.FareClassID});
-                    } else {
-                        kivalaszottUlesekVissza.push({"hely": ulesHelye, "ar": ulesAra, "tipus": ulesAdat.FareClassID});
+                    else {
+                        if (tomb.length < maxPassengers) {
+                            $hely.addClass('kivalasztott');
+                            if (irany === 'oda') {
+                                kivalaszottUlesekOda.push({ "hely": ulesHelye, "ar": ulesAra, "tipus": ulesAdat.FareClassID });
+                            } else {
+                                kivalaszottUlesekVissza.push({ "hely": ulesHelye, "ar": ulesAra, "tipus": ulesAdat.FareClassID });
+                            }
+                        }
                     }
-                    }
-                }
-                frissitAllapot();
-            })
+                    frissitAllapot();
+                })
+            }
+            else {
+                $hely.removeClass('tipus1 tipus2 tipus3');
+                $hely.addClass('lefoglalt')
+                $hely.text('X');
+            }
 
             $sorDiv.append($hely);
             if (ulesAdat.ColumnID == "C") {
@@ -162,7 +213,7 @@ function ulesek_general(hova, adatok, irany){
 }
 
 // Allapot frissitese
-function frissitAllapot(){
+function frissitAllapot() {
     megjelenitKijeloltek($('#kivalasztottak_oda'), kivalaszottUlesekOda);
     if (isRoundTrip) {
         megjelenitKijeloltek($('#kivalasztottak_vissza'), kivalaszottUlesekVissza);
@@ -186,7 +237,7 @@ function frissitAllapot(){
     $('#lefoglal').prop('disabled', !(odaOk && visszaOk));
 }
 
-function megjelenitKijeloltek($lista, ulesek){
+function megjelenitKijeloltek($lista, ulesek) {
     $lista.empty();
     if (ulesek.length == 0) {
         $lista.append('<li class="list-group-item italic">Nincs kiválasztott hely!</li>');

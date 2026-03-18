@@ -419,7 +419,7 @@ async function handleRegister(event) {
 
         else {
 
-            alert('Sikeres regisztráció! Bejelentkezve vagy.');
+            alert('Sikeres regisztráció!');
 
             // Modal bezárása
             const childModal = bootstrap.Modal.getInstance(document.getElementById('childModal'));

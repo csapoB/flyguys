@@ -132,6 +132,14 @@
     font-weight: bold;
 }
 
+.lefoglalt{
+    background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+    border-color: #616161;
+    color: #ffffff;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
 .folyoso{
     width: 40px;
 }
