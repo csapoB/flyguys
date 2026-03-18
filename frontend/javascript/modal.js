@@ -1,8 +1,8 @@
 import { getModal } from "./locale.js";
 export async function modalInit(current_language) {
-    
+
     await checkLoginStatus();
-    $("#login_button").on("click", async function() {   
+    $("#login_button").on("click", async function () {
         await login_modal(current_language);
     });
     $(document).on("click", ".submit-login", handleLogin);
@@ -27,14 +27,14 @@ async function checkLoginStatus() {
             if (data.admin) {
                 $("#admin_button").show();
             }
-            else{
+            else {
                 $("#profile_button").show();
             }
             $("#login_button").hide();
             $("#logout_button").show();
         }
     }
-    catch(error){
+    catch (error) {
     }
 }
 
@@ -252,6 +252,7 @@ function regis_modal(i18next_values) {
         "type": "text",
         "placeholder": `${i18next_values.birth_date}`
     });
+    $birth_date.datepicker();
 
     let $e_mail = $("<input/>", {
         "id": "new_usr_email",
@@ -381,11 +382,8 @@ async function handleRegister(event) {
     let birthDate = null;
 
     if (birthDateInput) {
-        const parts = birthDateInput.split('.');
-            const mm = parts[0];
-            const dd = parts[1];
-            const yyyy = parts[2];
-            birthDate = `${yyyy}-${mm}-${dd}`;
+        
+        birthDate = dateFormatter(birthDateInput, ((birthDateInput[2] == "/") ? "en" : "hu"))
     }
 
     if (!userName.trim() || !email || !password) {
@@ -439,4 +437,17 @@ async function handleRegister(event) {
         console.error('Regisztráció hiba:', error);
         alert('Szerver hiba a regisztráció során');
     }
+}
+
+function dateFormatter(dateText, language) {
+    let dateText_array;
+    if (language == "en") {
+        dateText_array = dateText.split("/");
+        dateText_array.reverse();
+
+    } else {
+        dateText_array = dateText.split(".");
+        dateText_array.pop();
+    }
+    return dateText_array.join("-");
 }
