@@ -78,7 +78,12 @@ $(document).ready(async function () {
             else {
                 isAdult = 1;
             }
-            const sikeres = await helyFoglal(flight_id_to, u.hely[0], u.hely[1], isAdult);
+            if (u.hely.length > 2) {
+                await helyFoglal(flight_id_to, u.hely[0] + u.hely[1], u.hely[2], isAdult);
+            }
+            else {
+                await helyFoglal(flight_id_to, u.hely[0], u.hely[1], isAdult);
+            }
             childleft--;
         });
         if (isRoundTrip) {
@@ -93,13 +98,17 @@ $(document).ready(async function () {
                 else {
                     isAdult = 1;
                 }
-                const sikeres = await helyFoglal(flight_id_back, u.hely[0], u.hely[1], isAdult);
+                if (u.hely.length > 2) {
+                    await helyFoglal(flight_id_back, u.hely[0] + u.hely[1], u.hely[2], isAdult);
+                }
+                else {
+                    await helyFoglal(flight_id_back, u.hely[0], u.hely[1], isAdult);
+                }
             });
         }
         let osszesen = 0;
         kivalaszottUlesekOda.forEach(u => osszesen += u.ar);
-        kivalaszottUlesekVissza.forEach(u => oss0zesen += u.ar);
-
+        kivalaszottUlesekVissza.forEach(u => osszesen += u.ar);
         alert("Sikeres foglalás! 5 másodperc múlva átirányítunk.");
         setTimeout(function () {
             window.location.replace('/');
@@ -112,7 +121,7 @@ async function helyFoglal(flightID, rowID, columnID, isAdult) {
         let vissza = await fetch("/api/helyfoglalas", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({flightID, rowID, columnID, isAdult})
+            body: JSON.stringify({ flightID, rowID, columnID, isAdult })
         });
         let json = await vissza.json();
         if (!json.siker) {
@@ -158,35 +167,34 @@ function ulesek_general(hova, adatok, irany) {
         let x = i * 6;
         while (x < i * 6 + 6) {
             let ulesAdat = adatok[x];
-            if (!ulesAdat) break;
-            let ulesHelye = (i + 1) + ulesAdat.ColumnID;
+            let ulesHelye = ulesAdat.RowID + ulesAdat.ColumnID;
             let ulesAra = ulesAdat.Price;
 
             let $hely = $('<div class="ules tipus' + ulesAdat.FareClassID + '">' + ulesAdat.ColumnID + '</div>');
-            if (ulesAdat.IsOccupied==0) {
+            if (ulesAdat.IsOccupied == 0) {
                 $hely.click(function () {
-                let tomb = irany === 'oda' ? kivalaszottUlesekOda : kivalaszottUlesekVissza;
+                    let tomb = irany === 'oda' ? kivalaszottUlesekOda : kivalaszottUlesekVissza;
 
-                if ($hely.hasClass('kivalasztott')) {
-                    $hely.removeClass('kivalasztott');
-                    if (irany === 'oda') {
-                        kivalaszottUlesekOda = kivalaszottUlesekOda.filter(u => u.hely != ulesHelye);
-                    } else {
-                        kivalaszottUlesekVissza = kivalaszottUlesekVissza.filter(u => u.hely != ulesHelye);
-                    }
-                }
-                else {
-                    if (tomb.length < maxPassengers) {
-                        $hely.addClass('kivalasztott');
+                    if ($hely.hasClass('kivalasztott')) {
+                        $hely.removeClass('kivalasztott');
                         if (irany === 'oda') {
-                            kivalaszottUlesekOda.push({ "hely": ulesHelye, "ar": ulesAra, "tipus": ulesAdat.FareClassID });
+                            kivalaszottUlesekOda = kivalaszottUlesekOda.filter(u => u.hely != ulesHelye);
                         } else {
-                            kivalaszottUlesekVissza.push({ "hely": ulesHelye, "ar": ulesAra, "tipus": ulesAdat.FareClassID });
+                            kivalaszottUlesekVissza = kivalaszottUlesekVissza.filter(u => u.hely != ulesHelye);
                         }
                     }
-                }
-                frissitAllapot();
-            })
+                    else {
+                        if (tomb.length < maxPassengers) {
+                            $hely.addClass('kivalasztott');
+                            if (irany === 'oda') {
+                                kivalaszottUlesekOda.push({ "hely": ulesHelye, "ar": ulesAra, "tipus": ulesAdat.FareClassID });
+                            } else {
+                                kivalaszottUlesekVissza.push({ "hely": ulesHelye, "ar": ulesAra, "tipus": ulesAdat.FareClassID });
+                            }
+                        }
+                    }
+                    frissitAllapot();
+                })
             }
             else {
                 $hely.removeClass('tipus1 tipus2 tipus3');
