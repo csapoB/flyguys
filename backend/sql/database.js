@@ -143,7 +143,7 @@ async function Login(email){
 
 //Hűségprogram
 async function Husegprogram(id){
-    const query = 'SELECT UserName, NumberOfFlights, LoyaltyStatusName From UserAccount INNER JOIN Loyaltystatus ON UserAccount.LoyaltyStatusID = Loyaltystatus.LoyaltyStatusID WHERE UserAccount.UserId = ?';
+    const query = 'SELECT UserName, NumberOfFlights, LoyaltyStatusName From UserAccount LEFT JOIN Loyaltystatus ON UserAccount.LoyaltyStatusID = Loyaltystatus.LoyaltyStatusID INNER JOIN number_of_flights_of_users ON useraccount.UserID = number_of_flights_of_users.UserID WHERE UserAccount.UserId = ?';
     const [rows] = await pool.execute(query, [id]);
     return rows;
 }
