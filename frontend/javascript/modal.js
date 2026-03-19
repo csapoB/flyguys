@@ -1,36 +1,40 @@
-$(function () {
-    checkLoginStatus();
-    $("#login_button").on("click", login_modal);
+import { getModal } from "./locale.js";
+export async function modalInit(current_language) {
+
+    await checkLoginStatus();
+    $("#login_button").on("click", async function () {
+        await login_modal(current_language);
+    });
     $(document).on("click", ".submit-login", handleLogin);
     $(document).on("click", ".submit-register", handleRegister);
     $("#logout_button").on("click", handleLogout);
-});
+};
 
 async function checkLoginStatus() {
     try {
-        const response = await fetch('api/LoginCheck', {
+        const response = await fetch('/api/LoginCheck', {
             method: 'GET',
         });
 
         const data = await response.json();
         if (!data.allapot) {
-            $("#login_button").parent().show();
-            $("#profile_button").parent().hide();
-            $("#logout_button").parent().hide();
-            $("#admin_button").parent().hide();
+            $("#login_button").show();
+            $("#profile_button").hide();
+            $("#logout_button").hide();
+            $("#admin_button").hide();
         }
         else {
             if (data.admin) {
-                $("#admin_button").parent().show();
+                $("#admin_button").show();
             }
-            else{
-                $("#profile_button").parent().show();
+            else {
+                $("#profile_button").show();
             }
-            $("#login_button").parent().hide();
-            $("#logout_button").parent().show();
+            $("#login_button").hide();
+            $("#logout_button").show();
         }
     }
-    catch(error){
+    catch (error) {
     }
 }
 
@@ -47,12 +51,9 @@ async function handleLogout(event) {
     }
 
     // Navbar frissítése
-    $("#login_button").parent().show();
-    $("#profile_button").parent().hide();
-    $("#logout_button").parent().hide();
-    $("#admin_button").parent().hide();
 
     alert('Sikeres kijelentkezés!');
+    location.reload();
 }
 
 function init_child_modal() {
@@ -110,7 +111,9 @@ function init_modal_content_template(id, type) {
 }
 
 
-function login_modal() {
+async function login_modal(current_language) {
+
+    let getmodal = await getModal(current_language);
 
     if ($("#monadModal").next().length != 0) {
         $("#modal_frame").children().last().remove();
@@ -124,7 +127,7 @@ function login_modal() {
     let $title = $("<h1>", {
         "id": "modalMonadLabel",
         "class": "text-danger modal-title fs-2",
-        "text": "Bejelentkezés"
+        "text": `${getmodal.log_in}`
     });
 
     let $close_button = $("<button>", {
@@ -138,7 +141,7 @@ function login_modal() {
         "id": "usr_email",
         "class": "form-control modal_input w-75 mb-4 mt-2",
         "type": "email",
-        "placeholder": "E-mail"
+        "placeholder": `${getmodal.email}`
     });
 
     let $input_group_for_passw = $("<div>", {
@@ -149,7 +152,7 @@ function login_modal() {
         "id": "usr_passw",
         "class": "form-control modal_input",
         "type": "password",
-        "placeholder": "Jelszó"
+        "placeholder": `${getmodal.password}`
     });
 
     let $see_passw_button = $("<button>", {
@@ -167,18 +170,18 @@ function login_modal() {
     let $login_button = $("<button>", {
         "class": "btn btn-danger w-75 mb-2 submit-login",
         "type": "button",
-        "text": "Bejelentkezés"
+        "text": `${getmodal.log_in}`
     });
 
     let $p = $("<p>", {
         "class": "mt-2",
-        "text": "Nincs még fiókod? Hozz létre egyet!"
+        "text": `${getmodal.no_account}`
     });
 
     let $regis_button = $("<button>", {
         "class": "btn btn-outline-danger w-75 mb-2",
         "type": "button",
-        "text": "Regisztráció",
+        "text": `${getmodal.registration}`,
         "data-bs-target": "#childModal",
         "data-bs-toggle": "modal"
     });
@@ -195,11 +198,11 @@ function login_modal() {
 
     init_child_modal();
     init_modal_content_template("childModal_content", "child");
-    regis_modal();
+    regis_modal(getmodal);
 
 }
 
-function regis_modal() {
+function regis_modal(i18next_values) {
 
     let $modal_header = $("#childModal_header");
     let $modal_body = $("#childModal_body");
@@ -209,7 +212,7 @@ function regis_modal() {
     let $title = $("<h1>", {
         "id": "modalChildLabel",
         "class": "text-danger modal-title fs-2",
-        "text": "Regisztráció"
+        "text": `${i18next_values.registration}`
     });
 
     let $close_button = $("<button>", {
@@ -227,14 +230,14 @@ function regis_modal() {
         "id": "first_name",
         "class": "modal_input form-control",
         "type": "text",
-        "placeholder": "Keresztnév"
+        "placeholder": `${i18next_values.first_name}`
     });
 
     let $last_name = $("<input/>", {
         "id": "last_name",
         "class": "modal_input form-control",
         "type": "text",
-        "placeholder": "Vezetéknév"
+        "placeholder": `${i18next_values.last_name}`
     });
 
     $input_group_for_name.append($last_name);
@@ -244,15 +247,15 @@ function regis_modal() {
         "id": "birth_date",
         "class": "form-control modal_input mb-4 w-75",
         "type": "text",
-        "placeholder": "Születési dátum"
+        "placeholder": `${i18next_values.birth_date}`
     });
-    $birth_date.datepicker()
+    $birth_date.datepicker();
 
     let $e_mail = $("<input/>", {
         "id": "new_usr_email",
         "class": "form-control modal_input w-75 mb-4",
         "type": "email",
-        "placeholder": "E-mail",
+        "placeholder": `${i18next_values.email}`,
     });
 
     let $input_group_for_passw = $("<div>", {
@@ -263,7 +266,7 @@ function regis_modal() {
         "id": "new_usr_passw",
         "class": "form-control modal_input",
         "type": "password",
-        "placeholder": "Jelszó"
+        "placeholder": `${i18next_values.password}`
     });
 
     let $see_passw_button = $("<button>", {
@@ -281,7 +284,7 @@ function regis_modal() {
     let $regis_button = $("<button>", {
         "class": "btn btn-danger w-75 mb-2 mt-2 submit-register",
         "type": "button",
-        "text": "Regisztráció"
+        "text": `${i18next_values.registration}`
     });
 
     $modal_header.append($title);
@@ -323,7 +326,7 @@ async function handleLogin(event) {
     }
 
     try {
-        const response = await fetch('api/login', {
+        const response = await fetch('/api/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -341,13 +344,7 @@ async function handleLogin(event) {
 
             // Navbar frissítése - Bejelentkezés gomb elrejtése, Profilom gomb megjelenítése
 
-            if (data.admin) {
-                $("#admin_button").parent().show();
-            }
-            $("#login_button").parent().hide();
-            $("#profile_button").parent().show();
-            $("#logout_button").parent().show();
-
+            location.reload()
 
             // Modal bezárása
             const modal = bootstrap.Modal.getInstance(document.getElementById('monadModal'));
@@ -372,16 +369,12 @@ async function handleRegister(event) {
 
     // Születési dátum konvertálása mm/dd/yyyy formátumból YYYY-MM-DD formátumba
     const birthDateInput = $("#birth_date").val().trim();
+    console.log(birthDateInput)
     let birthDate = null;
 
     if (birthDateInput) {
-        const parts = birthDateInput.split('/');
-        if (parts.length === 3) {
-            const mm = parts[0];
-            const dd = parts[1];
-            const yyyy = parts[2];
-            birthDate = `${yyyy}-${mm}-${dd}`;
-        }
+        
+        birthDate = dateFormatter(birthDateInput, ((birthDateInput[2] == "/") ? "en" : "hu"))
     }
 
     if (!userName.trim() || !email || !password) {
@@ -394,6 +387,7 @@ async function handleRegister(event) {
         return;
     }
     try {
+        console.log(userName.trim(), email, password, birthDate)
         const response = await fetch('/api/register', {
             method: 'POST',
             headers: {
@@ -414,7 +408,7 @@ async function handleRegister(event) {
 
         else {
 
-            alert('Sikeres regisztráció! Bejelentkezve vagy.');
+            alert('Sikeres regisztráció!');
 
             // Modal bezárása
             const childModal = bootstrap.Modal.getInstance(document.getElementById('childModal'));
@@ -434,4 +428,17 @@ async function handleRegister(event) {
         console.error('Regisztráció hiba:', error);
         alert('Szerver hiba a regisztráció során');
     }
+}
+
+function dateFormatter(dateText, language) {
+    let dateText_array;
+    if (language == "en") {
+        dateText_array = dateText.split("/");
+        dateText_array.reverse();
+
+    } else {
+        dateText_array = dateText.split(".");
+        dateText_array.pop();
+    }
+    return dateText_array.join("-");
 }
