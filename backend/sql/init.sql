@@ -26,7 +26,6 @@ CREATE TABLE IF NOT EXISTS useraccount (
     UserEmail VARCHAR(255),
     UserPassword VARCHAR(100) NOT NULL,
     UserBirthDate DATE,
-    NumberOfFlights INT,
     LoyaltyStatusID INT,
     AdminStatus BOOLEAN DEFAULT 0,
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -151,6 +150,9 @@ CREATE VIEW IF NOT EXISTS available_flights_simplified AS
 
 CREATE VIEW IF NOT EXISTS not_cancelled_reservations AS
 	SELECT reservations_with_prices.ReservationID, reservations_with_prices.PassengerID, reservations_with_prices.FlightID, reservations_with_prices.RowID, reservations_with_prices.ColumnID FROM reservations_with_prices WHERE !reservations_with_prices.IsCancelled;
+
+CREATE VIEW IF NOT EXISTS number_of_flights_of_users AS
+	SELECT useraccount.UserID, COUNT(DISTINCT not_cancelled_reservations.FlightID) AS "NumberOfFlights" FROM useraccount LEFT JOIN not_cancelled_reservations ON useraccount.UserID = not_cancelled_reservations.PassengerID GROUP BY useraccount.UserID;
 
 INSERT INTO loyaltystatus (loyaltystatus.LoyaltyStatusName, loyaltystatus.DiscountInPercentage) VALUES 
 ("Bronze", 1),

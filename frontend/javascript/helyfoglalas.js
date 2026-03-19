@@ -111,7 +111,7 @@ $(document).ready(async function () {
         kivalaszottUlesekVissza.forEach(u => osszesen += u.ar);
         alert("Sikeres foglalás! 5 másodperc múlva átirányítunk.");
         setTimeout(function () {
-            window.location.replace('/');
+            window.location.replace(`/${language}`);
         }, 5000);
     })
 })

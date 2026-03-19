@@ -1,10 +1,14 @@
 export async function getNavbar(lang, url_splitted) {
     let getnavbar = (await (await fetch("/api/getnavbar", { method: "GET", headers: { "Accept-Language": lang } })).json()).navbar;
+    
+    $("#back_to_main_page").prop("href", `/${lang}`)
     $("#about_us_nav").text(getnavbar.about_us);
     let $planner_nav = $("#planner_nav")
     $planner_nav.text(getnavbar.planner);
     $planner_nav.prop("href", `/${lang}/map`);
-    $("#loyalty_program_nav").text(getnavbar.loyalty_program);
+    let $loyalty_program_nav = $("#loyalty_program_nav");
+    $loyalty_program_nav.text(getnavbar.loyalty_program);
+    $loyalty_program_nav.prop("href", `/${lang}/husegprogram`);
     let $language_nav = $("#language_nav");
     $language_nav.children().first().html(getnavbar.language);
     url_splitted = url_splitted.filter(x => url_splitted.indexOf(x) > 3);
