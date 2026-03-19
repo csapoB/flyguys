@@ -74,8 +74,8 @@
         "email" : "E-mail",
         "password" : "Password",
         "no_account" : "Don't have an account? Sign up here:",
-        "first_name" : "First name",
-        "last_name" : "Last name",
+        "first_name" : "Last name",
+        "last_name" : "First name",
         "birth_date" : "Birth date"
     },
 

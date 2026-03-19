@@ -128,9 +128,9 @@ async function getUserById(id){
 
 
 //Register
-async function Register(userName, userEmail, hashedPassword, userBirthDate, numberOfFlights){
-    const query = 'INSERT INTO UserAccount (UserName, UserEmail, UserPassword, UserBirthDate, NumberOfFlights, LoyaltyStatusID) VALUES (?, ?, ?, ?, ?, 1)';
-    const [result] = await pool.execute(query, [userName, userEmail, hashedPassword, userBirthDate, numberOfFlights]);
+async function Register(userName, userEmail, hashedPassword, userBirthDate){
+    const query = 'INSERT INTO UserAccount (UserName, UserEmail, UserPassword, UserBirthDate, LoyaltyStatusID) VALUES (?, ?, ?, ?, 1)';
+    const [result] = await pool.execute(query, [userName, userEmail, hashedPassword, userBirthDate]);
     return result.affectedRows>0;
 }
 

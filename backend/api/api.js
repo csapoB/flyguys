@@ -84,43 +84,6 @@ router.get('/AdminCheck', async (request, response) => {
     }
 });
 
-/*router.get('/availabledepartureairports', async (request, response) => {
-    try {
-        const result = await database.selectAvailableDepartureAirports();
-
-        let airportcodes = [];
-        for (let i = 0; i < result.length; i++) {
-            airportcodes.push(result[i].DepartureAirport);
-        }
-
-        response.status(200).json({
-            airportcodes: airportcodes
-        });
-    } catch (error) {
-        response.status(500).json({
-            message: error
-        });
-    }
-});*/
-
-/*router.get('/availablearrivalairports', async (request, response) => {
-    try {
-        const result = await database.selectAvailableArrivalAirports();
-
-        let airportcodes = [];
-        for (let i = 0; i < result.length; i++) {
-            airportcodes.push(result[i].ArrivalAirport);
-        }
-
-        response.status(200).json({
-            airportcodes: airportcodes
-        });
-    } catch (error) {
-        response.status(500).json({
-            message: error
-        });
-    }
-});*/
 
 router.get('/availableflights', async (request, response) => {
     try {
@@ -445,22 +408,6 @@ router.get('/getmap', (request, response) => {
     }
 });
 
-/*router.get('/a', (request, response) => {
-    try {
-        
-        
-
-        response.status(200).json({
-            message : 
-        });
-    } catch (error) {
-        response.status(500).json({
-            message: error
-        });
-    }
-});*/
-
-
 router.post('/login', async (request, response) => {
     try {
         const { email, password } = request.body
@@ -520,7 +467,7 @@ router.post('/register', async (request, response) => {
         else {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
-            const register = await database.Register(nev, email, hashedPassword, szuldatum, 0, 1);
+            const register = await database.Register(nev, email, hashedPassword, szuldatum, 1);
             if (!register) {
                 return response.status(400).json({
                     message: 'Sikertelen regisztráció'
