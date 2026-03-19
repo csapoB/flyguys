@@ -85,7 +85,7 @@ $(async function () {
                                         });
                                         $flights_frame.append($flights_back);
                                         await flightSelector(flights_back, $flights_back, language, getflights);
-                                        await seatBookingButtonGenerator($flights_frame, adults, children, getflights);
+                                        await seatBookingButtonGenerator($flights_frame, adults, children, getflights, language);
 
                                         flightsResizer();
 
@@ -101,7 +101,7 @@ $(async function () {
                         } else {
                             await flightSelector(flights_to, $flights_to, language, getflights);
                             flightsResizer();
-                            await seatBookingButtonGenerator($flights_frame, adults, children, getflights);
+                            await seatBookingButtonGenerator($flights_frame, adults, children, getflights, language);
                         }
                     }
                     break;
@@ -320,7 +320,7 @@ function infoPageGenerator($frame, message) {
     $frame.append($no_flights_div);
 }
 
-async function seatBookingButtonGenerator($frame, adults, children, i18n_values) {
+async function seatBookingButtonGenerator($frame, adults, children, i18n_values, lang) {
 
     let $seat_booking_button_frame = $("<div>", {
         "class": "row d-flex justify-content-center"
@@ -352,7 +352,7 @@ async function seatBookingButtonGenerator($frame, adults, children, i18n_values)
                 const searchParams = new URLSearchParams(fd);
                 const queryString = searchParams.toString();
 
-                window.location.href = `/helyfoglalas?${queryString}`;
+                window.location.href = `/${lang}/helyfoglalas?${queryString}`;
 
             }
         }
