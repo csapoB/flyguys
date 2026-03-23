@@ -3,22 +3,7 @@ import { getPlannerPassengersPopover } from "./locale.js";
 export async function plannerInit(current_language) {
 
 
-    let getplanner = await getPlanner(current_language);
-    $("#origin_label").text(getplanner.origin_label);
-    $("#destination_label").text(getplanner.destination_label);
-    $("#departure_label").text(getplanner.departure_label);
-    $("#return_label").text(getplanner.return_label);
-    $("#passengers_label").text(getplanner.passengers_label);
-    $("#search_flights").text(getplanner.search_flights_button);
-    $("#passengers_input").prop("value", getplanner.passengers_input);
-
-    $(window).on("unload", function () {
-        $("#origin_input").prop("value", "");
-        $("#destination_input").prop("value", "");
-        $("#departure_input").prop("value", "");
-        $("#return_input").prop("value", "");
-        //$("#passengers_input").prop("value", getplanner.passengers_input);
-    });
+    await getPlanner(current_language);
 
     ///////// INIT /////////
 
@@ -29,9 +14,7 @@ export async function plannerInit(current_language) {
     */
     // Repülőtér popoverek
     let origin = await popoverInit("origin_input", "origin_popover");
-    popoverManualTrigger(origin[0].get(0) /*vissza alakítja hagyományos DOM elemmé*/, origin[1]);
     let destination = await popoverInit("destination_input", "destination_popover");
-    popoverManualTrigger(destination[0].get(0), destination[1]);
     // Datepickerek
     let $departure = $("#departure_input");
     let available_departure_dates = (await (await fetch("/api/availabledeparturedatesfiltered", { method: "GET" })).json()).departuredates
@@ -77,7 +60,7 @@ export async function plannerInit(current_language) {
 
                         returnEnabler(available_return_dates, current_language);
 
-                        console.log(dateFormatter($return.val(), current_language))
+                        
                         airportSwapperEnabler(origin[0], destination[0], "", "");
 
                     }
@@ -198,7 +181,7 @@ export async function plannerInit(current_language) {
 
     // Utasok popover
     let passengers = await passengers_popoverInit("passengers_input", "passengers_popover");
-    popoverManualTrigger(passengers[0].get(0), passengers[1]);
+    popoverManualTrigger(passengers[0], passengers[1]);
 
 
     $("#search_flights").on("click", function (e) {
@@ -271,6 +254,8 @@ async function popoverInit(input_field_id, content_div_id) {
     });
     popover.setContent({ ".popover-body": airports_popover_contentGenerator(input_field_id, content_div_id, popover, (await (await fetch(`/api/${(input_field_id == "origin_input") ? "availabledepartureairportsfiltered" : "availablearrivalairportsfiltered"}`, { method: "GET", headers : {"Accept-Language" : document.getElementById("language_nav").dataset.langCode} })).json())) }); // általános eljárás a két repülőteres popoverhez
 
+    popoverManualTrigger($input_field, popover);
+
     return [$input_field, popover];
 }
 
@@ -291,9 +276,9 @@ export async function passengers_popoverInit(input_field_id, content_div_id) {
 }
 
 // Eseménykezelő a beviteli mezőhöz, valamint a popoverhez
-export function popoverManualTrigger(input_field, popover_obj) {
+export function popoverManualTrigger($input_field, popover_obj) {
     let popover_div;
-    input_field.addEventListener("click", function () {
+    $input_field.on("click.popover", function () {
 
         if (popover_obj.tip == null) {
 
@@ -306,7 +291,7 @@ export function popoverManualTrigger(input_field, popover_obj) {
                 if (event.relatedTarget == null) { // Ha az elem amire kattintottunk nem focusable, akkor lesz null az event.relatedTarget értéke
                     popover_obj.hide();
                 } else {
-                    if (event.relatedTarget.id != input_field.id) { // Ha nem az input_fiealdbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
+                    if (event.relatedTarget.id != $input_field.prop("id")) { // Ha nem az input_fiealdbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
                         popover_obj.hide();
                     }
                 }
@@ -314,7 +299,7 @@ export function popoverManualTrigger(input_field, popover_obj) {
         }
     });
 
-    input_field.addEventListener("focus", function () {
+    $input_field.on("focus.popover", function () {
 
         if (popover_obj.tip == null) {
 
@@ -327,7 +312,7 @@ export function popoverManualTrigger(input_field, popover_obj) {
                 if (event.relatedTarget == null) { // Ha az elem amire kattintottunk nem focusable, akkor lesz null az event.relatedTarget értéke
                     popover_obj.hide();
                 } else {
-                    if (event.relatedTarget.id != input_field.id) { // Ha nem az input_fiealdbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
+                    if (event.relatedTarget.id != $input_field.prop("id")) { // Ha nem az input_fiealdbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
                         popover_obj.hide();
                     }
                 }
@@ -335,8 +320,9 @@ export function popoverManualTrigger(input_field, popover_obj) {
         }
     });
 
-    input_field.addEventListener("blur", (event) => {
+    $input_field.on("blur.popover", function (event) {
 
+        
         if (event.relatedTarget == null) { // Ha az elem amire kattintottunk nem focusable, akkor lesz null az event.relatedTarget értéke
             popover_obj.hide();
         } else {
@@ -762,7 +748,7 @@ export async function returnEnabler(available_return_dates, current_language) {
     }
 }
 
-function inputDisabler($input) {
+export function inputDisabler($input) {
 
     if (!$input.prop("disabled")) {
 
