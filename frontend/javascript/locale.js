@@ -24,7 +24,22 @@ export async function getNavbar(lang, url_splitted) {
 }
 
 export async function getPlanner(lang) {
-    return (await (await fetch("/api/getplanner", { method: "GET", headers: { "Accept-Language": lang } })).json()).planner;
+    let getplanner =  (await (await fetch("/api/getplanner", { method: "GET", headers: { "Accept-Language": lang } })).json()).planner;
+    $("#origin_label").text(getplanner.origin_label);
+    $("#destination_label").text(getplanner.destination_label);
+    $("#departure_label").text(getplanner.departure_label);
+    $("#return_label").text(getplanner.return_label);
+    $("#passengers_label").text(getplanner.passengers_label);
+    $("#search_flights").text(getplanner.search_flights_button);
+    $("#passengers_input").prop("value", getplanner.passengers_input);
+
+    $(window).on("unload", function () {
+        $("#origin_input").prop("value", "");
+        $("#destination_input").prop("value", "");
+        $("#departure_input").prop("value", "");
+        $("#return_input").prop("value", "");
+        
+    });
 
 }
 
