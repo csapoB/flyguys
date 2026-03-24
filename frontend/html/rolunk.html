@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="hu">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hűségprogram</title>
+    <title>Főoldal</title>
     <!--!Bootstrap-->
     <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="../bootstrap/css/bootstrap-grid.min.css">
@@ -15,18 +14,20 @@
     <!--<script src="../bootstrap/js/bootstrap.bundle.min.js"></script>-->
     <!--!CSS-->
     <link rel="stylesheet" href="../css/jquery-ui.min.css">
-    <link rel="stylesheet" href="../css/index.css" />
-    <link rel="stylesheet" href="../css/husegprogram.css" />
     <link rel="stylesheet" href="../css/navbar.css" />
+    <link rel="stylesheet" href="../css/index.css" />
+    <link rel="stylesheet" href="../css/rolunk.css" />
     <!--!JavaScript-->
-    
+
     <script src="../javascript/jquery-3.7.1.min.js"></script>
     <script src="../javascript/jquery-ui.min.js"></script>
     <script src="../javascript/datepicker-hu.js"></script>
     <script src="../javascript/datepicker-en-GB.js"></script>
     <script type="module" src="../javascript/locale.js"></script>
+    <script type="module" src="../javascript/rolunk.js"></script>
     <script type="module" src="../javascript/modal.js"></script>
-    <script type="module" src="../javascript/husegprogram.js"></script>
+    <script type="module" src="../javascript/planner.js"></script>
+    <script src="../javascript/plannerresizer.js"></script>
 
     <!-- Zalando Sans Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,13 +71,14 @@
         </div>
     </nav>
 
-    <main class="flex-grow-1">
-        <div class="container-fluid h-100 align-items-stretch d-flex flex-column">
-            <div class="row m-3 g-3 d-flex justify-content-around" id="row1">
-                <div id="userDiv" class="d-flex col-md-5 col-lg-5 pt-4 pb-4 p-2 rounded border border-danger text-center align-items-center justify-content-center" ></div>
-                <div id="nextLevelDiv" class="d-flex col-md-6 col-lg-6 pt-4 pb-4 p-2 rounded border border-danger text-center align-items-center justify-content-center"></div>
-            </div>
-            <div class="row mh-100 m-3 g-3 d-flex justify-content-evenly align-items-center" id="row2"></div>
+    <main class="flex-grow-1 mt-2">
+        <div class="container-fluid bg" id="content">
+            <div class="row justify-content-center align-items-center" id="rolunk"></div>
+            <div class="row justify-content-center align-items-center" id="tortenet"></div>
+            <div class="row justify-content-center align-items-center" id="uticelok"></div>
+            <div class="row justify-content-center align-items-center" id="elkotelezetsegunk"></div>
+            <div class="row justify-content-center align-items-center" id="elmeny"></div>
+            <div class="row justify-content-center align-items-center" id="csatlakozz"></div>
         </div>
     </main>
 
