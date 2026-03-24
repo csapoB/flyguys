@@ -156,7 +156,7 @@ async function flightSelector(flights, $frame, language, i18n_values) {
         placement: "bottom",
         trigger: "manual"
     });
-    popoverManualTrigger($flights_button.get(0), flights_popover);
+    popoverManualTrigger($flights_button, flights_popover);
     flights_popover.setContent({ ".popover-body": flights_popover_contentGenerator($flights_button, flights_popover, flights) })
 
     $frame.append($flights_button);
