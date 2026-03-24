@@ -40,7 +40,7 @@
         "departure_label" : "Indulás",
         "return_label" : "Visszaút",
         "passengers_label" : "Utasok",
-        "search_flights_button" : "Keresés",
+        "search_flights_button" : "Foglalás",
         "passengers_input" : "1 felnőtt, 0 gyermek"
 
     },

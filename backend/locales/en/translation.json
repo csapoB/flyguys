@@ -40,7 +40,7 @@
         "departure_label" : "Departure",
         "return_label" : "Return",
         "passengers_label" : "Passengers",
-        "search_flights_button" : "Search",
+        "search_flights_button" : "Start Booking",
         "passengers_input" : "1 adult, 0 children"
 
     },

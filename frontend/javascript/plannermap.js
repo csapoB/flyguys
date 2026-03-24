@@ -25,45 +25,6 @@ export async function plannerMapInit(current_language) {
     let origin = [$("#origin_input"), null];
     let destination = [$("#destination_input"), null];
 
-    origin[1] = await popoverInit(origin[0], "origin_popover", "body", "");
-    origin[0].on("marker:click", async function (event, code) {
-        origin[0].off(".popover");
-        origin[1] = null;
-        origin[1] = await popoverInit(origin[0], "origin_popover", "#hidden_container", "");
-        origin[1].show();
-        let i = 0;
-        while ($("#origin_popover").children().eq(i).children().eq(1).data("code") != code) {
-            i++;
-        }
-        $("#origin_popover").children().eq(i).children().eq(1).trigger("click");
-
-        $("#hidden_container").html("");
-
-        origin[0].off(".popover");
-        origin[1] = null;
-        origin[1] = await popoverInit(origin[0], "origin_popover", "body", code);
-
-    });
-
-    destination[1] = await popoverInit(destination[0], "destination_popover", "body", "");
-    destination[0].on("marker:click", async function (event, code) {
-        destination[0].off(".popover");
-        destination[1] = null;
-        destination[1] = await popoverInit(destination[0], "destination_popover", "#hidden_container", "");
-        destination[1].show();
-        let i = 0;
-        while ($("#destination_popover").children().eq(i).children().eq(1).data("code") != code) {
-            i++;
-        }
-        $("#destination_popover").children().eq(i).children().eq(1).trigger("click");
-
-        $("#hidden_container").html("");
-
-        destination[0].off(".popover");
-        destination[1] = null;
-        destination[1] = await popoverInit(destination[0], "destination_popover", "body", code);
-    });
-    inputDisabler(destination[0]);
     // Datepickerek
     let $departure = $("#departure_input");
     let available_departure_dates = (await (await fetch("/api/availabledeparturedatesfiltered", { method: "GET" })).json()).departuredates
@@ -258,7 +219,7 @@ export async function plannerMapInit(current_language) {
 
     });
 
-    ///////// ON CHANGE /////////
+    ///////// EVENT LISTENERS /////////
 
     // A passengers_input kivvételével mindenhez eseménykezlőt írni !!!
     origin[0].on("change", async function () {
@@ -289,11 +250,50 @@ export async function plannerMapInit(current_language) {
     });
 
 
+    origin[1] = await popoverInit(origin[0], "origin_popover", "body", "", "");
+    origin[0].on("marker:click", async function (event, code) {
+        origin[0].off(".popover");
+        origin[1] = null;
+        origin[1] = await popoverInit(origin[0], "origin_popover", "#hidden_container", "", dateFormatter($departure.val(), current_language));
+        origin[1].show();
+        let i = 0;
+        while ($("#origin_popover").children().eq(i).children().eq(1).data("code") != code) {
+            i++;
+        }
+        $("#origin_popover").children().eq(i).children().eq(1).trigger("click");
+
+        $("#hidden_container").html("");
+
+        origin[0].off(".popover");
+        origin[1] = null;
+        origin[1] = await popoverInit(origin[0], "origin_popover", "body", code, dateFormatter($departure.val(), current_language));
+
+    });
+
+    destination[1] = await popoverInit(destination[0], "destination_popover", "body", "", "", "");
+    destination[0].on("marker:click", async function (event, code) {
+        destination[0].off(".popover");
+        destination[1] = null;
+        destination[1] = await popoverInit(destination[0], "destination_popover", "#hidden_container", "", dateFormatter($departure.val(), current_language), origin[0].data("code_of_selected_airport"));
+        destination[1].show();
+        let i = 0;
+        while ($("#destination_popover").children().eq(i).children().eq(1).data("code") != code) {
+            i++;
+        }
+        $("#destination_popover").children().eq(i).children().eq(1).trigger("click");
+
+        $("#hidden_container").html("");
+
+        destination[0].off(".popover");
+        destination[1] = null;
+        destination[1] = await popoverInit(destination[0], "destination_popover", "body", code, dateFormatter($departure.val(), current_language), origin[0].data("code_of_selected_airport"));
+    });
+    inputDisabler(destination[0]);
 }
 
 ///////// FÜGGVÉNYEK /////////
 
-async function popoverInit($input_field, content_div_id, container_id, code_of_selected_airport) {
+async function popoverInit($input_field, content_div_id, container_id, code_of_selected_airport, departureDate, departureAirport) {
 
     $input_field.data("code_of_selected_airport", code_of_selected_airport);
 
@@ -304,7 +304,7 @@ async function popoverInit($input_field, content_div_id, container_id, code_of_s
         placement: "bottom",
         trigger: "manual" // A popover mikor jelenjen meg. "manual": a fejlesztő írja meg hozzá a szabályrendszert
     });
-    popover.setContent({ ".popover-body": airports_popover_contentGenerator($input_field, content_div_id, popover, (await (await fetch(`/api/${($input_field.prop("id") == "origin_input") ? "availabledepartureairportsfiltered" : "availablearrivalairportsfiltered"}`, { method: "GET", headers: { "Accept-Language": document.getElementById("language_nav").dataset.langCode } })).json())) }); // általános eljárás a két repülőteres popoverhez
+    popover.setContent({ ".popover-body": airports_popover_contentGenerator($input_field, content_div_id, popover, (await (await fetch(`/api/${($input_field.prop("id") == "origin_input") ? `availabledepartureairportsfiltered?departureDate=${departureDate}` : `availablearrivalairportsfiltered?departureAirport=${departureAirport}&departureDate=${departureDate}`}`, { method: "GET", headers: { "Accept-Language": document.getElementById("language_nav").dataset.langCode } })).json())) }); // általános eljárás a két repülőteres popoverhez
 
     popoverManualTrigger($input_field, popover);
 

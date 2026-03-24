@@ -91,8 +91,8 @@ async function initMap(language) {
       i++;
     }
     deleteMarkersWithException(origin_markers, origin_markers[i][0]);
+    origin_markers[i][0].setMap(map);
     if (arrivalAirport != ""){
-      origin_markers[i][0].setMap(map);
 
       let j = 0;
       while (destination_markers[j][0].dataset.code != arrivalAirport) {
@@ -110,6 +110,7 @@ async function initMap(language) {
       i++;
     }
     deleteMarkersWithException(destination_markers, destination_markers[i][0]);
+    destination_markers[i][0].setMap(map);
 
     let j = 0;
     while (origin_markers[j][0].dataset.code != departureAirport) {
