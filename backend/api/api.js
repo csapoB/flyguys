@@ -408,6 +408,19 @@ router.get('/getmap', (request, response) => {
     }
 });
 
+router.get('/getaboutus', (request, response) => {
+    try {
+
+        response.status(200).json({
+            about_us: request.t("about_us", { returnObjects: true })
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
 router.post('/login', async (request, response) => {
     try {
         const { email, password } = request.body

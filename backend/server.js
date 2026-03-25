@@ -131,6 +131,10 @@ router.get('/hu/helyfoglalas', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/helyfoglalas.html'));
 });
 
+router.get('/rolunk', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/rolunk.html'));
+});
+
 router.get('/en/rolunk', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/rolunk.html'));
 });

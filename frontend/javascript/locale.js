@@ -2,7 +2,9 @@ export async function getNavbar(lang, url_splitted) {
     let getnavbar = (await (await fetch("/api/getnavbar", { method: "GET", headers: { "Accept-Language": lang } })).json()).navbar;
     
     $("#back_to_main_page").prop("href", `/${lang}`)
-    $("#about_us_nav").text(getnavbar.about_us);
+    let $about_us_nav = $("#about_us_nav");
+    $about_us_nav.text(getnavbar.about_us);
+    $about_us_nav.prop("href", `/${lang}/rolunk`)
     let $planner_nav = $("#planner_nav")
     $planner_nav.text(getnavbar.planner);
     $planner_nav.prop("href", `/${lang}/map`);
@@ -56,6 +58,10 @@ export async function getFooter(lang) {
     $("#title_contact_footer").text(getfooter.title_contact);
     $("#all_rights_reserved_footer").text(getfooter.all_rights_reserved);
 
+}
+
+export async function getAboutUs(lang) {
+    return (await (await fetch("/api/getaboutus", { method: "GET", headers: { "Accept-Language": lang } })).json()).about_us;
 }
 
 export async function getPlannerPassengersPopover(lang) {

@@ -1,85 +1,96 @@
 {
-
-    "locale" : "en",
-
-    "index" : {
-        "body" : {
-
+    "locale": "en",
+    "index": {
+        "body": {}
+    },
+    "footer": {
+        "title_about_us": "About us",
+        "title_services": "Services",
+        "title_contact": "Contacts",
+        "company_infos": "Company informations",
+        "news": "News",
+        "loyalty_program": "Loyalty Program",
+        "flight_search": "Flight searcher",
+        "my_flights": "My flights",
+        "travel_planner": "Travel Planner",
+        "all_rights_reserved": "© FlyGuys. All rights reserved."
+    },
+    "navbar": {
+        "about_us": "About us",
+        "planner": "Travel Planner",
+        "loyalty_program": "Loyalty Program",
+        "language_code": "en",
+        "language": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 480\" height=\"24\" width=\"32\"><g fill-rule=\"evenodd\"><path fill=\"#fff\" d=\"M640 480H0V0h640z\"></path><path fill=\"#388d00\" d=\"M640 480H0V320h640z\"></path><path fill=\"#d43516\" d=\"M640 160H0V0h640z\"></path></g></svg>",
+        "log_in": "Log in",
+        "admin": "Admin",
+        "my_profile": "My profile",
+        "log_out": "Log out"
+    },
+    "planner": {
+        "origin_label": "Origin",
+        "destination_label": "Destination",
+        "departure_label": "Departure",
+        "return_label": "Return",
+        "passengers_label": "Passengers",
+        "search_flights_button": "Start Booking",
+        "passengers_input": "1 adult, 0 children"
+    },
+    "planner_passengers_popover": {
+        "adults_inc_dec": "Adults",
+        "children_inc_dec": "Children",
+        "adult": "adult",
+        "adults": "adults",
+        "child": "child",
+        "children": "children"
+    },
+    "flights": {
+        "title": "Flights",
+        "choose_flight": "Choose a flight!",
+        "choose_seats": "Choose seats!"
+    },
+    "errors": {
+        "bad_http_get_request": "The HTTP-GET request isn't proper!",
+        "no_flight_by_parameters": "Unfortunately, there's no flight by the given parameters.",
+        "bad_url_parameter": "ERROR : Some of the URL parameters are wrong.",
+        "server_error": "Unfortunately, an error occured in the server. Please, try again later!"
+    },
+    "modal": {
+        "log_in": "Log in",
+        "registration": "Registration",
+        "email": "E-mail",
+        "password": "Password",
+        "no_account": "Don't have an account? Sign up here:",
+        "first_name": "Last name",
+        "last_name": "First name",
+        "birth_date": "Birth date"
+    },
+    "map": {
+        "choose_button": "Choose"
+    },
+    "about_us": {
+        "about_us_section": {
+            "title": "About Us",
+            "content": "<p>At FlyGuys, we believe that air travel should be more than simply getting from point A to point B — it should be comfortable, reliable, and genuinely enjoyable. Founded in Hungary and proudly based in the heart of Europe, FlyGuys is a new-generation commercial airline built on modern values, innovative thinking, and a commitment to exceptional passenger experience.</p>"
+        },
+        "our_story_section": {
+            "title": "Our Story",
+            "content": "<p>FlyGuys was created with a clear mission: to make air travel accessible, efficient, and comfortable. From our home base in Hungary, we’ve expanded rapidly to connect travelers to key destinations across Europe and the Middle East, offering a growing network of routes designed for both business and leisure passengers.</p><p>As a startup airline, we embrace flexibility and forward-thinking solutions. This allows us to continually refine our services, adopt the latest aviation technologies, and ensure our aircraft meet the highest standards of safety, comfort, and environmental responsibility.</p>"
+        },
+        "destinations_section": {
+            "title": "Destinations",
+            "content": "<p>Our expanding route network links Hungary with major cities and gateway hubs throughout:</p><ul><li>Western, Central & Eastern Europe</li><li>The Balkans</li><li>The Mediterranean region</li><li>The Middle East’s most dynamic destinations</li></ul><p>Whether traveling for work, relaxation, or adventure, FlyGuys offers smooth connections, convenient schedules, and thoughtfully curated services to make each journey effortless.</p>"
+        },
+        "our_commitment_section": {
+            "title": "Our Commitment",
+            "content": "<p>At FlyGuys, we prioritize:</p><ul><li>Passenger comfort – Modern cabins, friendly service, and a customer-first mindset</li><li>Efficient travel – Streamlined operations for punctual, stress-free flights</li><li>Safety & Reliability – Aircraft maintained to world-class standards</li><li>Innovation – Smart technology that enhances every stage of the travel experience</li><li>Sustainability – A focus on fuel-efficient operations and responsible growth</li></ul>"
+        },
+        "the_experience_section": {
+            "title": "The FlyGuys Experience",
+            "content": "<p>We’re more than an airline — we’re your travel partners. Every member of our team, from check-in to cockpit, is dedicated to providing warm service with a personal touch. At FlyGuys, you’re not just a passenger; you’re part of our journey as we redefine what a modern European airline can be.</p>"
+        },
+        "join_us_section": {
+            "title": "Join Us in the Sky",
+            "content": "<p>As we continue to expand our destinations and services, we invite you to fly with us and experience a new standard of travel.<br>FlyGuys — Your journey starts with us.</p>"
         }
-    },
-
-    "footer" : {
-        "title_about_us" : "About us",
-        "title_services" : "Services",
-        "title_contact" : "Contacts",
-        "company_infos" : "Company informations",
-        "news" : "News",
-        "loyalty_program" : "Loyalty Program",
-        "flight_search" : "Flight searcher",
-        "my_flights" : "My flights",
-        "travel_planner" : "Travel Planner",
-        "all_rights_reserved" : "© FlyGuys. All rights reserved."
-    },
-
-    "navbar" : {
-        "about_us" : "About us",
-        "planner" : "Travel Planner",
-        "loyalty_program" : "Loyalty Program",
-        "language_code" : "en",
-        "language" : "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 480\" height=\"24\" width=\"32\"><g fill-rule=\"evenodd\"><path fill=\"#fff\" d=\"M640 480H0V0h640z\"></path><path fill=\"#388d00\" d=\"M640 480H0V320h640z\"></path><path fill=\"#d43516\" d=\"M640 160H0V0h640z\"></path></g></svg>",
-        "log_in" : "Log in",
-        "admin" : "Admin",
-        "my_profile" : "My profile",
-        "log_out" : "Log out"
-
-    },
-
-    "planner" : {
-        "origin_label" : "Origin",
-        "destination_label" : "Destination",
-        "departure_label" : "Departure",
-        "return_label" : "Return",
-        "passengers_label" : "Passengers",
-        "search_flights_button" : "Start Booking",
-        "passengers_input" : "1 adult, 0 children"
-
-    },
-
-    "planner_passengers_popover" : {
-        "adults_inc_dec" : "Adults",
-        "children_inc_dec" : "Children",
-        "adult" : "adult",
-        "adults" : "adults",
-        "child" : "child",
-        "children" : "children"
-    },
-
-    "flights" : {
-        "title" : "Flights",
-        "choose_flight" : "Choose a flight!",
-        "choose_seats" : "Choose seats!"
-    },
-
-    "errors" : {
-        "bad_http_get_request" : "The HTTP-GET request isn't proper!",
-        "no_flight_by_parameters" : "Unfortunately, there's no flight by the given parameters.",
-        "bad_url_parameter" : "ERROR : Some of the URL parameters are wrong.",
-        "server_error" : "Unfortunately, an error occured in the server. Please, try again later!"
-
-    },
-
-    "modal" : {
-        "log_in" : "Log in",
-        "registration" : "Registration",
-        "email" : "E-mail",
-        "password" : "Password",
-        "no_account" : "Don't have an account? Sign up here:",
-        "first_name" : "Last name",
-        "last_name" : "First name",
-        "birth_date" : "Birth date"
-    },
-
-    "map" : {
-        "choose_button" : "Choose"
     }
 }

@@ -81,5 +81,37 @@
 
     "map" : {
         "choose_button" : "Kiválaszt"
+    },
+
+    "about_us" : {
+
+        "about_us_section" : {
+            "title" : "Rólunk",
+            "content" : "<p>A FlyGuys-nál hisszük, hogy a repülésnek többről kell szólnia, mint egyszerű közlekedésről – legyen kényelmes, megbízható és valóban élvezetes. Magyarországon alapított, Európa szívében működő légitársaságként célunk, hogy új megközelítést hozzunk a kereskedelmi repülés világába: modern értékekkel, innovatív gondolkodással és kiemelkedő utasközpontú szolgáltatásokkal.</p>"
+        },
+        "our_story_section" : {
+            "title" : "Történetünk",
+            "content" : "<p>A FlyGuys egy világos küldetéssel jött létre: elérhetővé, hatékonnyá és emberközelivé tenni a légi közlekedést. Magyarországi bázisunkról indulva gyorsan fejlődünk, és egyre több európai és közel-keleti várossal kötjük össze utasainkat – legyen szó üzleti vagy szabadidős utazásról.</p><p>Mint startup légitársaság, rugalmasan alkalmazkodunk és bátran építünk modern megoldásokra. Ennek köszönhetően folyamatosan fejlesztjük szolgáltatásainkat, alkalmazzuk a legújabb repüléstechnikai innovációkat, és biztosítjuk, hogy flottánk a legmagasabb biztonsági, kényelmi és környezeti követelményeknek feleljen meg.</p>" 
+        },
+        
+        "destinations_section" : {
+            "title" : "Úticéljaink",
+            "content" : "<p>Folyamatosan bővülő útvonalhálózatunk összeköti Magyarországot többek között:</p><ul><li>Nyugat-, Közép- és Kelet-Európa nagyvárosaival</li><li>A Balkán fontos központjaival</li><li>A mediterrán régió kedvelt úti céljaival</li><li>A Közel-Kelet legdinamikusabban fejlődő városaival</li></ul><p>Bármi is legyen az úticél – munka, pihenés vagy kaland –, a FlyGuys kényelmes csatlakozásokat, átgondolt menetrendeket és utasainkra szabott szolgáltatásokat kínál, hogy az utazás valóban gördülékeny legyen.</p>"
+        },
+
+        "our_commitment_section" : {
+            "title" : "Elkötelezettségünk",
+            "content" : "<p>A FlyGuys-nál kiemelten fontos számunkra:</p><ul><li>Utasaink kényelme – modern kabinok, barátságos személyzet és utasközpontú szemlélet</li><li>Hatékonyság – pontos és stresszmentes működés</li><li>Biztonság és megbízhatóság – világszínvonalú karbantartás és üzemeltetés</li><li>Innováció – okos technológiai megoldások az utazás minden szakaszában</li><li>Fenntarthatóság – üzemanyag-hatékony működés és felelős növekedés</li></ul>"
+        },
+
+        "the_experience_section" : {
+            "title" : "FlyGuys élmény",
+            "content" : "<p>Mi többek vagyunk egy légitársaságnál — utazópartnerek vagyunk. Csapatunk minden tagja, a check-intől a pilótafülkéig, azon dolgozik, hogy utasaink meleg, személyes és figyelmes kiszolgálásban részesüljenek. A FlyGuys-nál Ön nem csupán egy utas – Ön a történetünk része, miközben együtt formáljuk a modern európai légi közlekedést.</p>"
+        },
+
+        "join_us_section" : {
+            "title" : "Csatlakozzon hozzánk az égben",
+            "content" : "<p>Ahogy tovább bővítjük úti céljainkat és szolgáltatásainkat, örömmel várjuk, hogy velünk repüljön, és megtapasztalja az utazás új szintjét.<br>FlyGuys — Your journey starts with us.</p>"
+        }
     }
 }
