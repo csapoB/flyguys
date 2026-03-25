@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS fareclass (
 CREATE TABLE IF NOT EXISTS loyaltystatus (
 	LoyaltyStatusID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     LoyaltyStatusName VARCHAR(50) UNIQUE,
-    DiscountInPercentage INT(8) NOT NULL
+    DiscountInPercentage INT(8) NOT NULL,
+    NumberOfFlightsRequired INT NOT NULL    
 );
 
 -- UserAccount Table
@@ -155,11 +156,11 @@ CREATE VIEW IF NOT EXISTS number_of_flights_of_users AS
 	SELECT useraccount.UserID, COUNT(DISTINCT not_cancelled_reservations.FlightID) AS "NumberOfFlights" FROM useraccount LEFT JOIN not_cancelled_reservations ON useraccount.UserID = not_cancelled_reservations.PassengerID GROUP BY useraccount.UserID;
 
 INSERT INTO loyaltystatus (loyaltystatus.LoyaltyStatusName, loyaltystatus.DiscountInPercentage) VALUES 
-("Bronze", 1),
-("Silver", 5),
-("Gold", 7),
-("Platinum", 10),
-("Diamond", 15);
+("Bronze", 0, 0),
+("Silver", 1, 6),
+("Gold", 5, 16),
+("Platinum", 7, 26),
+("Diamond", 10, 36);
 
 INSERT INTO city (city.English, city.Hungarian, city.GeographicCoordinates) VALUES
 ("London","London", "51.507222, -0.127500"),
