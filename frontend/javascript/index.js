@@ -32,88 +32,65 @@ $(async function () {
     
     await plannerInit(language);
 
-    document.getElementById('keret').appendChild(jaratok());
+    $("#keret").append(initCheapestFlights((await (await fetch("/api/cheapestflights", {method : "GET", headers: {"Accept-Language": language}})).json()).results));
 });
 
-//Teszt adatok
-var adatok = [
-    {
-        varos: 'Bécs',
-        ar: 19990,
-        idopont: 'Január',
-        tipus: 'oda-vissza',
-        kep: 'https://www.wien.info/resource/image/387880/Hero-Header/1890/700/99bc99f314f2cfc014d9379d6fb650c2/5D1B23B0089FB6614BA763C22BC03ECC/header-3840x1060px-wien-oben.webp'
-    },
-    {
-        varos: 'Iráklio',
-        ar: 35620,
-        idopont: 'Június',
-        tipus: 'Egyirányú',
-        kep: 'https://blueskytravel.hu/uploads/6404ed8e4ccdd9e5be820525f61e86d4.jpg'
-    },
-    {
-        varos: 'New York',
-        ar: 275090,
-        idopont: 'December',
-        tipus: 'oda-vissza',
-        kep: 'https://cdn.sanity.io/images/nxpteyfv/goguides/dd05bddc197a1c9dba9ecb43e26b30af4dbcf4f9-1600x1066.jpg'
-    },
-    {
-        varos: 'Shanghai',
-        ar: 430210,
-        idopont: 'Augusztus',
-        tipus: 'oda-vissza',
-        kep: 'https://images.goway.com/production/featured_images/View-of-downtown-Shanghai-skyline-at-twilight-in-China%20_iStock-1031781438.jpg?VersionId=NAttsb7CpfztlS2leLO4tzRWWtlt2wRX'
-    }
-];
-
 //Ajánlott járatok megjelenítése
-function jaratok() {
-    let sor = document.createElement('div');
-    sor.classList.add('row', 'justify-content-center', 'g-3');
-    for (let i = 0; i < adatok.length; i++) {
-        let col = document.createElement('div');
-        col.classList.add('col-6', 'col-md-4', 'col-lg-3');
+function initCheapestFlights(flights) {
+    let $sor = $("<div>", {
+        "class" : "row justify-content-center g-3"
+    });
+    
+    for (let i = 0; i < flights.one_way.length; i++) {
+        let $col = $("<div>", {
+            "class" : "col-6 col-md-4 col-lg-3"
+        });
 
-        let card = document.createElement('div');
-        card.classList.add('card', 'h-100', 'shadow-sm', 'bg-light');
+        let $card = $("<div>", {
+            "class" : "card h-100 shadow-sm bg-light"
+        });
 
-        let kepkeret = document.createElement('div');
-        kepkeret.classList.add('w-100', 'h-75', 'overflow-hidden');
+        let $kepkeret = $("<div>", {
+            "class" : "w-100 h-75 overflow-hidden"
+        });
 
-        let img = document.createElement('img');
-        img.src = adatok[i].kep;
-        img.classList.add('card-img-top', 'object-fit-cover', 'h-100', 'w-100');
-        kepkeret.appendChild(img);
-        card.appendChild(kepkeret);
+        let $img = $("<img/>", {
+            "class" : "card-img-top object-fit-cover h-100 w-100",
+            "src" : `../css/images/${flights.one_way[i].ArrivalAirport}.png`
+        });
+        $kepkeret.append($img);
+        $card.append($kepkeret);
 
-        let cardbody = document.createElement('div');
-        cardbody.classList.add('card-body', 'd-flex', 'flex-column');
+        let $cardbody = $("<div>", {
+            "class" : "card-body d-flex flex-column"
+        });
 
-        let varosnev = document.createElement('h3');
-        varosnev.innerText = adatok[i].varos;
-        cardbody.appendChild(varosnev);
+        let $varosnev = $('<h3>', {
+            "text" : `${flights.one_way[i].ArrivalCity}`
+        });
+        
+        $cardbody.append($varosnev);
 
-        let div = document.createElement('div');
-        div.classList.add('row', 'justify-content-around', 'mt-auto', 'pt-2');
+        let $div = $("<div>", {
+            "class" : "row justify-content-around mt-auto pt-2"
+        });
 
-        let col7div = document.createElement('div');
-        col7div.classList.add('col-sm-7');
+        let $col7div = $('<div>', {
+            "class" : "col-sm-7"
+        });
+        
 
-        let belsosor = document.createElement('div');
-        belsosor.classList.add('row');
+        let $belsosor = $("<div>", {
+            "class" : "row"
+        });
 
-        let divcol1 = document.createElement('div');
-        divcol1.classList.add(
-            'col-sm-10',
-            'col-md-6',
-            'col-lg-6',
-            'd-flex',
-            'align-items-center',
-            'justify-content-center'
-        );
+        let $divcol1 = $("<div>", {
+            "class" : "col-sm-10 col-md-6 col-lg-6 d-flex align-items-center justify-content-center"
+        });
 
-        let mikor = document.createElement('p');
+        let $mikor = $("<p>", {
+            "text" : ""
+        });
         mikor.innerText = adatok[i].idopont;
         mikor.classList.add('text-nowrap', 'fs-6');
         divcol1.appendChild(mikor);

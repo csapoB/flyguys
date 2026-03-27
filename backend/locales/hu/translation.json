@@ -3,7 +3,10 @@
 
     "index" : {
         "body" : {
-
+            "cheapest_flights" : {
+                "one_way" : "egyirányú",
+                "return" : "oda-vissza"
+            }
         }
         
     },

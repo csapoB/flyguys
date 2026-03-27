@@ -253,7 +253,7 @@ router.get('/hu/flights', async (request, response) => {
         } else {
 
             let data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren);
-            data.map(x => x.BasePrice = `${x.BasePrice} HUF`);
+            data.map(x => x.BasePrice = `${x.BasePrice} Ft`);
             response.status(200).json({
                 flights: data
             });
@@ -278,12 +278,41 @@ router.get('/en/flights', async (request, response) => {
 
             let current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
             let data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren);
-            data.map(x => x.BasePrice = `${Math.round(x.BasePrice * current_eur_exch_rate)} EUR`);
+            data.map(x => x.BasePrice = `${Math.round(x.BasePrice * current_eur_exch_rate)} €`);
 
             response.status(200).json({
                 flights: data
             });
         }
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/cheapestflights', async (request, response) => {
+    try {
+        let one_way;
+        let return_;
+        if (request.get("Accept-Language") == "hu") {
+            one_way = await database.selectTop4CheapestOneWayFlightsHun();
+            one_way.map(x => x.BasePrice = `${x.BasePrice} Ft`);
+            return_ = await database.selectCheapestReturnFlightsHun();
+            return_.map(x => x.BasePrice = `${x.BasePrice} Ft`);
+        } else {
+            let current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+
+            one_way = await database.selectTop4CheapestOneWayFlightsEn();
+            return_ = await database.selectCheapestReturnFlightsEn()
+            one_way.map(x => x.BasePrice = `${Math.round(x.BasePrice * current_eur_exch_rate)} €`);
+            return_.map(x => x.BasePrice = `${Math.round(x.BasePrice * current_eur_exch_rate)} €`);
+
+        }
+
+        response.status(200).json({
+            results: {"one_way": one_way, "return" : return_}
+        });
     } catch (error) {
         response.status(500).json({
             message: error

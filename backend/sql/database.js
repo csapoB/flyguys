@@ -111,14 +111,33 @@ async function selectAvailableAirportsHun() {
     return rows;
 }
 
+async function selectTop4CheapestOneWayFlightsEn() {
+    const query = 'SELECT available_flights_en.DepartureAirport, available_flights_en.DepartureCity, available_flights_en.ArrivalAirport, available_flights_en.ArrivalCity, DATE(available_flights_en.DepartureDateTime) AS "DepartureDate", MIN(available_flights_en.BasePrice) AS "BasePrice" FROM available_flights_en GROUP BY available_flights_en.ArrivalAirport ORDER BY MIN(available_flights_en.BasePrice) ASC LIMIT 4;';
+    const [rows] = await pool.execute(query)
 
-/*
-async function a() {
-    const query = 'SELECT DepartureAirport, ArrivalAirport, DATE(DepartureDate) AS "aaa" FROM available_flights_simplified';
-    const [rows] = await pool.execute(query);
     return rows;
 }
-*/
+
+async function selectTop4CheapestOneWayFlightsHun() {
+    const query = 'SELECT available_flights_hun.DepartureAirport, available_flights_hun.DepartureCity, available_flights_hun.ArrivalAirport, available_flights_hun.ArrivalCity, DATE(available_flights_hun.DepartureDateTime) AS "DepartureDate", MIN(available_flights_hun.BasePrice) AS "BasePrice" FROM available_flights_hun GROUP BY available_flights_hun.ArrivalAirport ORDER BY MIN(available_flights_hun.BasePrice) ASC LIMIT 4;';
+    const [rows] = await pool.execute(query)
+
+    return rows;
+}
+
+async function selectCheapestReturnFlightsEn() {
+    const query = 'SELECT af1.DepartureAirport, af1.DepartureCity, af1.ArrivalAirport, af1.ArrivalCity, DATE(af1.DepartureDateTime) AS "DepartureDate", MIN(af1.BasePrice) AS "BasePrice" FROM available_flights_en af1, available_flights_en af2 WHERE (af1.DepartureAirport LIKE af2.ArrivalAirport AND af2.DepartureAirport LIKE af1.ArrivalAirport) GROUP BY af1.DepartureAirport, af1.ArrivalAirport;';
+    const [rows] = await pool.execute(query)
+
+    return rows;
+}
+
+async function selectCheapestReturnFlightsHun() {
+    const query = 'SELECT af1.DepartureAirport, af1.DepartureCity, af1.ArrivalAirport, af1.ArrivalCity, DATE(af1.DepartureDateTime) AS "DepartureDate", MIN(af1.BasePrice) AS "BasePrice" FROM available_flights_hun af1, available_flights_hun af2 WHERE (af1.DepartureAirport LIKE af2.ArrivalAirport AND af2.DepartureAirport LIKE af1.ArrivalAirport) GROUP BY af1.DepartureAirport, af1.ArrivalAirport;';
+    const [rows] = await pool.execute(query)
+
+    return rows;
+}
     
 async function getUserById(id){
     const query = 'SELECT * FROM UserAccount WHERE UserID = ?';
@@ -182,5 +201,9 @@ module.exports = {
     selectAvailableSeatsOnFlight,
     SeatReservation,
     selectAvailableAirportsEn,
-    selectAvailableAirportsHun
+    selectAvailableAirportsHun,
+    selectTop4CheapestOneWayFlightsEn,
+    selectTop4CheapestOneWayFlightsHun,
+    selectCheapestReturnFlightsEn,
+    selectCheapestReturnFlightsHun
 };
