@@ -3,7 +3,13 @@
 
     "index" : {
         "body" : {
-
+            "cheapest_flights" : {
+                "title" : "Legolcsóbb járatok",
+                "currency" : "&nbspFt",
+                "per_person" : " &nbsp/ fő",
+                "choose_seats" : "Válasszon ülőhelyet!"
+                
+            }
         }
         
     },
@@ -76,7 +82,7 @@
         "no_account" : "Nincs még fiókod? Hozz létre egyet!",
         "first_name" : "Keresztnév",
         "last_name" : "Vezetéknév",
-        "birth_date" : "Születési dátum"
+        "birth_date" : "Születési dátum (éééé.hh.nn.)"
     },
 
     "map" : {

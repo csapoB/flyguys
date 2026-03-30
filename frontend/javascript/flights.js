@@ -1,9 +1,10 @@
-import { getNavbar } from "./locale.js";
+import { getIndex, getNavbar } from "./locale.js";
 import { getFlights } from "./locale.js";
 import { getLocale } from "./locale.js";
 import { getFooter } from "./locale.js";
-import { modalInit } from "./modal.js";
-import { popoverManualTrigger } from "./planner.js";
+import { modalInit, login_modal } from "./modal.js";
+import { dateDeFormatter } from "./toolbox.js";
+import { popoverManualTrigger } from "./toolbox.js";
 import { flightsResizer } from "./flightsresizer.js";
 
 $(async function () {
@@ -24,7 +25,7 @@ $(async function () {
     }
 
     $("html").prop("lang", language);
-    
+
     await getNavbar(language, old_url);
     await modalInit(language);
     await getFooter(language);
@@ -45,7 +46,7 @@ $(async function () {
 
     if (origin == null || destination == null || departure == null || return_ == null || adults == null || children == null) {
 
-        errorPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: {"Accept-Language" : language} })).json()).errors.bad_url_parameter);
+        errorPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: { "Accept-Language": language } })).json()).errors.bad_url_parameter);
 
     } else {
 
@@ -61,7 +62,7 @@ $(async function () {
 
                     if (flights_to.length == 0) {
 
-                        infoPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: {"Accept-Language" : language} })).json()).errors.no_flights_by_parameters);
+                        infoPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: { "Accept-Language": language } })).json()).errors.no_flights_by_parameters);
 
                     } else {
 
@@ -90,7 +91,7 @@ $(async function () {
                                         flightsResizer();
 
                                     } else {
-                                        infoPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: {"Accept-Language" : language} })).json()).errors.no_flights_by_parameters);
+                                        infoPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: { "Accept-Language": language } })).json()).errors.no_flights_by_parameters);
                                     }
                                     break;
 
@@ -117,7 +118,7 @@ $(async function () {
 
         } catch (error) {
             console.log(error)
-            errorPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: {"Accept-Language" : language} })).json()).errors.server_error)
+            errorPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: { "Accept-Language": language } })).json()).errors.server_error)
         }
 
 
@@ -127,7 +128,7 @@ $(async function () {
 });
 
 async function flightSelector(flights, $frame, language, i18n_values) {
-    
+
     let $date = $("<h1>", {
         "class": "display_resizer display-4 mb-4 d-flex justify-content-center",
         "html": `<span class=\"pe-4\"><svg class=\"svg_resizer_48\" fill="#dc3545" version=\"1.1" xmlns=\"http://www.w3.org/2000/svg\" width=\"48\" height=\"48\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 371.656 371.656\" xml:space=\"preserve\"><g><g><g><path d=\"M37.833,212.348c-0.01,0.006-0.021,0.01-0.032,0.017c-4.027,2.093-5.776,6.929-4.015,11.114     c1.766,4.199,6.465,6.33,10.787,4.892l121.85-40.541l-22.784,37.207c-1.655,2.703-1.305,6.178,0.856,8.497     c2.161,2.318,5.603,2.912,8.417,1.449l23.894-12.416c0.686-0.356,1.309-0.823,1.844-1.383l70.785-73.941l87.358-45.582     c33.085-17.835,29.252-31.545,27.29-35.321c-1.521-2.928-4.922-6.854-12.479-8.93c-7.665-2.106-18.021-1.938-31.653,0.514     c-4.551,0.818-7.063,0.749-9.723,0.676c-9.351-0.256-15.694,0.371-47.188,16.736L90.788,164.851l-66.8-34.668     c-2.519-1.307-5.516-1.306-8.035,0.004l-11.256,5.85c-2.317,1.204-3.972,3.383-4.51,5.938c-0.538,2.556,0.098,5.218,1.732,7.253     l46.364,57.749L37.833,212.348z"/><path d="M355.052,282.501H28.948c-9.17,0-16.604,7.436-16.604,16.604s7.434,16.604,16.604,16.604h326.104     c9.17,0,16.604-7.434,16.604-16.604C371.655,289.934,364.222,282.501,355.052,282.501z\"/></g></g></g></svg></span>${dateDeFormatter(flights[0].DepartureDate, language)}`
@@ -139,7 +140,7 @@ async function flightSelector(flights, $frame, language, i18n_values) {
         "class": "display_resizer display-4 d-flex justify-content-center align-items-center",
         "html": `<div class=\"row w-100\"><span class=\"col-4 col-sm-4 col-md-4 col-lg-4 col-xl-4 d-flex flex-column justify-content-center align-items-center\"><span>${flights[0].DepartureCity}</span><span>(${flights[0].DepartureAirport})</span></span><span class=\"d-flex justify-content-center align-items-center col-4 col-sm-4 col-md-4 col-lg-4 col-xl-4 ps-0 pe-0\"><span><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"48\" height=\"48\" fill=\"currentColor\" class=\"svg_resizer_48 bi bi-dash\" viewBox=\"0 0 16 16\"><path d=\"M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8\"/></svg> (<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" fill=\"#dc3545\" class=\"svg_resizer_32 bi bi-clock\" viewBox=\"0 0 16 16\"><path d=\"M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z\"/><path d=\"M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0\"/></svg> ${flights[0].FlightTime}) <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"48\" height=\"48\" fill=\"currentColor\" class=\"svg_resizer_48 bi bi-arrow-right\" viewBox=\"0 0 16 16\"><path fill-rule=\"evenodd\" d=\"M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8\"/></svg></span></span><span class=\"col-4 col-sm-4 col-md-4 col-lg-4 col-xl-4 d-flex flex-column justify-content-center align-items-center\"><span>${flights[0].ArrivalCity}</span><span>(${flights[0].ArrivalAirport})</span></span></div>`
     });
-    
+
     $frame.prepend($title);
 
 
@@ -157,13 +158,13 @@ async function flightSelector(flights, $frame, language, i18n_values) {
         trigger: "manual"
     });
     popoverManualTrigger($flights_button, flights_popover);
-    flights_popover.setContent({ ".popover-body": flights_popover_contentGenerator($flights_button, flights_popover, flights) })
+    flights_popover.setContent({ ".popover-body": flights_popover_contentGenerator($flights_button, flights_popover, flights, (await getIndex(language)).body.cheapest_flights.per_person) })
 
     $frame.append($flights_button);
 
 }
 
-function flights_popover_contentGenerator($input_field, popover_obj, flights_data_from_api) {
+function flights_popover_contentGenerator($input_field, popover_obj, flights_data_from_api, i18n_values) {
 
     let $popover_content = $("<div>");
 
@@ -249,7 +250,7 @@ function flights_popover_contentGenerator($input_field, popover_obj, flights_dat
                         <span class="fs-3">${flights_data_from_api[i].ArrivalTime}</span>
                     </div>
                     <div class="d-flex align-items-center justify-content-center col-sm-12 col-md-12 col-lg-12 col-xl-4">
-                        <span class="fs-3">${flights_data_from_api[i].BasePrice}</span>
+                        <span class="fs-3">${flights_data_from_api[i].PriceInHUF}${i18n_values}</span>
                     </div>
                     <div class="d-flex align-items-center justify-content-center col-sm-12 col-md-12 col-lg-12 col-xl-2">
                         <span class="fs-3">${flights_data_from_api[i].NumOfAvailableSeats}</span>
@@ -293,7 +294,7 @@ function errorPageGenerator($frame, message) {
 
     let $plane_div = $("<div>", {
         "class": "col-md-12 col-lg-12",
-        "html": "<img class=\"img-fluid\" src=../css/images/plane.png>"
+        "html": "<img class=\"img-fluid\" src=../css/images/error_page_illustration.png>"
     });
     let $error_div = $("<div>", {
         "class": "alert alert-danger col-md-12 col-lg-12",
@@ -301,23 +302,25 @@ function errorPageGenerator($frame, message) {
         "role": "alert"
     });
 
-    $frame.append($plane_div);
     $frame.append($error_div);
+    $frame.append($plane_div);
+
 
 }
 
 function infoPageGenerator($frame, message) {
     let $plane_div = $("<div>", {
         "class": "col-md-12 col-lg-12",
-        "html": "<img class=\"img-fluid\" src=../css/images/plane.png>"
+        "html": "<img class=\"img-fluid\" src=../css/images/error_page_illustration.png>"
     });
     let $no_flights_div = $("<div>", {
         "class": "alert alert-primary col-md-12 col-lg-12",
         "html": `<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-info-circle-fill\" viewBox=\"0 0 16 16\"> <path d=\"M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2\"/></svg><span class=\"ps-2\">${message}</span>`,
         "role": "alert"
     });
-    $frame.append($plane_div);
+
     $frame.append($no_flights_div);
+    $frame.append($plane_div);
 }
 
 async function seatBookingButtonGenerator($frame, adults, children, i18n_values, lang) {
@@ -332,27 +335,29 @@ async function seatBookingButtonGenerator($frame, adults, children, i18n_values,
         "text": i18n_values.choose_seats,
         "type": "submit",
         on: {
-            "click": function (e) {
+            "click": async function (e) {
                 e.preventDefault();
 
-                let flight_ids = $.map($(".flight"), function (x) { return $(x).data("flight_id") }); // a kiválasztott járatok azonosítóját beleteszi egy tömbbe 
+                if ((await (await fetch("/api/checklogin", { method: "GET" })).json()).logged_in) {
+                    let flight_ids = $.map($(".flight"), function (x) { return $(x).data("flight_id") }); // a kiválasztott járatok azonosítóját beleteszi egy tömbbe 
 
-                const fd = new FormData(document.getElementById("flights_form"));
+                    const fd = new FormData(document.getElementById("flights_form"));
 
-                console.log(flight_ids);
-                
+                    fd.set("flight_id_to", flight_ids[0]);
+                    if (flight_ids.length == 2) {
+                        fd.set("flight_id_back", flight_ids[1]);
+                    }
+                    fd.set("adults", adults);
+                    fd.set("children", children)
 
-                fd.set("flight_id_to", flight_ids[0]);
-                if (flight_ids.length == 2) {
-                    fd.set("flight_id_back", flight_ids[1]);
+                    const searchParams = new URLSearchParams(fd);
+                    const queryString = searchParams.toString();
+
+                    window.location.href = `/${lang}/helyfoglalas?${queryString}`;
+                } else {
+                    await login_modal(lang);
+                    $("#monadModal").modal("show");
                 }
-                fd.set("adults", adults);
-                fd.set("children", children)
-
-                const searchParams = new URLSearchParams(fd);
-                const queryString = searchParams.toString();
-
-                window.location.href = `/${lang}/helyfoglalas?${queryString}`;
 
             }
         }
@@ -362,16 +367,4 @@ async function seatBookingButtonGenerator($frame, adults, children, i18n_values,
     $seat_booking_button_frame.append($seat_booking_button);
     $frame.append($seat_booking_button_frame);
 
-}
-
-function dateDeFormatter(dateText, language) {
-    let dateText_array = dateText.split("-");
-    let dateText_string;
-    if (language == "en") {
-        dateText_array.reverse();
-        dateText_string = dateText_array.join("/");
-    } else {
-        dateText_string = dateText_array.join(".") + ".";
-    }
-    return dateText_string;
 }

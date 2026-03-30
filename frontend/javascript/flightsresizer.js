@@ -18,7 +18,7 @@ export function flightsResizer () {
         resizersm(sm);
     });
 
-};
+}
 
 function resizerlg(x) {
 

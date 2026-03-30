@@ -1,7 +1,14 @@
 {
     "locale": "en",
     "index": {
-        "body": {}
+        "body": {
+            "cheapest_flights": {
+                "title": "Cheapest flights",
+                "currency" : "&nbsp€", 
+                "per_person" : "&nbsp/ person",
+                "choose_seats" : "Choose seats!"
+            }
+        }
     },
     "footer": {
         "title_about_us": "About us",
@@ -50,7 +57,7 @@
     },
     "errors": {
         "bad_http_get_request": "The HTTP-GET request isn't proper!",
-        "no_flight_by_parameters": "Unfortunately, there's no flight by the given parameters.",
+        "no_flights_by_parameters": "Unfortunately, there's no flight by the given parameters.",
         "bad_url_parameter": "ERROR : Some of the URL parameters are wrong.",
         "server_error": "Unfortunately, an error occured in the server. Please, try again later!"
     },
@@ -62,7 +69,7 @@
         "no_account": "Don't have an account? Sign up here:",
         "first_name": "Last name",
         "last_name": "First name",
-        "birth_date": "Birth date"
+        "birth_date": "Birth date (dd/mm/yyyy)"
     },
     "map": {
         "choose_button": "Choose"

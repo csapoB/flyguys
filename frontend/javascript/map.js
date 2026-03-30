@@ -4,6 +4,7 @@ import { getFooter } from "./locale.js";
 import { getMap } from "./locale.js";
 import { modalInit } from "./modal.js";
 import { plannerMapInit } from "./plannermap.js";
+import { plannerResizer } from "./plannerresizer.js";
 
 $(async function () {
 
@@ -37,6 +38,8 @@ $(async function () {
   await modalInit(language);
 
   await plannerMapInit(language);
+
+  plannerResizer();
 
   await getFooter(language);
 
