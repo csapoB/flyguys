@@ -84,43 +84,6 @@ router.get('/AdminCheck', async (request, response) => {
     }
 });
 
-/*router.get('/availabledepartureairports', async (request, response) => {
-    try {
-        const result = await database.selectAvailableDepartureAirports();
-
-        let airportcodes = [];
-        for (let i = 0; i < result.length; i++) {
-            airportcodes.push(result[i].DepartureAirport);
-        }
-
-        response.status(200).json({
-            airportcodes: airportcodes
-        });
-    } catch (error) {
-        response.status(500).json({
-            message: error
-        });
-    }
-});*/
-
-/*router.get('/availablearrivalairports', async (request, response) => {
-    try {
-        const result = await database.selectAvailableArrivalAirports();
-
-        let airportcodes = [];
-        for (let i = 0; i < result.length; i++) {
-            airportcodes.push(result[i].ArrivalAirport);
-        }
-
-        response.status(200).json({
-            airportcodes: airportcodes
-        });
-    } catch (error) {
-        response.status(500).json({
-            message: error
-        });
-    }
-});*/
 
 router.get('/availableflights', async (request, response) => {
     try {
@@ -289,8 +252,13 @@ router.get('/hu/flights', async (request, response) => {
             });
         } else {
 
-            let data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren);
-            data.map(x => x.BasePrice = `${x.BasePrice} HUF`);
+            let data;
+            if (LoggedInCheck(request)) {
+                data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren, request.session.user.id);
+            } else {
+                data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren, "NULL");
+            }
+
             response.status(200).json({
                 flights: data
             });
@@ -313,9 +281,22 @@ router.get('/en/flights', async (request, response) => {
         } else {
 
 
-            let current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
-            let data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren);
-            data.map(x => x.BasePrice = `${Math.round(x.BasePrice * current_eur_exch_rate)} EUR`);
+            let data;
+            let current_eur_exch_rate;
+
+            try {
+                current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+            } catch {
+                current_eur_exch_rate = 0.00259;
+            }
+            if (LoggedInCheck(request)) {
+                data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren, request.session.user.id);
+            } else {
+                data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren, "NULL");
+            }
+
+
+            data.map(x => x.PriceInHUF = `${Math.round(x.PriceInHUF * current_eur_exch_rate)}`);
 
             response.status(200).json({
                 flights: data
@@ -328,11 +309,67 @@ router.get('/en/flights', async (request, response) => {
     }
 });
 
+router.get('/cheapestflights', async (request, response) => {
+    try {
+        let one_way;
+        let return_;
+        if (request.get("Accept-Language") == "hu") {
+            if (LoggedInCheck(request)) {
+                
+                one_way = await database.selectTop4CheapestOneWayFlightsHun(request.session.user.id);
+            } else {
+                one_way = await database.selectTop4CheapestOneWayFlightsHun("NULL");
+            }
+
+            //return_ = await database.selectCheapestReturnFlightsHun();
+        } else {
+            let current_eur_exch_rate;
+
+            try {
+                current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+            } catch {
+                current_eur_exch_rate = 0.00259;
+            }
+
+            if (LoggedInCheck(request)) {
+                one_way = await database.selectTop4CheapestOneWayFlightsEn(request.session.user.id);
+            } else {
+                one_way = await database.selectTop4CheapestOneWayFlightsEn("NULL");
+            }
+            //return_ = await database.selectCheapestReturnFlightsEn()
+            one_way.map(x => x.PriceInHUF = `${Math.round(x.PriceInHUF * current_eur_exch_rate)}`);
+            //return_.map(x => x.PriceInHUF = `${Math.round(x.PriceInHUF * current_eur_exch_rate)}`);
+
+        }
+
+        response.status(200).json({
+            results: { "one_way": one_way }
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
 router.get('/geterrors', (request, response) => {
     try {
 
         response.status(200).json({
             errors: request.t("errors", { returnObjects: true })
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/getindex', (request, response) => {
+    try {
+
+        response.status(200).json({
+            index: request.t("index", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({
@@ -393,11 +430,11 @@ router.get('/getplannerpassengerspopover', (request, response) => {
     }
 });
 
-router.get('/getindex', (request, response) => {
+router.get('/getfooter', (request, response) => {
     try {
 
         response.status(200).json({
-            index: request.t("index", { returnObjects: true })
+            footer: request.t("footer", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({
@@ -432,21 +469,43 @@ router.get('/getmodal', (request, response) => {
     }
 });
 
-/*router.get('/a', (request, response) => {
+router.get('/getmap', (request, response) => {
     try {
-        
-        
 
         response.status(200).json({
-            message : 
+            map: request.t("map", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({
             message: error
         });
     }
-});*/
+});
 
+router.get('/getaboutus', (request, response) => {
+    try {
+
+        response.status(200).json({
+            about_us: request.t("about_us", { returnObjects: true })
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/checklogin', (request, response) => {
+    try{
+        response.status(200).json({
+            logged_in: LoggedInCheck(request)
+        });
+    } catch {
+        response.status(500).json({
+            message: "SERVER ERROR"
+        });
+    }
+});
 
 router.post('/login', async (request, response) => {
     try {
@@ -507,7 +566,7 @@ router.post('/register', async (request, response) => {
         else {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
-            const register = await database.Register(nev, email, hashedPassword, szuldatum, 0, 1);
+            const register = await database.Register(nev, email, hashedPassword, szuldatum);
             if (!register) {
                 return response.status(400).json({
                     message: 'Sikertelen regisztráció'
@@ -572,25 +631,6 @@ router.get('/husegprogram', async (request, response) => {
     }
 });
 
-router.get('/map_pins', async (request, response) => {
-    try {
-        if ((request.get("Accept-Language") == "hu")) {
-            response.status(200).json({
-                pins: await database.selectAvailableAirportsHun()
-            });
-        } else {
-            response.status(200).json({
-                pins: await database.selectAvailableAirportsEn()
-            });
-        }
-
-    } catch (error) {
-        console.log(error);
-        response.status(500).json({
-            message: 'Ez a végpont nem működik.'
-        });
-    }
-});
 
 function LoggedInCheck(request) {
     let vissza = false;

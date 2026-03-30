@@ -34,16 +34,51 @@
 main.flex-grow-1 {
   display: flex !important;
   flex-direction: column !important;
+  overflow-y: auto;
 }
+
 main.flex-grow-1 > .container-fluid {
   flex: 1 1 0 !important;
   min-height: 0 !important;
 }
-#row1, #row2 {
+#row1 {
+  flex: 0 0 auto !important;
+  min-height: 250px;
+}
+#row2 {
   flex: 1 1 0 !important;
   min-height: 0 !important;
 }
 
 .card{
   height:80% !important;
+}
+
+.bg {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding-bottom: 120px;
+}
+
+.userDiv{
+  height: 100%;
+}
+
+.nextLevelDiv{
+  height: 100%;
+}
+
+@media only screen and (max-width: 768px) {
+  .card {
+    height: auto !important;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  main{
+    max-height: calc(100vh - 600px);
+  }
+  .bg {
+    max-height: calc(100vh - 700px);
+  }
 }

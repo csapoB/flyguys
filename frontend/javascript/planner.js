@@ -1,24 +1,11 @@
 import { getPlanner } from "./locale.js";
 import { getPlannerPassengersPopover } from "./locale.js";
+import { popoverManualTrigger } from "./toolbox.js";
+import { dateFormatter } from "./toolbox.js";
 export async function plannerInit(current_language) {
 
 
-    let getplanner = await getPlanner(current_language);
-    $("#origin_label").text(getplanner.origin_label);
-    $("#destination_label").text(getplanner.destination_label);
-    $("#departure_label").text(getplanner.departure_label);
-    $("#return_label").text(getplanner.return_label);
-    $("#passengers_label").text(getplanner.passengers_label);
-    $("#search_flights").text(getplanner.search_flights_button);
-    $("#passengers_input").prop("value", getplanner.passengers_input);
-
-    $(window).on("unload", function () {
-        $("#origin_input").prop("value", "");
-        $("#destination_input").prop("value", "");
-        $("#departure_input").prop("value", "");
-        $("#return_input").prop("value", "");
-        //$("#passengers_input").prop("value", getplanner.passengers_input);
-    });
+    await getPlanner(current_language);
 
     ///////// INIT /////////
 
@@ -29,9 +16,7 @@ export async function plannerInit(current_language) {
     */
     // Repülőtér popoverek
     let origin = await popoverInit("origin_input", "origin_popover");
-    popoverManualTrigger(origin[0].get(0) /*vissza alakítja hagyományos dOM elemmé*/, origin[1]);
     let destination = await popoverInit("destination_input", "destination_popover");
-    popoverManualTrigger(destination[0].get(0), destination[1]);
     // Datepickerek
     let $departure = $("#departure_input");
     let available_departure_dates = (await (await fetch("/api/availabledeparturedatesfiltered", { method: "GET" })).json()).departuredates
@@ -77,7 +62,7 @@ export async function plannerInit(current_language) {
 
                         returnEnabler(available_return_dates, current_language);
 
-                        console.log(dateFormatter($return.val(), current_language))
+                        
                         airportSwapperEnabler(origin[0], destination[0], "", "");
 
                     }
@@ -198,7 +183,7 @@ export async function plannerInit(current_language) {
 
     // Utasok popover
     let passengers = await passengers_popoverInit("passengers_input", "passengers_popover");
-    popoverManualTrigger(passengers[0].get(0), passengers[1]);
+    popoverManualTrigger(passengers[0], passengers[1]);
 
 
     $("#search_flights").on("click", function (e) {
@@ -216,7 +201,7 @@ export async function plannerInit(current_language) {
         const searchParams = new URLSearchParams(fd);
         const queryString = searchParams.toString();
 
-        window.location.href = `${current_language}/flights?${queryString}`;
+        window.location.href = `/${current_language}/flights?${queryString}`;
 
 
     });
@@ -254,7 +239,6 @@ export async function plannerInit(current_language) {
 
 }
 
-
 ///////// FÜGGVÉNYEK /////////
 
 // Popover létrehozója
@@ -272,10 +256,12 @@ async function popoverInit(input_field_id, content_div_id) {
     });
     popover.setContent({ ".popover-body": airports_popover_contentGenerator(input_field_id, content_div_id, popover, (await (await fetch(`/api/${(input_field_id == "origin_input") ? "availabledepartureairportsfiltered" : "availablearrivalairportsfiltered"}`, { method: "GET", headers : {"Accept-Language" : document.getElementById("language_nav").dataset.langCode} })).json())) }); // általános eljárás a két repülőteres popoverhez
 
+    popoverManualTrigger($input_field, popover);
+
     return [$input_field, popover];
 }
 
-async function passengers_popoverInit(input_field_id, content_div_id) {
+export async function passengers_popoverInit(input_field_id, content_div_id) {
 
     let getplanner_passengers_popover = await getPlannerPassengersPopover(document.getElementById("language_nav").dataset.langCode);
 
@@ -291,62 +277,6 @@ async function passengers_popoverInit(input_field_id, content_div_id) {
     return [$input_field, popover];
 }
 
-// Eseménykezelő a beviteli mezőhöz, valamint a popoverhez
-function popoverManualTrigger(input_field, popover_obj) {
-    let popover_div;
-    input_field.addEventListener("click", function () {
-
-        if (popover_obj.tip == null) {
-
-            popover_obj.show();
-
-            popover_div = document.getElementById(popover_obj.tip.id); // Az popover_div id-ja minden megjelenésnél újragenerálódik => más lesz, mint az előző
-            popover_div.tabIndex = -1; // A tabindex beállítása azért szükséges, hogy az elemet (popover_div) a böngésző focusable-nek tekintse
-            popover_div.addEventListener("blur", (event) => {
-
-                if (event.relatedTarget == null) { // Ha az elem amire kattintottunk nem focusable, akkor lesz null az event.relatedTarget értéke
-                    popover_obj.hide();
-                } else {
-                    if (event.relatedTarget.id != input_field.id) { // Ha nem az input_fiealdbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
-                        popover_obj.hide();
-                    }
-                }
-            });
-        }
-    });
-
-    input_field.addEventListener("focus", function () {
-
-        if (popover_obj.tip == null) {
-
-            popover_obj.show();
-
-            popover_div = document.getElementById(popover_obj.tip.id); // Az popover_div id-ja minden megjelenésnél újragenerálódik => más lesz, mint az előző
-            popover_div.tabIndex = -1; // A tabindex beállítása azért szükséges, hogy az elemet (popover_div) a böngésző focusable-nek tekintse
-            popover_div.addEventListener("blur", (event) => {
-
-                if (event.relatedTarget == null) { // Ha az elem amire kattintottunk nem focusable, akkor lesz null az event.relatedTarget értéke
-                    popover_obj.hide();
-                } else {
-                    if (event.relatedTarget.id != input_field.id) { // Ha nem az input_fiealdbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
-                        popover_obj.hide();
-                    }
-                }
-            });
-        }
-    });
-
-    input_field.addEventListener("blur", (event) => {
-
-        if (event.relatedTarget == null) { // Ha az elem amire kattintottunk nem focusable, akkor lesz null az event.relatedTarget értéke
-            popover_obj.hide();
-        } else {
-            if (event.relatedTarget.id != popover_div.id) { // Ha nem a popover_divbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
-                popover_obj.hide();
-            }
-        }
-    });
-}
 
 function airports_popover_contentGenerator(input_field_id, content_div_id, popover_obj, airports_data_from_api) {
 
@@ -673,25 +603,7 @@ function passengers_popover_contentGenerator(content_div_id, popover_content_i18
 
 // Segédfüggvények
 
-function switchFunc($element) {
-
-    if ($element.css("pointer-events") == "auto") {
-
-        $element.css({
-            "pointer-events": "none",
-            "opacity": 0.5
-        });
-
-    } else {
-
-        $element.css({
-            "pointer-events": "auto",
-            "opacity": 1.0
-        });
-    }
-}
-
-function inputSwitcher($input) {
+export function inputSwitcher($input) {
 
     if ($input.prop("disabled")) {
 
@@ -708,7 +620,7 @@ function inputSwitcher($input) {
 }
 
 // az adott repteret választja ki, ha frissül a popover tartalma. Ha üres az input, akkor undefinedal tér vissza
-function airportSelector($popover_content_children, $selected_airport_code) {
+export function airportSelector($popover_content_children, $selected_airport_code) {
 
     let indexes;
 
@@ -736,18 +648,7 @@ function airportSelector($popover_content_children, $selected_airport_code) {
     return indexes;
 }
 
-function airportDeSelector($popover_content_children) {
-
-    for (let i = 0; i < $popover_content_children.length; i++) {
-        for (let j = 1; j < $popover_content_children.eq(i).children().length; j++) {
-            $popover_content_children.eq(i).children().eq(j).children().first().removeClass("rounded-pill bg-danger text-light");
-
-        }
-
-    }
-}
-
-async function returnEnabler(available_return_dates, current_language) {
+export async function returnEnabler(available_return_dates, current_language) {
 
     let $origin_input = $("#origin_input");
     let $destination_input = $("#destination_input");
@@ -792,7 +693,7 @@ async function returnEnabler(available_return_dates, current_language) {
     }
 }
 
-function inputDisabler($input) {
+export function inputDisabler($input) {
 
     if (!$input.prop("disabled")) {
 
@@ -802,7 +703,7 @@ function inputDisabler($input) {
 
 }
 
-function turnOff($element) {
+export function turnOff($element) {
     if ($element.css("pointer-events") == "auto") {
 
         $element.css({
@@ -817,7 +718,7 @@ function turnOff($element) {
     }
 }
 
-function turnOn($element) {
+export function turnOn($element) {
     if ($element.css("pointer-events") != "auto") {
 
         $element.css({
@@ -832,7 +733,7 @@ function turnOn($element) {
     }
 }
 
-async function airportSwapperEnabler($origin_input, $destination_input, departureDate, returnDate) {
+export async function airportSwapperEnabler($origin_input, $destination_input, departureDate, returnDate) {
 
     
     let swappable_airports;
@@ -872,15 +773,3 @@ async function airportSwapperEnabler($origin_input, $destination_input, departur
 
 }
 
-function dateFormatter(dateText, language) {
-    let dateText_array;
-    if (language == "en") {
-        dateText_array = dateText.split("/");
-        dateText_array.reverse();
-
-    } else {
-        dateText_array = dateText.split(".");
-        dateText_array.pop();
-    }
-    return dateText_array.join("-");
-}
