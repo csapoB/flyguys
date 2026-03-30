@@ -4,6 +4,7 @@
         "body": {
             "cheapest_flights": {
                 "title": "Cheapest flights",
+                "currency" : "&nbsp€", 
                 "per_person" : "&nbsp/ person",
                 "choose_seats" : "Choose seats!"
             }

@@ -112,7 +112,7 @@ function init_modal_content_template(id, type) {
 }
 
 
-async function login_modal(current_language) {
+export async function login_modal(current_language) {
 
     let getmodal = await getModal(current_language);
 

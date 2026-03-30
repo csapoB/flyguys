@@ -252,8 +252,13 @@ router.get('/hu/flights', async (request, response) => {
             });
         } else {
 
-            let data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren);
-            data.map(x => x.Price = `${x.Price}`);
+            let data;
+            if (LoggedInCheck(request)) {
+                data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren, request.session.user.id);
+            } else {
+                data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren, "NULL");
+            }
+
             response.status(200).json({
                 flights: data
             });
@@ -276,9 +281,22 @@ router.get('/en/flights', async (request, response) => {
         } else {
 
 
-            let current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
-            let data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren);
-            data.map(x => x.Price = `${Math.round(x.Price * current_eur_exch_rate)}`);
+            let data;
+            let current_eur_exch_rate;
+
+            try {
+                current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+            } catch {
+                current_eur_exch_rate = 0.00259;
+            }
+            if (LoggedInCheck(request)) {
+                data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren, request.session.user.id);
+            } else {
+                data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren, "NULL");
+            }
+
+
+            data.map(x => x.PriceInHUF = `${Math.round(x.PriceInHUF * current_eur_exch_rate)}`);
 
             response.status(200).json({
                 flights: data
@@ -296,22 +314,36 @@ router.get('/cheapestflights', async (request, response) => {
         let one_way;
         let return_;
         if (request.get("Accept-Language") == "hu") {
-            one_way = await database.selectTop4CheapestOneWayFlightsHun();
-            one_way.map(x => x.Price = `${x.Price} Ft`);
-            return_ = await database.selectCheapestReturnFlightsHun();
-            return_.map(x => x.Price = `${x.Price} Ft`);
-        } else {
-            let current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+            if (LoggedInCheck(request)) {
+                
+                one_way = await database.selectTop4CheapestOneWayFlightsHun(request.session.user.id);
+            } else {
+                one_way = await database.selectTop4CheapestOneWayFlightsHun("NULL");
+            }
 
-            one_way = await database.selectTop4CheapestOneWayFlightsEn();
-            return_ = await database.selectCheapestReturnFlightsEn()
-            one_way.map(x => x.Price = `${Math.round(x.Price * current_eur_exch_rate)} €`);
-            return_.map(x => x.Price = `${Math.round(x.Price * current_eur_exch_rate)} €`);
+            //return_ = await database.selectCheapestReturnFlightsHun();
+        } else {
+            let current_eur_exch_rate;
+
+            try {
+                current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+            } catch {
+                current_eur_exch_rate = 0.00259;
+            }
+
+            if (LoggedInCheck(request)) {
+                one_way = await database.selectTop4CheapestOneWayFlightsEn(request.session.user.id);
+            } else {
+                one_way = await database.selectTop4CheapestOneWayFlightsEn("NULL");
+            }
+            //return_ = await database.selectCheapestReturnFlightsEn()
+            one_way.map(x => x.PriceInHUF = `${Math.round(x.PriceInHUF * current_eur_exch_rate)}`);
+            //return_.map(x => x.PriceInHUF = `${Math.round(x.PriceInHUF * current_eur_exch_rate)}`);
 
         }
 
         response.status(200).json({
-            results: {"one_way": one_way, "return" : return_}
+            results: { "one_way": one_way }
         });
     } catch (error) {
         response.status(500).json({
@@ -463,6 +495,18 @@ router.get('/getaboutus', (request, response) => {
     }
 });
 
+router.get('/checklogin', (request, response) => {
+    try{
+        response.status(200).json({
+            logged_in: LoggedInCheck(request)
+        });
+    } catch {
+        response.status(500).json({
+            message: "SERVER ERROR"
+        });
+    }
+});
+
 router.post('/login', async (request, response) => {
     try {
         const { email, password } = request.body
@@ -522,7 +566,7 @@ router.post('/register', async (request, response) => {
         else {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
-            const register = await database.Register(nev, email, hashedPassword, szuldatum, 1);
+            const register = await database.Register(nev, email, hashedPassword, szuldatum);
             if (!register) {
                 return response.status(400).json({
                     message: 'Sikertelen regisztráció'

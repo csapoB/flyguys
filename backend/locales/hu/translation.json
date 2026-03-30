@@ -5,7 +5,8 @@
         "body" : {
             "cheapest_flights" : {
                 "title" : "Legolcsóbb járatok",
-                "per_person" : "&nbsp/ fő",
+                "currency" : "&nbspFt",
+                "per_person" : " &nbsp/ fő",
                 "choose_seats" : "Válasszon ülőhelyet!"
                 
             }
