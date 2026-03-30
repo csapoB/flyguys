@@ -77,16 +77,16 @@ async function selectSwappableFlights(departureAirport, arrivalAirport) {
     return rows;
 }
 
-async function selectAvailableFlightsFilteredHun(departureAirport, arrivalAirport, departureDate, numOfPassengers) {
-    const query = 'SELECT num_of_available_seats_on_available_flights_hun.* FROM num_of_available_seats_on_available_flights_hun WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate LIKE ? AND NumOfAvailableSeats >= ?;';
-    const [rows] = await pool.execute(query, [`${departureAirport}`, `${arrivalAirport}`, `${departureDate}`, `${numOfPassengers}`]);
+async function selectAvailableFlightsFilteredHun(departureAirport, arrivalAirport, departureDate, numOfPassengers, userId) {
+    const query = 'SELECT num_of_available_seats_on_available_flights_hun.FlightID, num_of_available_seats_on_available_flights_hun.DepartureAirport, num_of_available_seats_on_available_flights_hun.DepartureCity, num_of_available_seats_on_available_flights_hun.ArrivalCity, num_of_available_seats_on_available_flights_hun.ArrivalAirport, num_of_available_seats_on_available_flights_hun.DepartureDate, num_of_available_seats_on_available_flights_hun.ArrivalDate, num_of_available_seats_on_available_flights_hun.DepartureTime, num_of_available_seats_on_available_flights_hun.ArrivalTime, num_of_available_seats_on_available_flights_hun.FlightTime, num_of_available_seats_on_available_flights_hun.AircraftModelID, num_of_available_seats_on_available_flights_hun.NumOfAvailableSeats, ROUND(num_of_available_seats_on_available_flights_hun.BasePrice*((100-(SELECT loyaltystatus.DiscountInPercentage FROM useraccount INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserID = ?))/100)) AS "Price" FROM num_of_available_seats_on_available_flights_hun WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate LIKE ? AND NumOfAvailableSeats >= ?;';
+    const [rows] = await pool.execute(query, [`${userId}`, `${departureAirport}`, `${arrivalAirport}`, `${departureDate}`, `${numOfPassengers}`]);
     
     return rows;
 }
 
-async function selectAvailableFlightsFilteredEn(departureAirport, arrivalAirport, departureDate, numOfPassengers) {
-    const query = 'SELECT num_of_available_seats_on_available_flights_en.* FROM num_of_available_seats_on_available_flights_en WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate LIKE ? AND NumOfAvailableSeats >= ?;';
-    const [rows] = await pool.execute(query, [`${departureAirport}`, `${arrivalAirport}`, `${departureDate}`, `${numOfPassengers}`]);
+async function selectAvailableFlightsFilteredEn(departureAirport, arrivalAirport, departureDate, numOfPassengers, userId) {
+    const query = 'SELECT num_of_available_seats_on_available_flights_en.FlightID, num_of_available_seats_on_available_flights_en.DepartureAirport, num_of_available_seats_on_available_flights_en.DepartureCity, num_of_available_seats_on_available_flights_en.ArrivalCity, num_of_available_seats_on_available_flights_en.ArrivalAirport, num_of_available_seats_on_available_flights_en.DepartureDate, num_of_available_seats_on_available_flights_en.ArrivalDate, num_of_available_seats_on_available_flights_en.DepartureTime, num_of_available_seats_on_available_flights_en.ArrivalTime, num_of_available_seats_on_available_flights_en.FlightTime, num_of_available_seats_on_available_flights_en.AircraftModelID, num_of_available_seats_on_available_flights_en.NumOfAvailableSeats, ROUND(num_of_available_seats_on_available_flights_en.BasePrice*((100-(SELECT loyaltystatus.DiscountInPercentage FROM useraccount INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserID = ?))/100)) AS "Price" FROM num_of_available_seats_on_available_flights_en WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate LIKE ? AND NumOfAvailableSeats >= ?;';
+    const [rows] = await pool.execute(query, [`${userId}`,`${departureAirport}`, `${arrivalAirport}`, `${departureDate}`, `${numOfPassengers}`]);
     
     return rows;
 }
@@ -112,14 +112,14 @@ async function selectAvailableAirportsHun() {
 }
 
 async function selectTop4CheapestOneWayFlightsEn() {
-    const query = 'SELECT available_flights_en.DepartureAirport, available_flights_en.DepartureCity, available_flights_en.ArrivalAirport, available_flights_en.ArrivalCity, DATE(available_flights_en.DepartureDateTime) AS "DepartureDate", MIN(available_flights_en.BasePrice) AS "BasePrice" FROM available_flights_en GROUP BY available_flights_en.ArrivalAirport ORDER BY MIN(available_flights_en.BasePrice) ASC LIMIT 4;';
+    const query = 'SELECT num_of_available_seats_on_available_flights_en.FlightID, num_of_available_seats_on_available_flights_en.DepartureAirport, num_of_available_seats_on_available_flights_en.DepartureCity, num_of_available_seats_on_available_flights_en.ArrivalAirport, num_of_available_seats_on_available_flights_en.ArrivalCity, num_of_available_seats_on_available_flights_en.DepartureDate, num_of_available_seats_on_available_flights_en.DepartureTime, num_of_available_seats_on_available_flights_en.ArrivalTime, num_of_available_seats_on_available_flights_en.FlightTime, MIN(num_of_available_seats_on_available_flights_en.BasePrice) AS "BasePrice", num_of_available_seats_on_available_flights_en.NumOfAvailableSeats FROM num_of_available_seats_on_available_flights_en GROUP BY num_of_available_seats_on_available_flights_en.ArrivalAirport ORDER BY MIN(num_of_available_seats_on_available_flights_en.BasePrice) ASC LIMIT 4;';
     const [rows] = await pool.execute(query)
 
     return rows;
 }
 
 async function selectTop4CheapestOneWayFlightsHun() {
-    const query = 'SELECT available_flights_hun.DepartureAirport, available_flights_hun.DepartureCity, available_flights_hun.ArrivalAirport, available_flights_hun.ArrivalCity, DATE(available_flights_hun.DepartureDateTime) AS "DepartureDate", MIN(available_flights_hun.BasePrice) AS "BasePrice" FROM available_flights_hun GROUP BY available_flights_hun.ArrivalAirport ORDER BY MIN(available_flights_hun.BasePrice) ASC LIMIT 4;';
+    const query = 'SELECT num_of_available_seats_on_available_flights_hun.FlightID, num_of_available_seats_on_available_flights_hun.DepartureAirport, num_of_available_seats_on_available_flights_hun.DepartureCity, num_of_available_seats_on_available_flights_hun.ArrivalAirport, num_of_available_seats_on_available_flights_hun.ArrivalCity, num_of_available_seats_on_available_flights_hun.DepartureDate, num_of_available_seats_on_available_flights_hun.DepartureTime, num_of_available_seats_on_available_flights_hun.ArrivalTime, num_of_available_seats_on_available_flights_hun.FlightTime, MIN(num_of_available_seats_on_available_flights_hun.BasePrice) AS "BasePrice", num_of_available_seats_on_available_flights_hun.NumOfAvailableSeats FROM num_of_available_seats_on_available_flights_hun GROUP BY num_of_available_seats_on_available_flights_hun.ArrivalAirport ORDER BY MIN(num_of_available_seats_on_available_flights_hun.BasePrice) ASC LIMIT 4;';
     const [rows] = await pool.execute(query)
 
     return rows;

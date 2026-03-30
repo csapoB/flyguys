@@ -1,6 +1,5 @@
 export async function getNavbar(lang, url_splitted) {
     let getnavbar = (await (await fetch("/api/getnavbar", { method: "GET", headers: { "Accept-Language": lang } })).json()).navbar;
-    
     $("#back_to_main_page").prop("href", `/${lang}`)
     let $about_us_nav = $("#about_us_nav");
     $about_us_nav.text(getnavbar.about_us);
@@ -23,6 +22,10 @@ export async function getNavbar(lang, url_splitted) {
     $("#logout_button").text(getnavbar.log_out);
     $.datepicker.setDefaults($.datepicker.regional[(lang) == "hu" ? "hu" : "en-GB"]);
 
+}
+
+export async function getIndex(lang) {
+    return (await (await fetch("/api/getindex", { method: "GET", headers: { "Accept-Language": lang } })).json()).index;
 }
 
 export async function getPlanner(lang) {

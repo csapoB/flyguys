@@ -3,7 +3,8 @@ import { getFlights } from "./locale.js";
 import { getLocale } from "./locale.js";
 import { getFooter } from "./locale.js";
 import { modalInit } from "./modal.js";
-import { popoverManualTrigger } from "./planner.js";
+import { dateDeFormatter } from "./toolbox.js";
+import { popoverManualTrigger } from "./toolbox.js";
 import { flightsResizer } from "./flightsresizer.js";
 
 $(async function () {
@@ -364,16 +365,4 @@ async function seatBookingButtonGenerator($frame, adults, children, i18n_values,
     $seat_booking_button_frame.append($seat_booking_button);
     $frame.append($seat_booking_button_frame);
 
-}
-
-function dateDeFormatter(dateText, language) {
-    let dateText_array = dateText.split("-");
-    let dateText_string;
-    if (language == "en") {
-        dateText_array.reverse();
-        dateText_string = dateText_array.join("/");
-    } else {
-        dateText_string = dateText_array.join(".") + ".";
-    }
-    return dateText_string;
 }

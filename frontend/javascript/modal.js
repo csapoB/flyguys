@@ -1,4 +1,5 @@
 import { getModal } from "./locale.js";
+import { dateFormatter } from "./toolbox.js";
 export async function modalInit(current_language) {
 
     await checkLoginStatus();
@@ -428,17 +429,4 @@ async function handleRegister(event) {
         console.error('Regisztráció hiba:', error);
         alert('Szerver hiba a regisztráció során');
     }
-}
-
-function dateFormatter(dateText, language) {
-    let dateText_array;
-    if (language == "en") {
-        dateText_array = dateText.split("/");
-        dateText_array.reverse();
-
-    } else {
-        dateText_array = dateText.split(".");
-        dateText_array.pop();
-    }
-    return dateText_array.join("-");
 }

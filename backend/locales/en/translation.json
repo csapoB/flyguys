@@ -3,8 +3,9 @@
     "index": {
         "body": {
             "cheapest_flights": {
-                "one_way": "one way",
-                "return": "return"
+                "title": "Cheapest flights",
+                "per_person" : "&nbsp/ person",
+                "choose_seats" : "Choose seats!"
             }
         }
     },
@@ -67,7 +68,7 @@
         "no_account": "Don't have an account? Sign up here:",
         "first_name": "Last name",
         "last_name": "First name",
-        "birth_date": "Birth date"
+        "birth_date": "Birth date (dd/mm/yyyy)"
     },
     "map": {
         "choose_button": "Choose"
