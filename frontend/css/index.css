@@ -171,6 +171,12 @@ a:hover{
   
 }
 
+.acDivs{
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
 /* navbar */
   .custom-navbar {
     background: #ffffff;
@@ -224,3 +230,4 @@ a:hover{
   .navbar-toggler:focus {
     box-shadow: none;
   }
+
