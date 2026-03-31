@@ -21,3 +21,10 @@ $(async function(){
         console.log("hiba: " + error)
     }
 });
+
+/*
+aktív foglásaim
+korábbi foglásaim
+
+rolunk cim id => class
+*/
