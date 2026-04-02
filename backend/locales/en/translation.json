@@ -99,5 +99,13 @@
             "title": "Join Us in the Sky",
             "content": "<p>As we continue to expand our destinations and services, we invite you to fly with us and experience a new standard of travel.<br>FlyGuys — Your journey starts with us.</p>"
         }
-    }
+    },
+    "profile" : {
+        "flights_tabel"  : {
+            "row_column" : "Row",
+            "column_column" : "Column",
+            "fare_class_column" : "Fare class" 
+        }
+    },
+    "log_in_needed" : "Access denied. You need to log in to access data!"
 }

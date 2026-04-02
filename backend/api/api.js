@@ -315,7 +315,7 @@ router.get('/cheapestflights', async (request, response) => {
         let return_;
         if (request.get("Accept-Language") == "hu") {
             if (LoggedInCheck(request)) {
-                
+
                 one_way = await database.selectTop4CheapestOneWayFlightsHun(request.session.user.id);
             } else {
                 one_way = await database.selectTop4CheapestOneWayFlightsHun("NULL");
@@ -345,6 +345,30 @@ router.get('/cheapestflights', async (request, response) => {
         response.status(200).json({
             results: { "one_way": one_way }
         });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/reservations', async (request, response) => {
+    try {
+
+        if (request.session && request.session.user && request.session.user.id) {
+            const active_reservations = await database.selectActiveReservationsByUserId(request.session.user.id);
+            const previous_reservations = await database.selectPreviousReservationsByUserId(request.session.user.id)
+            response.status(200).json({
+                reservations: { active_reservations, previous_reservations }
+            });
+        } else {
+
+            response.status(220).json({
+                message: request.t("log_in_needed")
+            });
+        }
+
+
     } catch (error) {
         response.status(500).json({
             message: error
@@ -495,8 +519,21 @@ router.get('/getaboutus', (request, response) => {
     }
 });
 
+router.get('/getprofile', (request, response) => {
+    try {
+
+        response.status(200).json({
+            index: request.t("profile", { returnObjects: true })
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
 router.get('/checklogin', (request, response) => {
-    try{
+    try {
         response.status(200).json({
             logged_in: LoggedInCheck(request)
         });
