@@ -140,6 +140,25 @@ router.get('/availablearrivalairportsfiltered', async (request, response) => {
     }
 });
 
+router.get('/flight', async (request, response) => {
+    try {
+        let result;
+        if (request.get("Accept-Language") == "hu") {
+            result = await database.selectAvailableFlightByIdHun(request.query.flight_id);
+        } else {
+            result = await database.selectAvailableFlightByIdEn(request.query.flight_id);
+        }
+
+        response.status(200).json({
+            result: result[0]
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
 router.get('/availabledeparturedatesfiltered', async (request, response) => {
     try {
 
@@ -296,7 +315,7 @@ router.get('/en/flights', async (request, response) => {
             }
 
 
-            data.map(x => x.PriceInHUF = `${Math.round(x.PriceInHUF * current_eur_exch_rate)}`);
+            data.map(x => x.PriceInHUF = Math.round(x.PriceInHUF * current_eur_exch_rate));
 
             response.status(200).json({
                 flights: data
@@ -315,7 +334,7 @@ router.get('/cheapestflights', async (request, response) => {
         let return_;
         if (request.get("Accept-Language") == "hu") {
             if (LoggedInCheck(request)) {
-                
+
                 one_way = await database.selectTop4CheapestOneWayFlightsHun(request.session.user.id);
             } else {
                 one_way = await database.selectTop4CheapestOneWayFlightsHun("NULL");
@@ -337,7 +356,7 @@ router.get('/cheapestflights', async (request, response) => {
                 one_way = await database.selectTop4CheapestOneWayFlightsEn("NULL");
             }
             //return_ = await database.selectCheapestReturnFlightsEn()
-            one_way.map(x => x.PriceInHUF = `${Math.round(x.PriceInHUF * current_eur_exch_rate)}`);
+            one_way.map(x => x.PriceInHUF = Math.round(x.PriceInHUF * current_eur_exch_rate));
             //return_.map(x => x.PriceInHUF = `${Math.round(x.PriceInHUF * current_eur_exch_rate)}`);
 
         }
@@ -495,8 +514,21 @@ router.get('/getaboutus', (request, response) => {
     }
 });
 
+router.get('/getseatchooser', (request, response) => {
+    try {
+
+        response.status(200).json({
+            seat_chooser: request.t("seat_chooser", { returnObjects: true })
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
 router.get('/checklogin', (request, response) => {
-    try{
+    try {
         response.status(200).json({
             logged_in: LoggedInCheck(request)
         });
@@ -650,7 +682,9 @@ function LoggedInCheck(request) {
 router.get('/helyfoglalas', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            throw new Error("Nem vagy bejelentkezve!")
+            response.status(220).json({
+                message: "Nem vagy bejelentkezve!"
+            });
         }
         else {
             let id = request.query.id;
@@ -658,6 +692,18 @@ router.get('/helyfoglalas', async (request, response) => {
                 throw new Error("Nincs járat id")
             }
             const helyek = await database.selectAvailableSeatsOnFlight(id, request.session.user.id);
+
+            if (request.get("Accept-Language") == "en") {
+                let current_eur_exch_rate;
+
+                try {
+                    current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+                } catch {
+                    current_eur_exch_rate = 0.00259;
+                }
+
+                helyek.map(x => x.PriceInHUF = Math.round(x.PriceInHUF * current_eur_exch_rate))
+            }
             response.status(200).json({
                 helyek: helyek
             })
@@ -673,7 +719,9 @@ router.get('/helyfoglalas', async (request, response) => {
 router.post('/helyfoglalas', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            throw new Error("Nem vagy bejelentkezve!")
+            response.status(220).json({
+                message: "Nem vagy bejelentkezve!"
+            });
         }
         else {
             const { flightID, rowID, columnID, isAdult } = request.body;

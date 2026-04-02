@@ -88,3 +88,7 @@ export async function getModal(lang) {
 export async function getMap(lang) {
     return (await (await fetch("/api/getmap", { method: "GET", headers: { "Accept-Language": lang } })).json()).map;
 }
+
+export async function getSeatChooser(lang) {
+    return (await (await fetch("/api/getseatchooser", { method: "GET", headers: { "Accept-Language": lang } })).json()).seat_chooser;
+}

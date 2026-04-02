@@ -70,8 +70,8 @@
             </div>
         </div>
     </nav>
-    <div class="container-fluid my-4">
-        <div class="row">
+    <div id="frame" class="container-fluid my-4">
+        <div id="trips_frame" style="display: none;" class="row">
             <!-- Bal oldal: ülőhelyek -->
             <div class="col-lg-8">
                 <!-- Odaút helyek -->
@@ -88,7 +88,7 @@
                 </div>
                 <div class="text-center mb-4">
                     <div class="repulotest mx-auto">
-                        <h4 class="mb-4">Odaút - Válassz helyet!</h4>
+                        <h4 id="trip_to_title" class="mb-4">Odaút - Válassz helyet!</h4>
                         <div id="helyek"></div>
                     </div>
                 </div>
@@ -96,7 +96,7 @@
                 <!-- Visszaút helyek -->
                 <div id="visszaut_section" style="display:none;" class="text-center mb-4">
                     <div class="repulotest mx-auto">
-                        <h4 class="mb-4">Visszaút - Válassz helyet!</h4>
+                        <h4 id="trip_back_title" class="mb-4">Visszaút - Válassz helyet!</h4>
                         <div id="helyekvissza"></div>
                     </div>
                 </div>
@@ -109,11 +109,11 @@
                     <div class="card shadow-sm mb-3">
                         <div class="card-body">
                             <h5 class="card-title border-bottom pb-2">
-                                Odaút - Kiválasztott helyek
+                                <span id="trip_to_selected_seats_title">Odaút - Kiválasztott helyek</span>
                                 <span class="badge bg-secondary" id="oda_szamlalo">0 / 1</span>
                             </h5>
                             <ul id="kivalasztottak_oda" class="list-group list-group-flush mb-0">
-                                <li class="list-group-item italic">Nincs kiválasztott hely!</li>
+                                <li id="trip_to_no_seats_selected" class="list-group-item italic">Nincs kiválasztott hely!</li>
                             </ul>
                         </div>
                     </div>
@@ -122,11 +122,11 @@
                     <div class="card shadow-sm mb-3" id="visszaut_card" style="display:none;">
                         <div class="card-body">
                             <h5 class="card-title border-bottom pb-2">
-                                Visszaút - Kiválasztott helyek
+                                <span id="trip_back_selected_seats_title">Visszaút - Kiválasztott helyek</span>
                                 <span class="badge bg-secondary" id="vissza_szamlalo">0 / 1</span>
                             </h5>
                             <ul id="kivalasztottak_vissza" class="list-group list-group-flush mb-0">
-                                <li class="list-group-item italic">Nincs kiválasztott hely!</li>
+                                <li id="trip_back_no_seats_selected" class="list-group-item italic">Nincs kiválasztott hely!</li>
                             </ul>
                         </div>
                     </div>
@@ -135,8 +135,8 @@
                     <div class="card shadow-sm booking-summary-card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center fw-bold mb-3">
-                                <p class="mb-0 fs-5">Összesen:</p>
-                                <span class="fs-5 text-danger"><span id="ar">0</span> Ft</span>
+                                <p id="title_sum" class="mb-0 fs-5">Összesen:</p>
+                                <span class="fs-5 text-danger"><span id="ar">0</span><span id="sum_currency"> Ft</span></span>
                             </div>
                             <input type="button" value="Lefoglalás" class="btn btn-danger w-100 btn-lg" id="lefoglal"
                                 disabled>

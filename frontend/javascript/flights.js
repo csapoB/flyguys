@@ -4,7 +4,7 @@ import { getLocale } from "./locale.js";
 import { getFooter } from "./locale.js";
 import { modalInit, login_modal } from "./modal.js";
 import { dateDeFormatter } from "./toolbox.js";
-import { popoverManualTrigger } from "./toolbox.js";
+import { popoverManualTrigger, infoPageGenerator, errorPageGenerator } from "./toolbox.js";
 import { flightsResizer } from "./flightsresizer.js";
 
 $(async function () {
@@ -62,7 +62,7 @@ $(async function () {
 
                     if (flights_to.length == 0) {
 
-                        infoPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: { "Accept-Language": language } })).json()).errors.no_flights_by_parameters);
+                        infoPageGenerator($flights_to, getflights.errors.no_flights_by_parameters);
 
                     } else {
 
@@ -91,7 +91,7 @@ $(async function () {
                                         flightsResizer();
 
                                     } else {
-                                        infoPageGenerator($flights_to, (await (await fetch("/api/geterrors", { method: "GET", headers: { "Accept-Language": language } })).json()).errors.no_flights_by_parameters);
+                                        infoPageGenerator($flights_to, getflights.errors.no_flights_by_parameters);
                                     }
                                     break;
 
@@ -158,7 +158,7 @@ async function flightSelector(flights, $frame, language, i18n_values) {
         trigger: "manual"
     });
     popoverManualTrigger($flights_button, flights_popover);
-    flights_popover.setContent({ ".popover-body": flights_popover_contentGenerator($flights_button, flights_popover, flights, (await getIndex(language)).body.cheapest_flights.per_person) })
+    flights_popover.setContent({ ".popover-body": flights_popover_contentGenerator($flights_button, flights_popover, flights, i18n_values) })
 
     $frame.append($flights_button);
 
@@ -250,7 +250,7 @@ function flights_popover_contentGenerator($input_field, popover_obj, flights_dat
                         <span class="fs-3">${flights_data_from_api[i].ArrivalTime}</span>
                     </div>
                     <div class="d-flex align-items-center justify-content-center col-sm-12 col-md-12 col-lg-12 col-xl-4">
-                        <span class="fs-3">${flights_data_from_api[i].PriceInHUF}${i18n_values}</span>
+                        <span class="fs-3">${flights_data_from_api[i].PriceInHUF}${i18n_values.currency}${i18n_values.per_person}</span>
                     </div>
                     <div class="d-flex align-items-center justify-content-center col-sm-12 col-md-12 col-lg-12 col-xl-2">
                         <span class="fs-3">${flights_data_from_api[i].NumOfAvailableSeats}</span>
@@ -290,38 +290,6 @@ function switchFunc($element) {
     }
 }
 
-function errorPageGenerator($frame, message) {
-
-    let $plane_div = $("<div>", {
-        "class": "col-md-12 col-lg-12",
-        "html": "<img class=\"img-fluid\" src=../css/images/error_page_illustration.png>"
-    });
-    let $error_div = $("<div>", {
-        "class": "alert alert-danger col-md-12 col-lg-12",
-        "html": `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/></svg><span class=\"ps-2\">${message}</span>`,
-        "role": "alert"
-    });
-
-    $frame.append($error_div);
-    $frame.append($plane_div);
-
-
-}
-
-function infoPageGenerator($frame, message) {
-    let $plane_div = $("<div>", {
-        "class": "col-md-12 col-lg-12",
-        "html": "<img class=\"img-fluid\" src=../css/images/error_page_illustration.png>"
-    });
-    let $no_flights_div = $("<div>", {
-        "class": "alert alert-primary col-md-12 col-lg-12",
-        "html": `<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-info-circle-fill\" viewBox=\"0 0 16 16\"> <path d=\"M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2\"/></svg><span class=\"ps-2\">${message}</span>`,
-        "role": "alert"
-    });
-
-    $frame.append($no_flights_div);
-    $frame.append($plane_div);
-}
 
 async function seatBookingButtonGenerator($frame, adults, children, i18n_values, lang) {
 

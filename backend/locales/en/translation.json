@@ -53,11 +53,15 @@
     "flights": {
         "title": "Flights",
         "choose_flight": "Choose a flight!",
-        "choose_seats": "Choose seats!"
+        "choose_seats": "Choose seats!",
+        "currency": "&nbsp€",
+        "per_person": " &nbsp/ person",
+        "errors" : {
+            "no_flights_by_parameters": "Unfortunately, there's no flight by the given parameters."
+        }
     },
     "errors": {
         "bad_http_get_request": "The HTTP-GET request isn't proper!",
-        "no_flights_by_parameters": "Unfortunately, there's no flight by the given parameters.",
         "bad_url_parameter": "ERROR : Some of the URL parameters are wrong.",
         "server_error": "Unfortunately, an error occured in the server. Please, try again later!"
     },
@@ -72,7 +76,10 @@
         "birth_date": "Birth date (dd/mm/yyyy)"
     },
     "map": {
-        "choose_button": "Choose"
+        "choose_button": "Choose",
+        "error" : {
+            "map_not_loaded" : "Due to an unknown error, the map can't be loaded."
+        }
     },
     "about_us": {
         "about_us_section": {
@@ -99,5 +106,22 @@
             "title": "Join Us in the Sky",
             "content": "<p>As we continue to expand our destinations and services, we invite you to fly with us and experience a new standard of travel.<br>FlyGuys — Your journey starts with us.</p>"
         }
+    },
+
+    "seat_chooser" : {
+        "page_title" : "Choose seats!",
+        "currency" : "&nbsp€",
+        "trip_to" : "Trip to",
+        "trip_back" : "Trip back",
+        "seat" : "seat",
+        "sum" : "Sum:",
+        "booking" : "Booking",
+        "selected_seats" : "Selected seats",
+        "no_seats_selected" : "No seats have been selected!",
+        "errors" : {
+            "not_logged_in" : "You have to be logged in to book a flight.",
+            "no_adults" : "When booking, there has to be at least 1 adult."
+        }
+        
     }
 }

@@ -127,18 +127,30 @@ async function selectTop4CheapestOneWayFlightsHun(userId) {
 
 async function selectCheapestReturnFlightsEn() {
     const query = 'SELECT af1.DepartureAirport, af1.DepartureCity, af1.ArrivalAirport, af1.ArrivalCity, DATE(af1.DepartureDateTime) AS "DepartureDate", MIN(af1.BasePriceInHUF) AS "BasePrice" FROM available_flights_en af1, available_flights_en af2 WHERE (af1.DepartureAirport LIKE af2.ArrivalAirport AND af2.DepartureAirport LIKE af1.ArrivalAirport) GROUP BY af1.DepartureAirport, af1.ArrivalAirport;';
-    const [rows] = await pool.execute(query)
+    const [rows] = await pool.execute(query);
 
     return rows;
 }
 
 async function selectCheapestReturnFlightsHun() {
     const query = 'SELECT af1.DepartureAirport, af1.DepartureCity, af1.ArrivalAirport, af1.ArrivalCity, DATE(af1.DepartureDateTime) AS "DepartureDate", MIN(af1.BasePriceInHUF) AS "BasePrice" FROM available_flights_hun af1, available_flights_hun af2 WHERE (af1.DepartureAirport LIKE af2.ArrivalAirport AND af2.DepartureAirport LIKE af1.ArrivalAirport) GROUP BY af1.DepartureAirport, af1.ArrivalAirport;';
-    const [rows] = await pool.execute(query)
+    const [rows] = await pool.execute(query);
 
     return rows;
 }
-    
+
+async function selectAvailableFlightByIdEn(flightId) {
+    const query = 'SELECT available_flights_en.DepartureAirport, available_flights_en.DepartureCity, available_flights_en.ArrivalAirport, available_flights_en.ArrivalCity FROM available_flights_en WHERE available_flights_en.FlightID = ?;';
+    const [rows] = await pool.execute(query, [`${flightId}`]);
+
+    return rows;
+}
+async function selectAvailableFlightByIdHun(flightId) {
+    const query = 'SELECT available_flights_hun.DepartureAirport, available_flights_hun.DepartureCity, available_flights_hun.ArrivalAirport, available_flights_hun.ArrivalCity FROM available_flights_hun WHERE available_flights_hun.FlightID = ?;';
+    const [rows] = await pool.execute(query, [`${flightId}`]);
+
+    return rows;
+}
 async function getUserById(id){
     const query = 'SELECT * FROM useraccount WHERE UserID = ?';
     const [rows] = await pool.execute(query, [id]);
@@ -205,5 +217,7 @@ module.exports = {
     selectTop4CheapestOneWayFlightsEn,
     selectTop4CheapestOneWayFlightsHun,
     selectCheapestReturnFlightsEn,
-    selectCheapestReturnFlightsHun
+    selectCheapestReturnFlightsHun,
+    selectAvailableFlightByIdEn,
+    selectAvailableFlightByIdHun
 };

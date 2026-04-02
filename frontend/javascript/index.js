@@ -6,7 +6,7 @@ import { getPlannerPassengersPopover } from "./locale.js";
 import { plannerInit } from "./planner.js";
 import { login_modal, modalInit } from "./modal.js";
 import { plannerResizer } from "./plannerresizer.js";
-import { dateDeFormatter } from "./toolbox.js";
+import { dateDeFormatter, showLogin } from "./toolbox.js";
 import { indexResizer } from "./indexresizer.js";
 
 
@@ -134,8 +134,7 @@ async function initCheapestFlights(flights, language, i18n_values) {
                         
                     } else {
                         
-                        await login_modal(language);
-                        $("#monadModal").modal("show");
+                        showLogin(language);
                     }
                    
 
