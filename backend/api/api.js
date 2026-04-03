@@ -331,7 +331,6 @@ router.get('/en/flights', async (request, response) => {
 router.get('/cheapestflights', async (request, response) => {
     try {
         let one_way;
-        let return_;
         if (request.get("Accept-Language") == "hu") {
             if (LoggedInCheck(request)) {
 

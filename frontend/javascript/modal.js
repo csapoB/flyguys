@@ -53,8 +53,12 @@ async function handleLogout(event) {
 
     // Navbar frissítése
 
-    alert('Sikeres kijelentkezés!');
-    location.reload();
+    $("#login_button").show();
+    $("#profile_button").hide();
+    $("#logout_button").hide();
+    $("#admin_button").hide();
+
+    // itt lesz majd a toast
 }
 
 function init_child_modal() {
@@ -341,17 +345,26 @@ async function handleLogin(event) {
         }
 
         if (response.ok) {
-            alert('Sikeres bejelentkezés!');
+            
 
             // Navbar frissítése - Bejelentkezés gomb elrejtése, Profilom gomb megjelenítése
 
-            location.reload()
+            if (data.admin) {
+                $("#admin_button").show();
+            }
+            $("#login_button").hide();
+            $("#profile_button").show();
+            $("#logout_button").show();
+
 
             // Modal bezárása
             const modal = bootstrap.Modal.getInstance(document.getElementById('monadModal'));
             if (modal) {
                 modal.hide();
             }
+
+            // itt lesz majd a toast
+
         } else {
             alert('Hiba: ' + (data.message || 'Bejelentkezés sikertelen'));
         }
@@ -374,7 +387,7 @@ async function handleRegister(event) {
     let birthDate = null;
 
     if (birthDateInput) {
-        
+
         birthDate = dateFormatter(birthDateInput, ((birthDateInput[2] == "/") ? "en" : "hu"))
     }
 
@@ -409,8 +422,6 @@ async function handleRegister(event) {
 
         else {
 
-            alert('Sikeres regisztráció!');
-
             // Modal bezárása
             const childModal = bootstrap.Modal.getInstance(document.getElementById('childModal'));
             const parentModal = bootstrap.Modal.getInstance(document.getElementById('monadModal'));
@@ -422,8 +433,10 @@ async function handleRegister(event) {
                 parentModal.hide();
             }
 
+            // itt lesz majd a toast
+
             // Oldal frissítése vagy átirányítás
-            location.reload();
+            //location.reload();
         }
     } catch (error) {
         console.error('Regisztráció hiba:', error);
