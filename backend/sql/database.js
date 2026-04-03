@@ -56,7 +56,7 @@ async function selectAvailableReturnDates(departureAirport, arrivalAirport, dest
 }
 
 async function selectAvailableArrivalDatesFiltered(departureAirport, arrivalAirport, departureDate) {
-    const query = 'SELECT DISTINCT DATE(ArrivalDateTime) AS "ArrivalDate" FROM available_flights_hun WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DATE(DepartureDateTime) LIKE ?;';
+    const query = 'SELECT DISTINCT DATE(ArrivalDateTime) AS "ArrivalDate" FROM active_flights_hun WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DATE(DepartureDateTime) LIKE ?;';
     const [rows] = await pool.execute(query, [`%${departureAirport}%`, `%${arrivalAirport}%`, `%${departureDate}%`]);
     
     return rows;
@@ -78,14 +78,14 @@ async function selectSwappableFlights(departureAirport, arrivalAirport) {
 }
 
 async function selectAvailableFlightsFilteredHun(departureAirport, arrivalAirport, departureDate, numOfPassengers, userId) {
-    const query = 'SELECT num_of_available_seats_on_available_flights_hun.FlightID, num_of_available_seats_on_available_flights_hun.DepartureAirport, num_of_available_seats_on_available_flights_hun.DepartureCity, num_of_available_seats_on_available_flights_hun.ArrivalCity, num_of_available_seats_on_available_flights_hun.ArrivalAirport, num_of_available_seats_on_available_flights_hun.DepartureDate, num_of_available_seats_on_available_flights_hun.ArrivalDate, num_of_available_seats_on_available_flights_hun.DepartureTime, num_of_available_seats_on_available_flights_hun.ArrivalTime, num_of_available_seats_on_available_flights_hun.FlightTime, num_of_available_seats_on_available_flights_hun.AircraftModelID, num_of_available_seats_on_available_flights_hun.NumOfAvailableSeats, ROUND(num_of_available_seats_on_available_flights_hun.BasePriceInHUF*(CASE WHEN ? LIKE "NULL" THEN 1 ELSE ((100-(SELECT loyaltystatus.DiscountInPercentage FROM useraccount INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserID = ?))/100) END)) AS "PriceInHUF" FROM num_of_available_seats_on_available_flights_hun WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate LIKE ? AND NumOfAvailableSeats >= ?;;';
+    const query = 'SELECT num_of_available_seats_on_active_flights_hun.FlightID, num_of_available_seats_on_active_flights_hun.DepartureAirport, num_of_available_seats_on_active_flights_hun.DepartureCity, num_of_available_seats_on_active_flights_hun.ArrivalCity, num_of_available_seats_on_active_flights_hun.ArrivalAirport, num_of_available_seats_on_active_flights_hun.DepartureDate, num_of_available_seats_on_active_flights_hun.ArrivalDate, num_of_available_seats_on_active_flights_hun.DepartureTime, num_of_available_seats_on_active_flights_hun.ArrivalTime, num_of_available_seats_on_active_flights_hun.FlightTime, num_of_available_seats_on_active_flights_hun.AircraftModelID, num_of_available_seats_on_active_flights_hun.NumOfAvailableSeats, ROUND(num_of_available_seats_on_active_flights_hun.BasePriceInHUF*(CASE WHEN ? LIKE "NULL" THEN 1 ELSE ((100-(SELECT loyaltystatus.DiscountInPercentage FROM useraccount INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserID = ?))/100) END)) AS "PriceInHUF" FROM num_of_available_seats_on_active_flights_hun WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate LIKE ? AND NumOfAvailableSeats >= ?;;';
     const [rows] = await pool.execute(query, [`${userId}`, `${userId}`, `${departureAirport}`, `${arrivalAirport}`, `${departureDate}`, `${numOfPassengers}`]);
     
     return rows;
 }
 
 async function selectAvailableFlightsFilteredEn(departureAirport, arrivalAirport, departureDate, numOfPassengers, userId) {
-    const query = 'SELECT num_of_available_seats_on_available_flights_en.FlightID, num_of_available_seats_on_available_flights_en.DepartureAirport, num_of_available_seats_on_available_flights_en.DepartureCity, num_of_available_seats_on_available_flights_en.ArrivalCity, num_of_available_seats_on_available_flights_en.ArrivalAirport, num_of_available_seats_on_available_flights_en.DepartureDate, num_of_available_seats_on_available_flights_en.ArrivalDate, num_of_available_seats_on_available_flights_en.DepartureTime, num_of_available_seats_on_available_flights_en.ArrivalTime, num_of_available_seats_on_available_flights_en.FlightTime, num_of_available_seats_on_available_flights_en.AircraftModelID, num_of_available_seats_on_available_flights_en.NumOfAvailableSeats, ROUND(num_of_available_seats_on_available_flights_en.BasePriceInHUF*(CASE WHEN ? LIKE "NULL" THEN 1 ELSE ((100-(SELECT loyaltystatus.DiscountInPercentage FROM useraccount INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserID = ?))/100) END)) AS "PriceInHUF" FROM num_of_available_seats_on_available_flights_en WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate LIKE ? AND NumOfAvailableSeats >= ?;;';
+    const query = 'SELECT num_of_available_seats_on_active_flights_en.FlightID, num_of_available_seats_on_active_flights_en.DepartureAirport, num_of_available_seats_on_active_flights_en.DepartureCity, num_of_available_seats_on_active_flights_en.ArrivalCity, num_of_available_seats_on_active_flights_en.ArrivalAirport, num_of_available_seats_on_active_flights_en.DepartureDate, num_of_available_seats_on_active_flights_en.ArrivalDate, num_of_available_seats_on_active_flights_en.DepartureTime, num_of_available_seats_on_active_flights_en.ArrivalTime, num_of_available_seats_on_active_flights_en.FlightTime, num_of_available_seats_on_active_flights_en.AircraftModelID, num_of_available_seats_on_active_flights_en.NumOfAvailableSeats, ROUND(num_of_available_seats_on_active_flights_en.BasePriceInHUF*(CASE WHEN ? LIKE "NULL" THEN 1 ELSE ((100-(SELECT loyaltystatus.DiscountInPercentage FROM useraccount INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserID = ?))/100) END)) AS "PriceInHUF" FROM num_of_available_seats_on_active_flights_en WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate LIKE ? AND NumOfAvailableSeats >= ?;;';
     const [rows] = await pool.execute(query, [`${userId}`, `${userId}`,`${departureAirport}`, `${arrivalAirport}`, `${departureDate}`, `${numOfPassengers}`]);
     
     return rows;
@@ -98,47 +98,46 @@ async function selectAvailableSeatsOnFlight(flightId, userId) {
 }
 
 async function selectAvailableAirportsEn() {
-    const query = 'SELECT DISTINCT available_flights_en.DepartureAirport, available_flights_en.DepartureCity AS "CityName", city.GeographicCoordinates FROM available_flights_en INNER JOIN airport ON available_flights_en.DepartureAirport = airport.AirportCode INNER JOIN city ON airport.CityID = city.CityID;';
+    const query = 'SELECT DISTINCT active_flights_en.DepartureAirport, active_flights_en.DepartureCity AS "CityName", city.GeographicCoordinates FROM active_flights_en INNER JOIN airport ON active_flights_en.DepartureAirport = airport.AirportCode INNER JOIN city ON airport.CityID = city.CityID;';
     const [rows] = await pool.execute(query);
 
     return rows;
 }
 
 async function selectAvailableAirportsHun() {
-    const query = 'SELECT DISTINCT available_flights_hun.DepartureAirport, available_flights_hun.DepartureCity AS "CityName", city.GeographicCoordinates FROM available_flights_hun INNER JOIN airport ON available_flights_hun.DepartureAirport = airport.AirportCode INNER JOIN city ON airport.CityID = city.CityID;';
+    const query = 'SELECT DISTINCT active_flights_hun.DepartureAirport, active_flights_hun.DepartureCity AS "CityName", city.GeographicCoordinates FROM active_flights_hun INNER JOIN airport ON active_flights_hun.DepartureAirport = airport.AirportCode INNER JOIN city ON airport.CityID = city.CityID;';
     const [rows] = await pool.execute(query);
 
     return rows;
 }
 
 async function selectTop4CheapestOneWayFlightsEn(userId) {
-    const query = 'SELECT num_of_available_seats_on_available_flights_en.FlightID, num_of_available_seats_on_available_flights_en.DepartureAirport, num_of_available_seats_on_available_flights_en.DepartureCity, num_of_available_seats_on_available_flights_en.ArrivalAirport, num_of_available_seats_on_available_flights_en.ArrivalCity, num_of_available_seats_on_available_flights_en.DepartureDate, num_of_available_seats_on_available_flights_en.DepartureTime, num_of_available_seats_on_available_flights_en.ArrivalTime, num_of_available_seats_on_available_flights_en.FlightTime, MIN(ROUND(num_of_available_seats_on_available_flights_en.BasePriceInHUF*(CASE WHEN ? LIKE "NULL" THEN 1 ELSE ((100-(SELECT loyaltystatus.DiscountInPercentage FROM useraccount INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserID = ?))/100) END))) AS "PriceInHUF", num_of_available_seats_on_available_flights_en.NumOfAvailableSeats FROM num_of_available_seats_on_available_flights_en GROUP BY num_of_available_seats_on_available_flights_en.ArrivalAirport ORDER BY MIN(num_of_available_seats_on_available_flights_en.BasePriceInHUF) ASC LIMIT 4;';
+    const query = 'SELECT num_of_available_seats_on_active_flights_en.FlightID, num_of_available_seats_on_active_flights_en.DepartureAirport, num_of_available_seats_on_active_flights_en.DepartureCity, num_of_available_seats_on_active_flights_en.ArrivalAirport, num_of_available_seats_on_active_flights_en.ArrivalCity, num_of_available_seats_on_active_flights_en.DepartureDate, num_of_available_seats_on_active_flights_en.DepartureTime, num_of_available_seats_on_active_flights_en.ArrivalTime, num_of_available_seats_on_active_flights_en.FlightTime, MIN(ROUND(num_of_available_seats_on_active_flights_en.BasePriceInHUF*(CASE WHEN ? LIKE "NULL" THEN 1 ELSE ((100-(SELECT loyaltystatus.DiscountInPercentage FROM useraccount INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserID = ?))/100) END))) AS "PriceInHUF", num_of_available_seats_on_active_flights_en.NumOfAvailableSeats FROM num_of_available_seats_on_active_flights_en WHERE NumOfAvailableSeats > 0 GROUP BY num_of_available_seats_on_active_flights_en.ArrivalAirport ORDER BY MIN(num_of_available_seats_on_active_flights_en.BasePriceInHUF) ASC LIMIT 4;';
     const [rows] = await pool.execute(query, [`${userId}`, `${userId}`]);
 
     return rows;
 }
 
 async function selectTop4CheapestOneWayFlightsHun(userId) {
-    const query = 'SELECT num_of_available_seats_on_available_flights_hun.FlightID, num_of_available_seats_on_available_flights_hun.DepartureAirport, num_of_available_seats_on_available_flights_hun.DepartureCity, num_of_available_seats_on_available_flights_hun.ArrivalAirport, num_of_available_seats_on_available_flights_hun.ArrivalCity, num_of_available_seats_on_available_flights_hun.DepartureDate, num_of_available_seats_on_available_flights_hun.DepartureTime, num_of_available_seats_on_available_flights_hun.ArrivalTime, num_of_available_seats_on_available_flights_hun.FlightTime, MIN(ROUND(num_of_available_seats_on_available_flights_hun.BasePriceInHUF*(CASE WHEN ? LIKE "NULL" THEN 1 ELSE ((100-(SELECT loyaltystatus.DiscountInPercentage FROM useraccount INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserID = ?))/100) END))) AS "PriceInHUF", num_of_available_seats_on_available_flights_hun.NumOfAvailableSeats FROM num_of_available_seats_on_available_flights_hun GROUP BY num_of_available_seats_on_available_flights_hun.ArrivalAirport ORDER BY MIN(num_of_available_seats_on_available_flights_hun.BasePriceInHUF) ASC LIMIT 4;';
+    const query = 'SELECT num_of_available_seats_on_active_flights_hun.FlightID, num_of_available_seats_on_active_flights_hun.DepartureAirport, num_of_available_seats_on_active_flights_hun.DepartureCity, num_of_available_seats_on_active_flights_hun.ArrivalAirport, num_of_available_seats_on_active_flights_hun.ArrivalCity, num_of_available_seats_on_active_flights_hun.DepartureDate, num_of_available_seats_on_active_flights_hun.DepartureTime, num_of_available_seats_on_active_flights_hun.ArrivalTime, num_of_available_seats_on_active_flights_hun.FlightTime, MIN(ROUND(num_of_available_seats_on_active_flights_hun.BasePriceInHUF*(CASE WHEN ? LIKE "NULL" THEN 1 ELSE ((100-(SELECT loyaltystatus.DiscountInPercentage FROM useraccount INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserID = ?))/100) END))) AS "PriceInHUF", num_of_available_seats_on_active_flights_hun.NumOfAvailableSeats FROM num_of_available_seats_on_active_flights_hun WHERE NumOfAvailableSeats > 0 GROUP BY num_of_available_seats_on_active_flights_hun.ArrivalAirport ORDER BY MIN(num_of_available_seats_on_active_flights_hun.BasePriceInHUF) ASC LIMIT 4;';
     const [rows] = await pool.execute(query, [`${userId}`, `${userId}`]);
 
     return rows;
 }
 
-async function selectCheapestReturnFlightsEn() {
-    const query = 'SELECT af1.DepartureAirport, af1.DepartureCity, af1.ArrivalAirport, af1.ArrivalCity, DATE(af1.DepartureDateTime) AS "DepartureDate", MIN(af1.BasePriceInHUF) AS "BasePrice" FROM available_flights_en af1, available_flights_en af2 WHERE (af1.DepartureAirport LIKE af2.ArrivalAirport AND af2.DepartureAirport LIKE af1.ArrivalAirport) GROUP BY af1.DepartureAirport, af1.ArrivalAirport;';
-    const [rows] = await pool.execute(query)
+
+async function selectAvailableFlightByIdEn(flightId) {
+    const query = 'SELECT active_flights_en.DepartureAirport, active_flights_en.DepartureCity, active_flights_en.ArrivalAirport, active_flights_en.ArrivalCity FROM active_flights_en WHERE active_flights_en.FlightID = ?;';
+    const [rows] = await pool.execute(query, [`${flightId}`]);
 
     return rows;
 }
-
-async function selectCheapestReturnFlightsHun() {
-    const query = 'SELECT af1.DepartureAirport, af1.DepartureCity, af1.ArrivalAirport, af1.ArrivalCity, DATE(af1.DepartureDateTime) AS "DepartureDate", MIN(af1.BasePriceInHUF) AS "BasePrice" FROM available_flights_hun af1, available_flights_hun af2 WHERE (af1.DepartureAirport LIKE af2.ArrivalAirport AND af2.DepartureAirport LIKE af1.ArrivalAirport) GROUP BY af1.DepartureAirport, af1.ArrivalAirport;';
-    const [rows] = await pool.execute(query)
+async function selectAvailableFlightByIdHun(flightId) {
+    const query = 'SELECT active_flights_hun.DepartureAirport, active_flights_hun.DepartureCity, active_flights_hun.ArrivalAirport, active_flights_hun.ArrivalCity FROM active_flights_hun WHERE active_flights_hun.FlightID = ?;';
+    const [rows] = await pool.execute(query, [`${flightId}`]);
 
     return rows;
 }
-    
 async function getUserById(id){
     const query = 'SELECT * FROM useraccount WHERE UserID = ?';
     const [rows] = await pool.execute(query, [id]);

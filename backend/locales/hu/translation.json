@@ -53,11 +53,15 @@
     "flights": {
         "title": "Járatok",
         "choose_flight": "Válasszon járatot",
-        "choose_seats": "Válasszon ülőhelyet!"
+        "choose_seats": "Válasszon ülőhelyet!",
+        "currency": "&nbspFt",
+        "per_person": " &nbsp/ fő",
+        "errors" : {
+            "no_flights_by_parameters": "Sajnos, nincs a feltételeknek megfelelő járat."
+        }
     },
     "errors": {
         "bad_http_get_request": "A HTTP-GET lekérdezés nem megfelelő!",
-        "no_flights_by_parameters": "Sajnos, nincs a feltételeknek megfelelő járat.",
         "bad_url_parameter": "HIBA : Az URL paraméterek közül valamelyik hibás.",
         "server_error": "Sajnos, hiba történt a szerverben. Kérjük, próbálja meg újra később!"
     },
@@ -72,7 +76,10 @@
         "birth_date": "Születési dátum (éééé.hh.nn.)"
     },
     "map": {
-        "choose_button": "Kiválaszt"
+        "choose_button": "Kiválaszt",
+        "error" : {
+            "map_not_loaded" : "Ismeretlen hiba miatt a térkép nem tudott betöltődni."
+        }
     },
     "about_us": {
         "about_us_section": {
@@ -98,6 +105,21 @@
         "join_us_section": {
             "title": "Csatlakozzon hozzánk az égben",
             "content": "<p>Ahogy tovább bővítjük úti céljainkat és szolgáltatásainkat, örömmel várjuk, hogy velünk repüljön, és megtapasztalja az utazás új szintjét.<br>FlyGuys — Your journey starts with us.</p>"
+        }
+    },
+    "seat_chooser": {
+        "page_title": "Válassz helyet!",
+        "currency": "&nbspFt",
+        "trip_to" : "Odaút",
+        "trip_back" : "Visszaút",
+        "seat" : "ülés",
+        "sum" : "Összesen:",
+        "booking" : "Lefoglalás",
+        "selected_seats" : "Kiválasztott helyek",
+        "no_seats_selected" : "Nincs kiválasztott hely!",
+        "errors" : {
+            "not_logged_in" : "A foglaláshoz be kell jelentkeznie.",
+            "no_adults" : "A foglalásnál legalább 1 felnőtt utasnak lennie kell."
         }
     },
     "profile": {

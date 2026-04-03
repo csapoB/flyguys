@@ -89,6 +89,9 @@ export async function getMap(lang) {
     return (await (await fetch("/api/getmap", { method: "GET", headers: { "Accept-Language": lang } })).json()).map;
 }
 
+export async function getSeatChooser(lang) {
+    return (await (await fetch("/api/getseatchooser", { method: "GET", headers: { "Accept-Language": lang } })).json()).seat_chooser;
+}
 export async function getProfile(lang) {
     return (await (await fetch("/api/getprofile", { method: "GET", headers: { "Accept-Language": lang } })).json()).profile;
 }
