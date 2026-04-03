@@ -1,4 +1,4 @@
-import { getNavbar, getProfile } from "./locale.js";
+import { getNavbar, getProfile, getLocale } from "./locale.js";
 import { modalInit } from "./modal.js";
 $(async function () {
 
@@ -23,7 +23,7 @@ $(async function () {
     await modalInit(language);
 
     try {
-        const response = await fetch('api/LoginCheck', {
+        const response = await fetch('/api/LoginCheck', {
             method: 'GET',
         });
 
@@ -42,10 +42,11 @@ $(async function () {
     let {active_reservations, previous_reservations} = (await (await fetch("/api/cheapestflights", { method: "GET", headers: { "Accept-Language": language } })).json()).reservations;
 
 
-    // használd eképpen let $active_reservations_table =  initTableActiveReservations(active_reservations, getprofile)
-    // használd eképpen let $previous_reservations_table =  initTablePreviousReservations(previous_reservations, getprofile)
+    let $active_reservations_table =  initTableActiveReservations(active_reservations, getprofile)
+    let $previous_reservations_table =  initTablePreviousReservations(previous_reservations, getprofile)
 
-
+    $('#aktivFoglalasok').append($active_reservations_table);
+    $('#korabbiFoglalasok').append($previous_reservations_table);
 });
 
 // vissza ad egy tábla jquery objektumot 
@@ -74,7 +75,7 @@ function initTableActiveReservations(active_reservations, i18n_values) {
 function initTablePreviousReservations(previous_reservations, i18n_values) {
 
     let $table = $("<table>", {
-        "id": "active_reservations"
+        "id": "previous_reservations"
     });
     let $thead = $("<thead>");
     $thead.append(`<tr><th>${i18n_values.flights_tabel.row_column}</th><th>${i18n_values.flights_tabel.column_column}</th><th>${i18n_values.flights_tabel.fare_class_column}</th></tr>`)
@@ -96,5 +97,4 @@ function initTablePreviousReservations(previous_reservations, i18n_values) {
 aktív foglásaim
 korábbi foglásaim
 
-rolunk cim id => class
 */
