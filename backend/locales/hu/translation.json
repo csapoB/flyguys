@@ -121,5 +121,13 @@
             "not_logged_in" : "A foglaláshoz be kell jelentkeznie.",
             "no_adults" : "A foglalásnál legalább 1 felnőtt utasnak lennie kell."
         }
-    }
+    },
+    "profile": {
+        "flights_tabel": {
+            "row_column": "Sor",
+            "column_column": "Oszlop",
+            "fare_class_column": "Osztály"
+        }
+    },
+    "log_in_needed" : "Hozzáférés megtagadva. Az adatok megtekintéséhez előbb be kell jelenetkeznie!"
 }

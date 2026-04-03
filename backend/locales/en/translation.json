@@ -123,5 +123,13 @@
             "no_adults" : "When booking, there has to be at least 1 adult."
         }
         
-    }
+    },
+    "profile" : {
+        "flights_tabel"  : {
+            "row_column" : "Row",
+            "column_column" : "Column",
+            "fare_class_column" : "Fare class" 
+        }
+    },
+    "log_in_needed" : "Access denied. You need to log in to access data!"
 }

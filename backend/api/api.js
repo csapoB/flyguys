@@ -370,6 +370,30 @@ router.get('/cheapestflights', async (request, response) => {
     }
 });
 
+router.get('/reservations', async (request, response) => {
+    try {
+
+        if (request.session && request.session.user && request.session.user.id) {
+            const active_reservations = await database.selectActiveReservationsByUserId(request.session.user.id);
+            const previous_reservations = await database.selectPreviousReservationsByUserId(request.session.user.id)
+            response.status(200).json({
+                reservations: { active_reservations, previous_reservations }
+            });
+        } else {
+
+            response.status(220).json({
+                message: request.t("log_in_needed")
+            });
+        }
+
+
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
 router.get('/geterrors', (request, response) => {
     try {
 
@@ -518,6 +542,19 @@ router.get('/getseatchooser', (request, response) => {
 
         response.status(200).json({
             seat_chooser: request.t("seat_chooser", { returnObjects: true })
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
+router.get('/getprofile', (request, response) => {
+    try {
+
+        response.status(200).json({
+            profile: request.t("profile", { returnObjects: true })
         });
     } catch (error) {
         response.status(500).json({
