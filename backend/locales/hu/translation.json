@@ -1,7 +1,7 @@
 {
     "locale": "hu",
     "index": {
-        "title": "Flyguys",
+        "title": "FlyGuys",
         "body": {
             "cheapest_flights": {
                 "title": "Legolcsóbb járatok",
@@ -29,10 +29,10 @@
         "loyalty_program": "Hűségprogram",
         "language_code": "hu",
         "language": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 480\" height=\"24\" width=\"32\"><defs><clipPath><path d=\"M-85 0h682v512H-85z\"></path></clipPath></defs><g clip-path=\"url(#a)\" transform=\"translate(80) scale(.94)\"><path fill=\"#012169\" d=\"M-256 0H768v512H-256z\"></path><path fill=\"#fff\" d=\"M-256 0v57l910 455h114v-57L-141 0h-115zM768 0v57l-909 455h-115v-57L654 0h114z\"></path><path fill=\"#fff\" d=\"M171 0v512h170V0H171zm-427 171v170H768V171H-256z\"></path><path fill=\"#c8102e\" d=\"M-256 205v102H768V205H-256zM205 0v512h102V0H205zm-461 512L85 341h77l-342 171h-76zm0-512L85 171H9L-256 38V0zm606 171L692 0h76L427 171h-77zm418 341L427 341h76l265 133v38z\"></path></g></svg>",
-        "log_in": "Bejelentkezés",
+        "login": "Bejelentkezés",
         "admin": "Admin",
         "my_profile": "Profilom",
-        "log_out": "Kijelentkezés"
+        "logout": "Kijelentkezés"
     },
     "planner": {
         "origin_label": "Indulási hely",
@@ -67,14 +67,26 @@
         "server_error": "Sajnos, hiba történt a szerverben. Kérjük, próbálja meg újra később!"
     },
     "modal": {
-        "log_in": "Bejelentkezés",
+        "login": "Bejelentkezés",
         "registration": "Regisztráció",
         "email": "E-mail",
         "password": "Jelszó",
         "no_account": "Nincs még fiókod? Hozz létre egyet!",
         "first_name": "Keresztnév",
         "last_name": "Vezetéknév",
-        "birth_date": "Születési dátum (éééé.hh.nn.)"
+        "birth_date": "Születési dátum (éééé.hh.nn.)",
+        "login_successful": "Sikeres bejelentkezés!",
+        "logout_successful": "Sikeres kijelentkezés!",
+        "login_unsuccessful": "Sikertelen bejelentkezés!",
+        "logout_unsuccessful": "Sikertelen kijelentkezés!",
+        "missing_email_and_password_fields": "Kérjük, töltse ki az email és jelszó mezőket!",
+        "server_error_during_login": "A bejelentkezéskor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
+        "registration_successful": "Sikeres regisztráció!",
+        "registration_unsuccessful": "Sikertelen regisztráció!",
+        "missing_fields": "Kérjük, töltse ki az összes kötelező mezőt!",
+        "password_char_limit": "A jelszó legalább 6 karakter hosszú kell legyen!",
+        "server_error_during_registration": "A regisztrációkor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
+        "server_error_during_logout": "A kijelentkezéskor szerverhiba lépett fel. Kérjük próbálkozzon újra később!"
     },
     "map": {
         "title": "Tervezés",
@@ -132,37 +144,47 @@
             "fare_class_column": "Osztály"
         }
     },
-    "log_in_needed": "Hozzáférés megtagadva. Az adatok megtekintéséhez előbb be kell jelenetkeznie!",
+    "login_needed": "Hozzáférés megtagadva. Az adatok megtekintéséhez előbb be kell jelenetkeznie!",
+    "missing_data": "Hiányzó adat!",
+    "wrong_email_or_password": "Rossz email vagy jelszó",
+    "login_successful": "Sikeres bejelentkezés!",
+    "missing_data_by_user": "A felhasználó nem adta meg valamelyik adatot!",
+    "end_point_not_working": "Ez a végpont nem működik!",
+    "registration_successful": "Sikeres regisztráció!",
+    "registration_unsuccessful": "Sikertelen regisztráció!",
+    "logout_unsuccessful": "Sikertelen kijelentkezés!",
+    "logout_successful": "Sikeres kijelentkezés!",
+    "no_active_session": "Nincs aktív session!",
     "loyalty_program": {
         "title": "Hűségprogram",
-        "num_of_my_flights" : "Repüléseim száma",
-        "no_rank" : "Nincs rang",
-        "max_rank_reached" : "Max rang elérve",
-        "num_of_travels_to_reach_next_level" : "utazás a következő szintig",
-        "bronze" : {
-            "title" : "Bronze",
-            "range" : "Repüléseid száma: 0-5",
-            "discount" : "Kedvezményekért repüljön még velünk!"
+        "num_of_my_flights": "Repüléseim száma",
+        "no_rank": "Nincs rang",
+        "max_rank_reached": "Max rang elérve",
+        "num_of_travels_to_reach_next_level": "utazás a következő szintig",
+        "bronze": {
+            "title": "Bronze",
+            "range": "Repüléseid száma: 0-5",
+            "discount": "Kedvezményekért repüljön még velünk!"
         },
-        "silver" : {
-            "title" : "Silver",
-            "range" : "Repüléseid száma: 6-15",
-            "discount" : "Foglalásoknál 1%-os kedvezmény"
+        "silver": {
+            "title": "Silver",
+            "range": "Repüléseid száma: 6-15",
+            "discount": "Foglalásoknál 1%-os kedvezmény"
         },
-        "gold" : {
-            "title" : "Gold",
-            "range" : "Repüléseid száma: 16-25",
-            "discount" : "Foglalásoknál 5%-os kedvezmény"
+        "gold": {
+            "title": "Gold",
+            "range": "Repüléseid száma: 16-25",
+            "discount": "Foglalásoknál 5%-os kedvezmény"
         },
-        "platinum" : {
-            "title" : "Platinum",
-            "range" : "Repüléseid száma: 26-35",
-            "discount" : "Foglalásoknál 7%-os kedvezmény"
+        "platinum": {
+            "title": "Platinum",
+            "range": "Repüléseid száma: 26-35",
+            "discount": "Foglalásoknál 7%-os kedvezmény"
         },
-        "Diamond" : {
-            "title" : "Diamond",
-            "range" : "Repüléseid száma: 36+",
-            "discount" : "Foglalásoknál 10%-os kedvezmény"
+        "Diamond": {
+            "title": "Diamond",
+            "range": "Repüléseid száma: 36+",
+            "discount": "Foglalásoknál 10%-os kedvezmény"
         }
     }
 }

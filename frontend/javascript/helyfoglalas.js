@@ -35,7 +35,7 @@ $(document).ready(async function () {
         try {
             let $helyek = $('#helyek');
 
-            $("#trip_to_title").text(`${getseatchooser.trip_to} - ${getseatchooser.page_title}`);
+            $("#trip_to_title").text(`${getseatchooser.trip_to} - ${getseatchooser.title}`);
             $("#trip_to_selected_seats_title").text(`${getseatchooser.trip_to} - ${getseatchooser.selected_seats}`);
             $("#trip_to_no_seats_selected").text(getseatchooser.no_seats_selected);
 
@@ -48,7 +48,7 @@ $(document).ready(async function () {
                 let visszaAdatok = await getHelyek(flight_id_back, language);
                 if (visszaAdatok && visszaAdatok.length > 0) {
                     let $helyekvissza = $('#helyekvissza');
-                    $("#trip_back_title").text(`${getseatchooser.trip_back} - ${getseatchooser.page_title}`);
+                    $("#trip_back_title").text(`${getseatchooser.trip_back} - ${getseatchooser.title}`);
                     $("#trip_back_selected_seats_title").text(`${getseatchooser.trip_back} - ${getseatchooser.selected_seats}`);
                     $("#trip_back_no_seats_selected").text(getseatchooser.no_seats_selected);
                     ulesek_general($helyekvissza, visszaAdatok, 'vissza', getseatchooser);

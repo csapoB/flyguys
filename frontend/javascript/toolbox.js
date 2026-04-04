@@ -124,25 +124,34 @@ export async function showLogin(language) {
 
 export async function initI18n(end_point) {
 
-        let getlocale = await getLocale();
-    
-        let language;
-    
-        let old_url = window.location.href.split("/")
-        if (old_url[3].includes(end_point)) {
-            old_url.splice(3, 0, getlocale);
-            let new_url = old_url.join("/")
-            history.pushState({}, "", new_url);
-            language = getlocale;
-    
-        } else {
-            language = old_url[3];
-        }
-    
-        $("html").prop("lang", language);
-    
-        await getNavbar(language, old_url);
-        await modalInit(language);
+    let getlocale = await getLocale();
 
-        return language;
+    let language;
+
+    let old_url = window.location.href.split("/")
+    if (old_url[3].includes(end_point)) {
+        old_url.splice(3, 0, getlocale);
+        let new_url = old_url.join("/")
+        history.pushState({}, "", new_url);
+        language = getlocale;
+
+    } else {
+        language = old_url[3];
+    }
+
+    $("html").prop("lang", language);
+
+    await getNavbar(language, old_url);
+    await modalInit(language, end_point);
+
+    return language;
+}
+
+export function generateToast(message, color) {
+    let $toast_container = $($(".toast-container")[0]);
+
+    $toast_container.html("");
+    $toast_container.append(`<div id="custom_toast" class="toast align-items-center border border-${color}" role="alert" aria-live="assertive" aria-atomic="true"><div class="toast-header border-bottom border-${color}"><strong class="me-auto">FlyGuys</strong><button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button></div><div class="toast-body text-${color}"><h5>${message}</h5></div></div>`);
+
+    (bootstrap.Toast.getOrCreateInstance(document.getElementById("custom_toast"))).show();
 }

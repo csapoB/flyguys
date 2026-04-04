@@ -382,7 +382,7 @@ router.get('/reservations', async (request, response) => {
         } else {
 
             response.status(220).json({
-                message: request.t("log_in_needed")
+                message: request.t("login_needed")
             });
         }
 
@@ -576,6 +576,19 @@ router.get('/getloyaltyprogram', (request, response) => {
     }
 });
 
+router.get('/getcommonmessages', (request, response) => {
+    try {
+
+        response.status(200).json({
+            common_messages: request.t("common_messages", { returnObjects: true })
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
 router.get('/checklogin', (request, response) => {
     try {
         response.status(200).json({
@@ -595,7 +608,7 @@ router.post('/login', async (request, response) => {
             const login = await database.Login(email);
             if (!login) {
                 return response.status(400).json({
-                    message: 'Rossz email vagy jelszó'
+                    message: request.t("wrong_email_or_password")
                 });
             }
             else {
@@ -608,30 +621,30 @@ router.post('/login', async (request, response) => {
                     console.log(request.session.user)
                     if (request.session.user.role === 1) {
                         response.status(201).json({
-                            message: 'Sikeres bejelentkezés',
+                            message: request.t("login_successful"),
                             admin: true
                         });
                     }
                     response.status(201).json({
-                        message: 'Sikeres bejelentkezés',
+                        message: request.t("login_successful"),
                         admin: false
                     });
                 }
                 else {
                     response.status(400).json({
-                        message: 'Rossz email vagy jelszó'
+                        message:  request.t("wrong_email_or_password")
                     });
                 }
             }
         }
         else {
             response.status(400).json({
-                message: 'A felhasználó nem adta meg valamelyik adatot'
+                message: request.t("missing_data_by_user")
             });
         }
     } catch (error) {
         response.status(500).json({
-            message: 'Ez a végpont nem működik.'
+            message: request.t("end_point_not_working")
         });
     }
 });
@@ -641,7 +654,7 @@ router.post('/register', async (request, response) => {
         const { nev, email, jelszo, szuldatum } = request.body
         if (!nev || !email || !jelszo || !szuldatum) {
             return response.status(400).json({
-                message: 'A felhasználó nem adta meg valamelyik adatot'
+                message: request.t("missing_data_by_user")
             });
         }
         else {
@@ -650,18 +663,18 @@ router.post('/register', async (request, response) => {
             const register = await database.Register(nev, email, hashedPassword, szuldatum);
             if (!register) {
                 return response.status(400).json({
-                    message: 'Sikertelen regisztráció'
+                    message: request.t("registration_unsuccessful")
                 });
             }
             else {
                 response.status(200).json({
-                    message: 'Sikeres Regisztráció',
+                    message: request.t("registration_successful"),
                 });
             }
         }
     } catch (error) {
         response.status(500).json({
-            message: 'Ez a végpont nem működik.'
+            message: request.t("end_point_not_working")
         });
     }
 });
@@ -671,22 +684,22 @@ router.post('/logout', async (request, response) => {
     try {
         if (!request.session) {
             return response.status(200).json({
-                message: 'Nincs aktív session'
+                message: request.t("no_active_session")
             });
         }
         request.session.destroy(err => {
             if (err) {
-                console.error('Session destroy hiba:', err);
-                return response.status(500).json({ message: 'Sikertelen kijelentkezés' })
+                console.error('Session destroy error:', err);
+                return response.status(500).json({ message: request.t("logout_unsuccessful") })
             }
             response.clearCookie('connect.sid');
             return response.status(200).json({
-                message: 'Sikeres Kijelentkezés'
+                message: request.t("logout_successful")
             })
         })
     } catch (error) {
-        console.error('Logout Hiba:', error);
-        return response.status(500).json({ message: 'Szerverhiba a kijelentkezés' });
+        console.error('Logout error:', error);
+        return response.status(500).json({ message: request.t("end_point_not_working") });
     }
 });
 
@@ -780,7 +793,7 @@ router.post('/helyfoglalas', async (request, response) => {
             }
 
             if (!flightID || !rowID || !columnID) {
-                throw new Error("Hiányzó adat.")
+                throw new Error(request.t("missing_data"))
             }
             const siker = await database.SeatReservation(request.session.user.id, flightID, rowID, columnID, parsedIsAdult);
             if (!siker) {

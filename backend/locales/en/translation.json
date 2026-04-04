@@ -1,7 +1,7 @@
 {
     "locale": "en",
     "index": {
-        "title": "Flyguys",
+        "title": "FlyGuys",
         "body": {
             "cheapest_flights": {
                 "title": "Cheapest flights",
@@ -29,10 +29,10 @@
         "loyalty_program": "Loyalty Program",
         "language_code": "en",
         "language": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 480\" height=\"24\" width=\"32\"><g fill-rule=\"evenodd\"><path fill=\"#fff\" d=\"M640 480H0V0h640z\"></path><path fill=\"#388d00\" d=\"M640 480H0V320h640z\"></path><path fill=\"#d43516\" d=\"M640 160H0V0h640z\"></path></g></svg>",
-        "log_in": "Log in",
+        "login": "Login",
         "admin": "Admin",
         "my_profile": "My profile",
-        "log_out": "Log out"
+        "logout": "Logout"
     },
     "planner": {
         "origin_label": "Origin",
@@ -67,14 +67,26 @@
         "server_error": "Unfortunately, an error occured in the server. Please, try again later!"
     },
     "modal": {
-        "log_in": "Log in",
+        "login": "Login",
         "registration": "Registration",
         "email": "E-mail",
         "password": "Password",
         "no_account": "Don't have an account? Sign up here:",
         "first_name": "Last name",
         "last_name": "First name",
-        "birth_date": "Birth date (dd/mm/yyyy)"
+        "birth_date": "Birth date (dd/mm/yyyy)",
+        "login_successful": "Login successful!",
+        "logout_successful": "Logout successful!",
+        "login_unsuccessful": "Login unsuccessful!",
+        "logout_unsuccessful": "Logout unsuccessful!",
+        "missing_email_and_password_fields": "Please, fill out the email and password fields!",
+        "server_error_during_login": "A server error occured during login. Please, try again later!",
+        "registration_successful": "Registration successful!",
+        "registration_unsuccessful": "Registration unsuccessful!",
+        "missing_fields": "Please, fill out all fields!",
+        "password_char_limit": "Password needs to be at least 6 charaters long!",
+        "server_error_during_registration": "A server error occured during registraiton. Please, try again later!",
+        "server_error_during_logout": "A server error occured during logout. Please, try again later!"
     },
     "map": {
         "title": "Travel Planner",
@@ -132,7 +144,17 @@
             "fare_class_column": "Fare class"
         }
     },
-    "log_in_needed": "Access denied. You need to log in to access data!",
+    "login_needed": "Access denied. You need to log in to access data!",
+    "missing_data": "Missing data!",
+    "wrong_email_or_password": "Wrong email or password!",
+    "login_successful": "Login successful!",
+    "missing_data_by_user": "Missing data by user!",
+    "end_point_not_working": "This end point doesn't work!",
+    "registration_successful": "Registration successful!",
+    "registration_unsuccessful": "Registration unsuccessful!",
+    "no_active_session": "No active session!",
+    "logout_unsuccessful": "Logout unsuccessful!",
+    "logout_successful": "Logout successful!",
     "loyalty_program": {
         "title": "Loyalty Program",
         "num_of_my_flights": "Number of my flights",

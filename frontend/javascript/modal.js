@@ -1,14 +1,192 @@
-import { getModal } from "./locale.js";
-import { dateFormatter } from "./toolbox.js";
-export async function modalInit(current_language) {
+import { getIndex, getModal } from "./locale.js";
+import { dateFormatter, generateToast } from "./toolbox.js";
+import { initCheapestFlights } from "./index.js";
+export async function modalInit(current_language, end_point) {
+
+    //let getcommonmessages = await getCommonMessages(current_language);
+    let getmodal = await getModal(current_language);
+    let getindex = await getIndex(current_language);
 
     await checkLoginStatus();
     $("#login_button").on("click", async function () {
         await login_modal(current_language);
     });
-    $(document).on("click", ".submit-login", handleLogin);
-    $(document).on("click", ".submit-register", handleRegister);
-    $("#logout_button").on("click", handleLogout);
+    $(document).on("click", ".submit-login", async function () {
+        //event.preventDefault();
+
+
+        const email = $("#usr_email").val().trim();
+        const password = $("#usr_passw").val().trim();
+
+        if (!email || !password) {
+            generateToast(getmodal.missing_email_and_password_fields, "danger");
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept-Language': current_language
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+
+                // Navbar frissítése - Bejelentkezés gomb elrejtése, Profilom gomb megjelenítése
+
+                if (data.admin) {
+                    $("#admin_button").show();
+                }
+                $("#login_button").hide();
+                $("#profile_button").show();
+                $("#logout_button").show();
+
+
+                // Modal bezárása
+                const modal = bootstrap.Modal.getInstance(document.getElementById('monadModal'));
+                if (modal) {
+                    modal.hide();
+                }
+
+
+                // itt lesz majd a toast
+
+                switch (end_point) {
+                    case "index":
+                        await initCheapestFlights((await (await fetch("/api/cheapestflights", { method: "GET", headers: { "Accept-Language": current_language } })).json()).results, current_language, getindex);
+                        break;
+                    case "flights":
+                        break;
+                    default:
+                        break;
+                }
+
+                generateToast(getmodal.login_successful, "primary");
+
+            } else {
+                generateToast(getmodal.login_unsuccessful + " " + data.message, "danger");
+                console.error(data.message);
+            }
+        } catch (error) {
+            generateToast(getmodal.server_error_during_login, "danger")
+            console.error("ERROR: ", error);
+        }
+    });
+    $(document).on("click", ".submit-register", async function (event) {
+        event.preventDefault();
+
+        const userName = $("#first_name").val().trim() + " " + $("#last_name").val().trim();
+        const email = $("#new_usr_email").val().trim();
+        const password = $("#new_usr_passw").val().trim();
+
+        // Születési dátum konvertálása mm/dd/yyyy formátumból YYYY-MM-DD formátumba
+        const birthDateInput = $("#birth_date").val().trim();
+
+        let birthDate = null;
+
+        if (birthDateInput) {
+
+            birthDate = dateFormatter(birthDateInput, ((birthDateInput[2] == "/") ? "en" : "hu"))
+        }
+
+        if (!userName.trim() || !email || !password) {
+            generateToast(getmodal.missing_fields, "danger");
+            return;
+        }
+
+        if (password.length < 6) {
+            generateToast(getmodal.password_char_limit, "danger");
+            return;
+        }
+        try {
+            console.log(userName.trim(), email, password, birthDate)
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept-Language': current_language
+                },
+                body: JSON.stringify({
+                    nev: userName.trim(),
+                    email,
+                    jelszo: password,
+                    szuldatum: birthDate || null
+                })
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+
+                // Modal bezárása
+                const childModal = bootstrap.Modal.getInstance(document.getElementById('childModal'));
+                const parentModal = bootstrap.Modal.getInstance(document.getElementById('monadModal'));
+
+                if (childModal) {
+                    childModal.hide();
+                }
+                if (parentModal) {
+                    parentModal.hide();
+                }
+
+                generateToast(getmodal.registration_successful, "primary");
+
+            } else {
+
+                console.error(data.message);
+                generateToast(getmodal.registration_unsuccessful + " " + data.message, "danger");
+
+            }
+        } catch (error) {
+            console.error('ERROR: ', error);
+            generateToast(getmodal.server_error_during_registration, "danger");
+        }
+    });
+    $("#logout_button").on("click", async function () {
+        //event.preventDefault();
+        try {
+            let response = await fetch('/api/logout', {
+                method: 'POST'
+            });
+
+            let data = await response.json();
+
+            if (response.ok) {
+                // Navbar frissítése
+
+                $("#login_button").show();
+                $("#profile_button").hide();
+                $("#logout_button").hide();
+                $("#admin_button").hide();
+
+                switch (end_point) {
+                    case "index":
+                        await initCheapestFlights((await (await fetch("/api/cheapestflights", { method: "GET", headers: { "Accept-Language": current_language } })).json()).results, current_language, getindex);
+                        break;
+                    case "flights":
+                        break;
+                    default:
+                        break;
+                }
+
+                generateToast(getmodal.logout_successful, "primary");
+
+            } else {
+                console.error(data.message);
+                generateToast(getmodal.logout_unsuccessful + " " + data.message, "danger");
+            }
+
+        } catch (error) {
+            console.error('ERROR: ', error);
+            generateToast(getmodal.server_error_during_logout, "danger");
+        }
+
+
+    });
 };
 
 async function checkLoginStatus() {
@@ -39,28 +217,6 @@ async function checkLoginStatus() {
     }
 }
 
-async function handleLogout(event) {
-    event.preventDefault();
-    try {
-        await fetch('/api/logout', {
-            method: 'POST'
-        });
-
-    } catch (error) {
-        console.error('Kijelentkezési hiba:', error);
-        alert('Szerver hiba a kijelentkezés során');
-    }
-
-    // Navbar frissítése
-
-    /*$("#login_button").show();
-    $("#profile_button").hide();
-    $("#logout_button").hide();
-    $("#admin_button").hide();*/
-    location.reload();
-
-    // itt lesz majd a toast
-}
 
 function init_child_modal() {
 
@@ -133,7 +289,7 @@ export async function login_modal(current_language) {
     let $title = $("<h1>", {
         "id": "modalMonadLabel",
         "class": "text-danger modal-title fs-2",
-        "text": `${getmodal.log_in}`
+        "text": `${getmodal.login}`
     });
 
     let $close_button = $("<button>", {
@@ -176,7 +332,7 @@ export async function login_modal(current_language) {
     let $login_button = $("<button>", {
         "class": "btn btn-danger w-75 mb-2 submit-login",
         "type": "button",
-        "text": `${getmodal.log_in}`
+        "text": `${getmodal.login}`
     });
 
     let $p = $("<p>", {
@@ -319,129 +475,8 @@ function seePassw() {
     }
 }
 
-// LOGIN 
-async function handleLogin(event) {
-    event.preventDefault();
+// LOGIN
 
-    const email = $("#usr_email").val().trim();
-    const password = $("#usr_passw").val().trim();
-
-    if (!email || !password) {
-        alert("Kérlek, töltsd ki az email és jelszó mezőket!");
-        return;
-    }
-
-    try {
-        const response = await fetch('/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, password })
-        });
-
-        const data = await response.json();
-        if (!response.ok) {
-            console.log(data.message, data.error)
-        }
-
-        if (response.ok) {
-            
-
-            // Navbar frissítése - Bejelentkezés gomb elrejtése, Profilom gomb megjelenítése
-
-            /*if (data.admin) {
-                $("#admin_button").show();
-            }
-            $("#login_button").hide();
-            $("#profile_button").show();
-            $("#logout_button").show();
-
-
-            // Modal bezárása
-            const modal = bootstrap.Modal.getInstance(document.getElementById('monadModal'));
-            if (modal) {
-                modal.hide();
-            }*/
-
-            location.reload();
-            // itt lesz majd a toast
-
-        } else {
-            alert('Hiba: ' + (data.message || 'Bejelentkezés sikertelen'));
-        }
-    } catch (error) {
-        console.error('Szerver hiba bejelentkezéskor:', error);
-    }
-}
 
 // REGISTRATION HANDLER
-async function handleRegister(event) {
-    event.preventDefault();
 
-    const userName = $("#first_name").val().trim() + " " + $("#last_name").val().trim();
-    const email = $("#new_usr_email").val().trim();
-    const password = $("#new_usr_passw").val().trim();
-
-    // Születési dátum konvertálása mm/dd/yyyy formátumból YYYY-MM-DD formátumba
-    const birthDateInput = $("#birth_date").val().trim();
-    console.log(birthDateInput)
-    let birthDate = null;
-
-    if (birthDateInput) {
-
-        birthDate = dateFormatter(birthDateInput, ((birthDateInput[2] == "/") ? "en" : "hu"))
-    }
-
-    if (!userName.trim() || !email || !password) {
-        alert("Kérlek, töltsd ki az összes kötelező mezőt!");
-        return;
-    }
-
-    if (password.length < 6) {
-        alert("A jelszó legalább 6 karakter hosszú kell legyen!");
-        return;
-    }
-    try {
-        console.log(userName.trim(), email, password, birthDate)
-        const response = await fetch('/api/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                nev: userName.trim(),
-                email,
-                jelszo: password,
-                szuldatum: birthDate || null
-            })
-        });
-        const data = await response.json();
-        if (!response.ok) {
-            console.log("Regisztráció hiba: " + data.message, data.error)
-        }
-
-
-        else {
-
-            // Modal bezárása
-            const childModal = bootstrap.Modal.getInstance(document.getElementById('childModal'));
-            const parentModal = bootstrap.Modal.getInstance(document.getElementById('monadModal'));
-
-            if (childModal) {
-                childModal.hide();
-            }
-            if (parentModal) {
-                parentModal.hide();
-            }
-
-            // itt lesz majd a toast
-
-            // Oldal frissítése vagy átirányítás
-            //location.reload();
-        }
-    } catch (error) {
-        console.error('Regisztráció hiba:', error);
-        alert('Szerver hiba a regisztráció során');
-    }
-}

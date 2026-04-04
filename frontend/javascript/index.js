@@ -28,7 +28,7 @@ $(async function () {
     $("html").prop("lang", language);
 
     await getNavbar(language, url_splitted);
-    await modalInit(language);
+    await modalInit(language, "index");
 
     let getindex = await getIndex(language);
 
@@ -40,19 +40,26 @@ $(async function () {
 
     plannerResizer();
 
-    $("#keret").append(await initCheapestFlights((await (await fetch("/api/cheapestflights", { method: "GET", headers: { "Accept-Language": language } })).json()).results, language, getindex));
+    let $keret = $("#keret");
     $("#keret_cim").text(getindex.body.cheapest_flights.title);
+    await initCheapestFlights((await (await fetch("/api/cheapestflights", { method: "GET", headers: { "Accept-Language": language } })).json()).results, language, getindex);
 
     indexResizer();
 
 });
 
 //Ajánlott járatok megjelenítése
-async function initCheapestFlights(flights, language, i18n_values) {
+export async function initCheapestFlights(flights, language, i18n_values) {
 
-
+    let cheapest_flights_frame = document.getElementById("cheapest_flights_frame");
+    
+    if (cheapest_flights_frame != null) {
+        
+        $(cheapest_flights_frame).remove();
+    }
 
     let $frame = $("<div>", {
+        "id": "cheapest_flights_frame",
         "class": "row justify-content-center g-3",
     });
 
@@ -129,12 +136,12 @@ async function initCheapestFlights(flights, language, i18n_values) {
                         const queryString = searchParams.toString();
 
                         window.location.href = `/${language}/helyfoglalas?${queryString}`;
-                        
+
                     } else {
-                        
+
                         showLogin(language);
                     }
-                   
+
 
                 }
             }
@@ -159,7 +166,7 @@ async function initCheapestFlights(flights, language, i18n_values) {
         $frame.append($card_frame);
 
     }
-    return $frame;
+    $("#keret").append($frame);
 }
 
 function passengers_row_contentGenerator(counter_id, num_of_max_passengers, i18n_values) {
