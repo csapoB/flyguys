@@ -1,6 +1,5 @@
-﻿import { getNavbar, getLocale, getSeatChooser } from "./locale.js";
-import { infoPageGenerator, errorPageGenerator, showLogin } from "./toolbox.js";
-import { modalInit } from "./modal.js";
+﻿import { getSeatChooser } from "./locale.js";
+import { infoPageGenerator, errorPageGenerator, showLogin, initI18n } from "./toolbox.js";
 
 let kivalaszottUlesekOda = [];
 let kivalaszottUlesekVissza = [];
@@ -16,29 +15,11 @@ const fareClassNames = {
 
 $(document).ready(async function () {
 
-
-    let getlocale = await getLocale();
-
-    let language;
-
-    let old_url = window.location.href.split("/")
-    if (old_url[3].includes("helyfoglalas")) {
-        old_url.splice(3, 0, getlocale);
-        let new_url = old_url.join("/")
-        history.pushState({}, "", new_url);
-        language = getlocale;
-
-    } else {
-        language = old_url[3];
-    }
-
-    $("html").prop("lang", language);
-
-    await getNavbar(language, old_url);
-    await modalInit(language);
-
+    let language = await initI18n("husegprogram");
 
     let getseatchooser = await getSeatChooser(language);
+
+    $(document).prop('title', `${getseatchooser.title}`);
 
     let params = new URLSearchParams(document.location.search);
     let flight_id_to = params.get("flight_id_to");

@@ -181,15 +181,15 @@ async function SeatReservation(PassengerID, flightID, rowID, columnID, adult){
 
 // Profil
 async function selectActiveReservationsByUserId(userId){
-    const query = 'SELECT reservations_with_prices.RowID, reservations_with_prices.ColumnID, fareclass.FareClassName FROM reservations_with_prices INNER JOIN fareclass ON fareclass.FareClassID = reservations_with_prices.FareClassID WHERE reservations_with_prices.IsCancelled = 0 AND flight.DepartureDateTime > NOW() AND reservations_with_prices.PassengerID = ?;';
+    const query = 'SELECT reservations_with_prices.RowID, reservations_with_prices.ColumnID, fareclass.FareClassName FROM reservations_with_prices INNER JOIN flight ON reservations_with_prices.FlightID = flight.FlightID INNER JOIN fareclass ON fareclass.FareClassID = reservations_with_prices.FareClassID WHERE reservations_with_prices.IsCancelled = 0 AND flight.DepartureDateTime > NOW() AND reservations_with_prices.PassengerID = ?;';
     const [rows] = await pool.execute(query, [userId]);
-    return rows[0] || null;
+    return rows;
 }
 
 async function selectPreviousReservationsByUserId(userId){
-    const query = 'SELECT reservations_with_prices.RowID, reservations_with_prices.ColumnID, fareclass.FareClassName FROM reservations_with_prices INNER JOIN fareclass ON fareclass.FareClassID = reservations_with_prices.FareClassID WHERE reservations_with_prices.IsCancelled = 0 AND flight.DepartureDateTime < NOW() AND reservations_with_prices.PassengerID = ?;';
+    const query = 'SELECT reservations_with_prices.RowID, reservations_with_prices.ColumnID, fareclass.FareClassName FROM reservations_with_prices INNER JOIN flight ON reservations_with_prices.FlightID = flight.FlightID INNER JOIN fareclass ON fareclass.FareClassID = reservations_with_prices.FareClassID WHERE reservations_with_prices.IsCancelled = 0 AND flight.DepartureDateTime < NOW() AND reservations_with_prices.PassengerID = ?;';
     const [rows] = await pool.execute(query, [userId]);
-    return rows[0] || null;
+    return rows;
 }
 
 
@@ -219,8 +219,6 @@ module.exports = {
     selectAvailableAirportsHun,
     selectTop4CheapestOneWayFlightsEn,
     selectTop4CheapestOneWayFlightsHun,
-    selectCheapestReturnFlightsEn,
-    selectCheapestReturnFlightsHun,
     selectActiveReservationsByUserId,
     selectPreviousReservationsByUserId
 };

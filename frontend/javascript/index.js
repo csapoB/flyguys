@@ -1,10 +1,6 @@
-import { getNavbar } from "./locale.js";
-import { getFooter } from "./locale.js";
-import { getLocale } from "./locale.js";
-import { getIndex } from "./locale.js";
-import { getPlannerPassengersPopover } from "./locale.js";
+import { getNavbar, getFooter, getLocale, getIndex, getPlannerPassengersPopover } from "./locale.js";
 import { plannerInit } from "./planner.js";
-import { login_modal, modalInit } from "./modal.js";
+import { modalInit } from "./modal.js";
 import { plannerResizer } from "./plannerresizer.js";
 import { dateDeFormatter, showLogin } from "./toolbox.js";
 import { indexResizer } from "./indexresizer.js";
@@ -35,6 +31,8 @@ $(async function () {
     await modalInit(language);
 
     let getindex = await getIndex(language);
+
+    $(document).prop('title', `${getindex.title}`);
 
     await getFooter(language);
 

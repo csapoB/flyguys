@@ -53,10 +53,11 @@ async function handleLogout(event) {
 
     // Navbar frissítése
 
-    $("#login_button").show();
+    /*$("#login_button").show();
     $("#profile_button").hide();
     $("#logout_button").hide();
-    $("#admin_button").hide();
+    $("#admin_button").hide();*/
+    location.reload();
 
     // itt lesz majd a toast
 }
@@ -349,7 +350,7 @@ async function handleLogin(event) {
 
             // Navbar frissítése - Bejelentkezés gomb elrejtése, Profilom gomb megjelenítése
 
-            if (data.admin) {
+            /*if (data.admin) {
                 $("#admin_button").show();
             }
             $("#login_button").hide();
@@ -361,8 +362,9 @@ async function handleLogin(event) {
             const modal = bootstrap.Modal.getInstance(document.getElementById('monadModal'));
             if (modal) {
                 modal.hide();
-            }
+            }*/
 
+            location.reload();
             // itt lesz majd a toast
 
         } else {

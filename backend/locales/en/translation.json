@@ -1,12 +1,13 @@
 {
     "locale": "en",
     "index": {
+        "title": "Flyguys",
         "body": {
             "cheapest_flights": {
                 "title": "Cheapest flights",
-                "currency" : "&nbsp€", 
-                "per_person" : "&nbsp/ person",
-                "choose_seats" : "Choose seats!"
+                "currency": "&nbsp€",
+                "per_person": "&nbsp/ person",
+                "choose_seats": "Choose seats!"
             }
         }
     },
@@ -56,7 +57,7 @@
         "choose_seats": "Choose seats!",
         "currency": "&nbsp€",
         "per_person": " &nbsp/ person",
-        "errors" : {
+        "errors": {
             "no_flights_by_parameters": "Unfortunately, there's no flight by the given parameters."
         }
     },
@@ -76,12 +77,14 @@
         "birth_date": "Birth date (dd/mm/yyyy)"
     },
     "map": {
+        "title": "Travel Planner",
         "choose_button": "Choose",
-        "error" : {
-            "map_not_loaded" : "Due to an unknown error, the map can't be loaded."
+        "error": {
+            "map_not_loaded": "Due to an unknown error, the map can't be loaded."
         }
     },
     "about_us": {
+        "title": "About Us",
         "about_us_section": {
             "title": "About Us",
             "content": "<p>At FlyGuys, we believe that air travel should be more than simply getting from point A to point B — it should be comfortable, reliable, and genuinely enjoyable. Founded in Hungary and proudly based in the heart of Europe, FlyGuys is a new-generation commercial airline built on modern values, innovative thinking, and a commitment to exceptional passenger experience.</p>"
@@ -107,29 +110,59 @@
             "content": "<p>As we continue to expand our destinations and services, we invite you to fly with us and experience a new standard of travel.<br>FlyGuys — Your journey starts with us.</p>"
         }
     },
-
-    "seat_chooser" : {
-        "page_title" : "Choose seats!",
-        "currency" : "&nbsp€",
-        "trip_to" : "Trip to",
-        "trip_back" : "Trip back",
-        "seat" : "seat",
-        "sum" : "Sum:",
-        "booking" : "Booking",
-        "selected_seats" : "Selected seats",
-        "no_seats_selected" : "No seats have been selected!",
-        "errors" : {
-            "not_logged_in" : "You have to be logged in to book a flight.",
-            "no_adults" : "When booking, there has to be at least 1 adult."
-        }
-        
-    },
-    "profile" : {
-        "flights_tabel"  : {
-            "row_column" : "Row",
-            "column_column" : "Column",
-            "fare_class_column" : "Fare class" 
+    "seat_chooser": {
+        "title": "Choose seats!",
+        "currency": "&nbsp€",
+        "trip_to": "Trip to",
+        "trip_back": "Trip back",
+        "seat": "seat",
+        "sum": "Sum:",
+        "booking": "Booking",
+        "selected_seats": "Selected seats",
+        "no_seats_selected": "No seats have been selected!",
+        "errors": {
+            "not_logged_in": "You have to be logged in to book a flight.",
+            "no_adults": "When booking, there has to be at least 1 adult."
         }
     },
-    "log_in_needed" : "Access denied. You need to log in to access data!"
+    "profile": {
+        "flights_tabel": {
+            "row_column": "Row",
+            "column_column": "Column",
+            "fare_class_column": "Fare class"
+        }
+    },
+    "log_in_needed": "Access denied. You need to log in to access data!",
+    "loyalty_program": {
+        "title": "Loyalty Program",
+        "num_of_my_flights": "Number of my flights",
+        "no_rank": "No rank",
+        "max_rank_reached": "Max rank reached",
+        "num_of_travels_to_reach_next_level": "travel to the next level",
+        "bronze": {
+            "title": "Bronze",
+            "range": "Number of your flights: 0-5",
+            "discount": "For discounts, travel more with us!"
+        },
+        "silver": {
+            "title": "Silver",
+            "range": "Number of your flights: 6-15",
+            "discount": "1% discount on bookings"
+        },
+        "gold": {
+            "title": "Gold",
+            "range": "Number of your flights: 16-25",
+            "discount": "5% discount on bookings"
+        },
+        "platinum": {
+            "title": "Platinum",
+            "range": "Number of your flights: 26-35",
+            "discount": "7% discount on bookings"
+        },
+        "Diamond": {
+            "title": "Diamond",
+            "range": "Number of your flights: 36+",
+            "discount": "10% discount on bookings"
+        }
+    }
 }

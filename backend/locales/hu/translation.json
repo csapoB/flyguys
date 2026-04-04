@@ -1,6 +1,7 @@
 {
     "locale": "hu",
     "index": {
+        "title": "Flyguys",
         "body": {
             "cheapest_flights": {
                 "title": "Legolcsóbb járatok",
@@ -56,7 +57,7 @@
         "choose_seats": "Válasszon ülőhelyet!",
         "currency": "&nbspFt",
         "per_person": " &nbsp/ fő",
-        "errors" : {
+        "errors": {
             "no_flights_by_parameters": "Sajnos, nincs a feltételeknek megfelelő járat."
         }
     },
@@ -76,12 +77,14 @@
         "birth_date": "Születési dátum (éééé.hh.nn.)"
     },
     "map": {
+        "title": "Tervezés",
         "choose_button": "Kiválaszt",
-        "error" : {
-            "map_not_loaded" : "Ismeretlen hiba miatt a térkép nem tudott betöltődni."
+        "error": {
+            "map_not_loaded": "Ismeretlen hiba miatt a térkép nem tudott betöltődni."
         }
     },
     "about_us": {
+        "title": "Rólunk",
         "about_us_section": {
             "title": "Rólunk",
             "content": "<p>A FlyGuys-nál hisszük, hogy a repülésnek többről kell szólnia, mint egyszerű közlekedésről – legyen kényelmes, megbízható és valóban élvezetes. Magyarországon alapított, Európa szívében működő légitársaságként célunk, hogy új megközelítést hozzunk a kereskedelmi repülés világába: modern értékekkel, innovatív gondolkodással és kiemelkedő utasközpontú szolgáltatásokkal.</p>"
@@ -108,18 +111,18 @@
         }
     },
     "seat_chooser": {
-        "page_title": "Válassz helyet!",
+        "title": "Válassz helyet!",
         "currency": "&nbspFt",
-        "trip_to" : "Odaút",
-        "trip_back" : "Visszaút",
-        "seat" : "ülés",
-        "sum" : "Összesen:",
-        "booking" : "Lefoglalás",
-        "selected_seats" : "Kiválasztott helyek",
-        "no_seats_selected" : "Nincs kiválasztott hely!",
-        "errors" : {
-            "not_logged_in" : "A foglaláshoz be kell jelentkeznie.",
-            "no_adults" : "A foglalásnál legalább 1 felnőtt utasnak lennie kell."
+        "trip_to": "Odaút",
+        "trip_back": "Visszaút",
+        "seat": "ülés",
+        "sum": "Összesen:",
+        "booking": "Lefoglalás",
+        "selected_seats": "Kiválasztott helyek",
+        "no_seats_selected": "Nincs kiválasztott hely!",
+        "errors": {
+            "not_logged_in": "A foglaláshoz be kell jelentkeznie.",
+            "no_adults": "A foglalásnál legalább 1 felnőtt utasnak lennie kell."
         }
     },
     "profile": {
@@ -129,5 +132,37 @@
             "fare_class_column": "Osztály"
         }
     },
-    "log_in_needed" : "Hozzáférés megtagadva. Az adatok megtekintéséhez előbb be kell jelenetkeznie!"
+    "log_in_needed": "Hozzáférés megtagadva. Az adatok megtekintéséhez előbb be kell jelenetkeznie!",
+    "loyalty_program": {
+        "title": "Hűségprogram",
+        "num_of_my_flights" : "Repüléseim száma",
+        "no_rank" : "Nincs rang",
+        "max_rank_reached" : "Max rang elérve",
+        "num_of_travels_to_reach_next_level" : "utazás a következő szintig",
+        "bronze" : {
+            "title" : "Bronze",
+            "range" : "Repüléseid száma: 0-5",
+            "discount" : "Kedvezményekért repüljön még velünk!"
+        },
+        "silver" : {
+            "title" : "Silver",
+            "range" : "Repüléseid száma: 6-15",
+            "discount" : "Foglalásoknál 1%-os kedvezmény"
+        },
+        "gold" : {
+            "title" : "Gold",
+            "range" : "Repüléseid száma: 16-25",
+            "discount" : "Foglalásoknál 5%-os kedvezmény"
+        },
+        "platinum" : {
+            "title" : "Platinum",
+            "range" : "Repüléseid száma: 26-35",
+            "discount" : "Foglalásoknál 7%-os kedvezmény"
+        },
+        "Diamond" : {
+            "title" : "Diamond",
+            "range" : "Repüléseid száma: 36+",
+            "discount" : "Foglalásoknál 10%-os kedvezmény"
+        }
+    }
 }

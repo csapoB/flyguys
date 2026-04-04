@@ -563,6 +563,19 @@ router.get('/getprofile', (request, response) => {
     }
 });
 
+router.get('/getloyaltyprogram', (request, response) => {
+    try {
+
+        response.status(200).json({
+            loyalty_program: request.t("loyalty_program", { returnObjects: true })
+        });
+    } catch (error) {
+        response.status(500).json({
+            message: error
+        });
+    }
+});
+
 router.get('/checklogin', (request, response) => {
     try {
         response.status(200).json({

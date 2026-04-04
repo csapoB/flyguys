@@ -589,6 +589,7 @@ INSERT INTO seat (seat.RowID, seat.ColumnID, seat.AircraftModelID, seat.FareClas
 
 INSERT INTO useraccount (useraccount.UserName, useraccount.UserEmail, useraccount.UserPassword, useraccount.AdminStatus) VALUES
 ("admin", "admin@admin", "$2b$10$nAETe84Wnqon6iMkr0LMmORd76sUgCcME/cmaN0D/t2MjEgok5kqK", 1);
+("Sulós Laci", "suloslaci@gmail.com", "$2b$10$7GqRU5JcV3WwRWjZF00etO.gv213OgbRgpPmyQtAH01LynJx9fv9K", 0);
 
 INSERT INTO flight (flight.DepartureAirport, flight.ArrivalAirport, flight.DepartureDateTime, flight.ArrivalDateTime, flight.AircraftID, flight.BasePriceInHUF) VALUES
 ("BUD", "ATH", CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-28 10:30:00"), CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-28 13:30:00"), 1, 15000),

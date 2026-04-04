@@ -1,36 +1,19 @@
-import { getIndex, getNavbar } from "./locale.js";
-import { getFlights } from "./locale.js";
-import { getLocale } from "./locale.js";
-import { getFooter } from "./locale.js";
-import { modalInit, login_modal } from "./modal.js";
-import { dateDeFormatter } from "./toolbox.js";
+
+import { getFlights, getFooter } from "./locale.js";
+import { login_modal } from "./modal.js";
+import { dateDeFormatter, initI18n } from "./toolbox.js";
 import { popoverManualTrigger, infoPageGenerator, errorPageGenerator } from "./toolbox.js";
 import { flightsResizer } from "./flightsresizer.js";
 
 $(async function () {
 
-    let getlocale = await getLocale();
-
-    let language;
-
-    let old_url = window.location.href.split("/")
-    if (old_url[3].includes("flights")) {
-        old_url.splice(3, 0, getlocale);
-        let new_url = old_url.join("/")
-        history.pushState({}, "", new_url);
-        language = getlocale;
-
-    } else {
-        language = old_url[3];
-    }
-
-    $("html").prop("lang", language);
-
-    await getNavbar(language, old_url);
-    await modalInit(language);
+    let language = await initI18n("flights");
+    
     await getFooter(language);
 
     let getflights = await getFlights(language);
+
+    $(document).prop('title', `${getflights.title}`);
 
     let $flights_frame = $("#flights_frame");
     let $flights_to = $("#flights_to");

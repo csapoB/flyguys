@@ -1,32 +1,14 @@
-import { getLocale } from "./locale.js";
-import { getNavbar } from "./locale.js";
+import { getLocale, getNavbar, getFooter, getAboutUs } from "./locale.js";
 import { modalInit } from "./modal.js";
-import { getFooter } from "./locale.js";
-import { getAboutUs } from "./locale.js";
+import { initI18n } from "./toolbox.js";
+
 $(async function () {
 
-    let getlocale = await getLocale();
+    let language = await initI18n("rolunk");
 
-    let language;
-
-    let old_url = window.location.href.split("/")
-    if (old_url[3].includes("rolunk")) {
-        old_url.splice(3, 0, getlocale);
-        let new_url = old_url.join("/")
-        history.pushState({}, "", new_url);
-        language = getlocale;
-
-    } else {
-        language = old_url[3];
-    }
-
-    $("html").prop("lang", language);
-
-    await getNavbar(language, old_url);
-    await modalInit(language);
     await getFooter(language);
     let getaboutus = await getAboutUs(language);
-    
+    $(document).prop('title', `${getaboutus.title}`);
     contentFeltolt(getaboutus);
 });
 

@@ -17,8 +17,12 @@ export async function getNavbar(lang, url_splitted) {
     $language_nav.prop("href", lang == "hu" ? "/en" + url : "/hu" + url);
     document.getElementById("language_nav").dataset.langCode = lang;
     $("#login_button").text(getnavbar.log_in);
-    $("#admin_button").text(getnavbar.admin);
-    $("#profile_button").text(getnavbar.my_profile);
+    let $admin_button = $("#admin_button");
+    $admin_button.text(getnavbar.admin);
+    $admin_button.prop("href", `/${lang}/admin`);
+    let $profile_button = $("#profile_button");
+    $profile_button.prop("href", `/${lang}/profil`);
+    $profile_button.text(getnavbar.my_profile);
     $("#logout_button").text(getnavbar.log_out);
     $.datepicker.setDefaults($.datepicker.regional[(lang) == "hu" ? "hu" : "en-GB"]);
 
@@ -94,4 +98,7 @@ export async function getSeatChooser(lang) {
 }
 export async function getProfile(lang) {
     return (await (await fetch("/api/getprofile", { method: "GET", headers: { "Accept-Language": lang } })).json()).profile;
+}
+export async function getLoyaltyProgram(lang) {
+    return (await (await fetch("/api/getloyaltyprogram", { method: "GET", headers: { "Accept-Language": lang } })).json()).loyalty_program;
 }
