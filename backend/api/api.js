@@ -632,7 +632,7 @@ router.post('/login', async (request, response) => {
                 }
                 else {
                     response.status(400).json({
-                        message:  request.t("wrong_email_or_password")
+                        message: request.t("wrong_email_or_password")
                     });
                 }
             }
@@ -717,6 +717,22 @@ router.get('/husegprogram', async (request, response) => {
                 result: user
             })
         }
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            message: 'Ez a végpont nem működik.'
+        });
+    }
+});
+
+router.get('/profil', async (request, response) => {
+    try {
+        const user = await database.Profil(request.session.user.id);
+        response.status(200).json({
+            message: "Siker",
+            result: user
+        })
+
     } catch (error) {
         console.log(error);
         response.status(500).json({
