@@ -56,12 +56,12 @@ function initTableActiveReservations(active_reservations, i18n_values) {
         "id": "active_reservations"
     });
     let $thead = $("<thead>");
-    $thead.append(`<tr><th>${i18n_values.flights_tabel.row_column}</th><th>${i18n_values.flights_tabel.column_column}</th><th>${i18n_values.flights_tabel.fare_class_column}</th></tr>`)
+    $thead.append(`<tr><th>${i18n_values.flights_tabel.seat_column}</th><th>${i18n_values.flights_tabel.fare_class_column}</th></tr>`)
     let $tbody = $("<tbody>");
 
     for (let i = 0; i < active_reservations.length; i++) {
         let $tr = $("<tr>");
-        $tr.append(`<td>${active_reservations[i].RowID}</td><td>${active_reservations[i].ColumnID}</td><td>${active_reservations[i].FareClassName}</td>`);
+        $tr.append(`<td>${active_reservations[i].RowID}${active_reservations[i].ColumnID}</td><td>${active_reservations[i].FareClassName}</td>`);
         $tbody.append($tr);
     }
 
@@ -78,12 +78,12 @@ function initTablePreviousReservations(previous_reservations, i18n_values) {
         "id": "previous_reservations"
     });
     let $thead = $("<thead>");
-    $thead.append(`<tr><th>${i18n_values.flights_tabel.row_column}</th><th>${i18n_values.flights_tabel.column_column}</th><th>${i18n_values.flights_tabel.fare_class_column}</th></tr>`)
+    $thead.append(`<tr><th>${i18n_values.flights_tabel.seat_column}</th><th>${i18n_values.flights_tabel.fare_class_column}</th></tr>`)
     let $tbody = $("<tbody>");
 
     for (let i = 0; i < previous_reservations.length; i++) {
         let $tr = $("<tr>");
-        $tr.append(`<td>${previous_reservations[i].RowID}</td><td>${previous_reservations[i].ColumnID}</td><td>${previous_reservations[i].FareClassName}</td>`);
+        $tr.append(`<td>${previous_reservations[i].RowID}${previous_reservations[i].ColumnID}</td><td>${previous_reservations[i].FareClassName}</td>`);
         $tbody.append($tr);
     }
 

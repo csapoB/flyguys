@@ -1,6 +1,6 @@
 import { getIndex, getModal } from "./locale.js";
-import { dateFormatter, generateToast } from "./toolbox.js";
-import { initCheapestFlights } from "./index.js";
+import { dateFormatter, generateToast, initCheapestFlights, initFlights } from "./toolbox.js";
+
 export async function modalInit(current_language, end_point) {
 
     //let getcommonmessages = await getCommonMessages(current_language);
@@ -61,6 +61,7 @@ export async function modalInit(current_language, end_point) {
                         await initCheapestFlights((await (await fetch("/api/cheapestflights", { method: "GET", headers: { "Accept-Language": current_language } })).json()).results, current_language, getindex);
                         break;
                     case "flights":
+                        await initFlights(current_language);
                         break;
                     default:
                         break;
@@ -168,6 +169,7 @@ export async function modalInit(current_language, end_point) {
                         await initCheapestFlights((await (await fetch("/api/cheapestflights", { method: "GET", headers: { "Accept-Language": current_language } })).json()).results, current_language, getindex);
                         break;
                     case "flights":
+                        await initFlights(current_language);
                         break;
                     default:
                         break;

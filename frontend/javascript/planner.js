@@ -1,7 +1,5 @@
-import { getPlanner } from "./locale.js";
-import { getPlannerPassengersPopover } from "./locale.js";
-import { popoverManualTrigger } from "./toolbox.js";
-import { dateFormatter } from "./toolbox.js";
+import { getPlannerPassengersPopover, getPlanner } from "./locale.js";
+import { dateFormatter, popoverManualTrigger } from "./toolbox.js";
 export async function plannerInit(current_language) {
 
 
@@ -62,7 +60,6 @@ export async function plannerInit(current_language) {
 
                         returnEnabler(available_return_dates, current_language);
 
-                        
                         airportSwapperEnabler(origin[0], destination[0], "", "");
 
                     }
@@ -468,7 +465,7 @@ function airports_popover_contentGenerator(input_field_id, content_div_id, popov
 
     return $popover_content;
 }
-
+// probléma : annyi utast lehessen megadni maximum, ahány szabad férőhely van a járaton
 function passengers_popover_contentGenerator(content_div_id, popover_content_i18n_values) {
 
     let $popover_content = $("<div>", {
@@ -522,7 +519,7 @@ function passengers_popover_contentGenerator(content_div_id, popover_content_i18
             "click": function () {
                 // A felnőttek számát növeli egyel, ha kisebb vagy egyenlő, mint 16
                 let serv = parseInt($("#counter_adults").text());
-                if (serv <= 16) {
+                if ((serv + parseInt($("#counter_children").text())) <= 180) {
                     serv++;
                     $("#counter_adults").text(serv);
                     let counter_children = parseInt($("#counter_children").text());
@@ -583,7 +580,7 @@ function passengers_popover_contentGenerator(content_div_id, popover_content_i18
             "click": function () {
                 // a gyerekek számát növeli egyel, ha kisebb vagy egyenlő, mint 16
                 let serv = parseInt($("#counter_children").text());
-                if (serv <= 16) {
+                if ((serv + parseInt($("#counter_adults").text())) <= 180) {
                     serv++;
                     $("#counter_children").text(serv);
                     let counter_adults = parseInt($("#counter_adults").text());
