@@ -588,7 +588,7 @@ INSERT INTO seat (seat.RowID, seat.ColumnID, seat.AircraftModelID, seat.FareClas
 
 
 INSERT INTO useraccount (useraccount.UserName, useraccount.UserEmail, useraccount.UserPassword, useraccount.AdminStatus) VALUES
-("admin", "admin@admin", "$2b$10$nAETe84Wnqon6iMkr0LMmORd76sUgCcME/cmaN0D/t2MjEgok5kqK", 1);
+("admin", "admin@admin", "$2b$10$nAETe84Wnqon6iMkr0LMmORd76sUgCcME/cmaN0D/t2MjEgok5kqK", 1),
 ("Sulós Laci", "suloslaci@gmail.com", "$2b$10$7GqRU5JcV3WwRWjZF00etO.gv213OgbRgpPmyQtAH01LynJx9fv9K", 0);
 
 INSERT INTO flight (flight.DepartureAirport, flight.ArrivalAirport, flight.DepartureDateTime, flight.ArrivalDateTime, flight.AircraftID, flight.BasePriceInHUF) VALUES
@@ -600,7 +600,8 @@ INSERT INTO flight (flight.DepartureAirport, flight.ArrivalAirport, flight.Depar
 ("BUD", "MUC", DATE_ADD(CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-08 11:40:00"), INTERVAL 1 MONTH), DATE_ADD(CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-08 12:55:00"), INTERVAL 1 MONTH), 8, 10000),
 ("LHR", "ATH", DATE_ADD(CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-10 07:40:00"), INTERVAL 1 MONTH), DATE_ADD(CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-10 13:20:00"), INTERVAL 1 MONTH), 5, 40000),
 ("CPH", "MUC", DATE_ADD(CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-13 14:05:00"), INTERVAL 1 MONTH), DATE_ADD(CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-13 15:40:00"), INTERVAL 1 MONTH), 7, 22000),
-("BUD", "ZRH", DATE_ADD(CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-14 4:00:00"), INTERVAL 1 MONTH), DATE_ADD(CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-14 5:40:00"), INTERVAL 1 MONTH), 6, 18000);
+("BUD", "ZRH", DATE_ADD(CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-14 4:00:00"), INTERVAL 1 MONTH), DATE_ADD(CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-14 5:40:00"), INTERVAL 1 MONTH), 6, 18000),
+("ZRH", "BUD", DATE_ADD(CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-17 16:30:00"), INTERVAL 1 MONTH), DATE_ADD(CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-14 18:10:00"), INTERVAL 1 MONTH), 6, 26700);
 
 
 

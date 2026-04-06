@@ -64,6 +64,7 @@
     "errors": {
         "bad_http_get_request": "A HTTP-GET lekérdezés nem megfelelő!",
         "bad_url_parameter": "HIBA : Az URL paraméterek közül valamelyik hibás.",
+        "client_error" : "Sajnos hiba történt a kliens oldalon. Kérjük, próbálja meg újra később!",
         "server_error": "Sajnos, hiba történt a szerverben. Kérjük, próbálja meg újra később!"
     },
     "modal": {
@@ -139,8 +140,7 @@
     },
     "profile": {
         "flights_tabel": {
-            "row_column": "Sor",
-            "column_column": "Oszlop",
+            "seat_column": "Hely",
             "fare_class_column": "Osztály"
         }
     },
@@ -155,34 +155,35 @@
     "logout_unsuccessful": "Sikertelen kijelentkezés!",
     "logout_successful": "Sikeres kijelentkezés!",
     "no_active_session": "Nincs aktív session!",
+    "server_error" : "Sajnos, hiba történt a szerverben. Kérjük, próbálja meg újra később!",
     "loyalty_program": {
         "title": "Hűségprogram",
         "num_of_my_flights": "Repüléseim száma",
         "no_rank": "Nincs rang",
-        "max_rank_reached": "Max rang elérve",
+        "max_rank_reached": "Max rang elérve!",
         "num_of_travels_to_reach_next_level": "utazás a következő szintig",
         "bronze": {
-            "title": "Bronze",
+            "title": "Bronz",
             "range": "Repüléseid száma: 0-5",
             "discount": "Kedvezményekért repüljön még velünk!"
         },
         "silver": {
-            "title": "Silver",
+            "title": "Ezüst",
             "range": "Repüléseid száma: 6-15",
             "discount": "Foglalásoknál 1%-os kedvezmény"
         },
         "gold": {
-            "title": "Gold",
+            "title": "Arany",
             "range": "Repüléseid száma: 16-25",
             "discount": "Foglalásoknál 5%-os kedvezmény"
         },
         "platinum": {
-            "title": "Platinum",
+            "title": "Platina",
             "range": "Repüléseid száma: 26-35",
             "discount": "Foglalásoknál 7%-os kedvezmény"
         },
-        "Diamond": {
-            "title": "Diamond",
+        "diamond": {
+            "title": "Gyémánt",
             "range": "Repüléseid száma: 36+",
             "discount": "Foglalásoknál 10%-os kedvezmény"
         }

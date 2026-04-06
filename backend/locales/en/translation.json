@@ -64,6 +64,7 @@
     "errors": {
         "bad_http_get_request": "The HTTP-GET request isn't proper!",
         "bad_url_parameter": "ERROR : Some of the URL parameters are wrong.",
+        "client_error" : "Unfortunately, an error occured in the client site. Please, try again later!",
         "server_error": "Unfortunately, an error occured in the server. Please, try again later!"
     },
     "modal": {
@@ -139,8 +140,7 @@
     },
     "profile": {
         "flights_tabel": {
-            "row_column": "Row",
-            "column_column": "Column",
+            "seat_column": "Seat",
             "fare_class_column": "Fare class"
         }
     },
@@ -155,11 +155,12 @@
     "no_active_session": "No active session!",
     "logout_unsuccessful": "Logout unsuccessful!",
     "logout_successful": "Logout successful!",
+    "server_error" : "A server error has occured. Please, try again later!",
     "loyalty_program": {
         "title": "Loyalty Program",
         "num_of_my_flights": "Number of my flights",
         "no_rank": "No rank",
-        "max_rank_reached": "Max rank reached",
+        "max_rank_reached": "Max rank reached!",
         "num_of_travels_to_reach_next_level": "travel to the next level",
         "bronze": {
             "title": "Bronze",
@@ -181,7 +182,7 @@
             "range": "Number of your flights: 26-35",
             "discount": "7% discount on bookings"
         },
-        "Diamond": {
+        "diamond": {
             "title": "Diamond",
             "range": "Number of your flights: 36+",
             "discount": "10% discount on bookings"

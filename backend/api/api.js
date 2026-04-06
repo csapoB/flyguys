@@ -273,9 +273,9 @@ router.get('/hu/flights', async (request, response) => {
 
             let data;
             if (LoggedInCheck(request)) {
-                data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren, request.session.user.id);
+                data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate,parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), request.session.user.id);
             } else {
-                data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren, "NULL");
+                data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate,parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL");
             }
 
             response.status(200).json({
@@ -309,9 +309,9 @@ router.get('/en/flights', async (request, response) => {
                 current_eur_exch_rate = 0.00259;
             }
             if (LoggedInCheck(request)) {
-                data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren, request.session.user.id);
+                data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), request.session.user.id);
             } else {
-                data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren, "NULL");
+                data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL");
             }
 
 
@@ -321,9 +321,9 @@ router.get('/en/flights', async (request, response) => {
                 flights: data
             });
         }
-    } catch (error) {
+    } catch {
         response.status(500).json({
-            message: error
+            error: request.t("server_error")
         });
     }
 });
