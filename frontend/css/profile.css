@@ -50,6 +50,19 @@ table{
     border-spacing: 0;
 }
 
+#editProfileBtn{
+    background-color: #DC3545;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#editProfileBtn:hover{
+    background-color: #A4161A;
+}
+
 
 
 tbody tr:nth-child(odd) {

@@ -199,6 +199,12 @@ async function selectPreviousReservationsByUserId(userId){
     return rows;
 }
 
+async function updateUserProfile(userId, userName, email){
+    const query = 'UPDATE useraccount SET UserName = ?, UserEmail = ? WHERE UserID = ?';
+    const [result] = await pool.execute(query, [userName, email, userId]);
+    return result;
+}
+
 
 // SELECT reservations_with_prices.RowID, reservations_with_prices.ColumnID, reservations_with_prices.FareClassID FROM reservations_with_prices WHERE reservations_with_prices.IsCancelled = 0;
 
@@ -228,5 +234,6 @@ module.exports = {
     selectTop4CheapestOneWayFlightsEn,
     selectTop4CheapestOneWayFlightsHun,
     selectActiveReservationsByUserId,
-    selectPreviousReservationsByUserId
+    selectPreviousReservationsByUserId,
+    updateUserProfile
 };
