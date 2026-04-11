@@ -87,7 +87,18 @@
         "missing_fields": "Please, fill out all fields!",
         "password_char_limit": "Password needs to be at least 6 charaters long!",
         "server_error_during_registration": "A server error occured during registraiton. Please, try again later!",
-        "server_error_during_logout": "A server error occured during logout. Please, try again later!"
+        "server_error_during_logout": "A server error occured during logout. Please, try again later!",
+        "edit_profile": "Edit Profile",
+        "verify": "Verify Password",
+        "save": "Save Changes",
+        "missing_password_field": "Please enter your password!",
+        "password_verified": "Password verified! You can now edit your profile.",
+        "wrong_password": "Wrong password!",
+        "server_error_during_password_verification": "A server error occured during password verification. Please, try again later!",
+        "missing_profile_fields": "Please fill out all profile fields!",
+        "profile_updated_successfully": "Profile updated successfully!",
+        "profile_update_failed": "Profile update failed!",
+        "server_error_during_profile_update": "A server error occured during profile update. Please, try again later!"
     },
     "map": {
         "title": "Travel Planner",

@@ -809,6 +809,94 @@ router.get('/profil', async (request, response) => {
     }
 });
 
+router.post('/verifypassword', async (request, response) => {
+    try {
+        if (!LoggedInCheck(request)) {
+            return response.status(220).json({
+                message: request.t("login_needed")
+            });
+        }
+
+        const { password } = request.body;
+        if (!password) {
+            return response.status(400).json({
+                message: request.t("missing_data_by_user")
+            });
+        }
+
+        const user = await database.getUserById(request.session.user.id);
+        
+        if (!user) {
+            return response.status(400).json({
+                message: request.t("user_not_found")
+            });
+        }
+
+        if (await bcrypt.compare(password, user[0].UserPassword)) {
+            response.status(200).json({
+                message: request.t("password_correct"),
+                verified: true
+            });
+        } else {
+            response.status(400).json({
+                message: request.t("wrong_password"),
+                verified: false
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            message: request.t("end_point_not_working")
+        });
+    }
+});
+
+router.post('/updateprofile', async (request, response) => {
+    try {
+        if (!LoggedInCheck(request)) {
+            return response.status(220).json({
+                message: request.t("not_logged_in")
+            });
+        }
+
+        const { userName, email, password } = request.body;
+        
+        if (!userName || !email || !password) {
+            return response.status(400).json({
+                message: request.t("missing_data_by_user")
+            });
+        }
+
+        const user = await database.getUserById(request.session.user.id);
+        
+        if (!user) {
+            return response.status(400).json({
+                message: request.t("user_not_found")
+            });
+        }
+
+        // Verify password first
+        if (!(await bcrypt.compare(password, user[0].UserPassword))) {
+            return response.status(400).json({
+                message: request.t("wrong_password")
+            });
+        }
+
+        // Update profile
+        await database.updateUserProfile(request.session.user.id, userName, email);
+        
+        response.status(200).json({
+            message: request.t("profile_updated_successfully")
+        });
+
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            message: request.t("end_point_not_working")
+        });
+    }
+});
+
 
 function LoggedInCheck(request) {
     let vissza = false;

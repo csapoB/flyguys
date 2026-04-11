@@ -87,7 +87,18 @@
         "missing_fields": "Kérjük, töltse ki az összes kötelező mezőt!",
         "password_char_limit": "A jelszó legalább 6 karakter hosszú kell legyen!",
         "server_error_during_registration": "A regisztrációkor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
-        "server_error_during_logout": "A kijelentkezéskor szerverhiba lépett fel. Kérjük próbálkozzon újra később!"
+        "server_error_during_logout": "A kijelentkezéskor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
+        "edit_profile": "Profil szerkesztése",
+        "verify": "Jelszó ellenőrzése",
+        "save": "Módosítások mentése",
+        "missing_password_field": "Kérjük, adja meg a jelszavát!",
+        "password_verified": "Jelszó ellenőrizve! Most már szerkesztheti a profilját.",
+        "wrong_password": "Hibás jelszó!",
+        "server_error_during_password_verification": "A jelszó ellenőrzésekor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
+        "missing_profile_fields": "Kérjük, töltse ki az összes profil mezőt!",
+        "profile_updated_successfully": "A profil sikeresen frissítve!",
+        "profile_update_failed": "A profil frissítése meghiúsult!",
+        "server_error_during_profile_update": "A profil frissítésekor szerverhiba lépett fel. Kérjük próbálkozzon újra később!"
     },
     "map": {
         "title": "Tervezés",
