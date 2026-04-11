@@ -16,7 +16,7 @@
         "title_services": "Szolgáltatásaink",
         "title_contact": "Elérhetőségeink",
         "company_infos": "Vállalati információk",
-        "news": "Hírek",
+        "magazine": "Magazin",
         "loyalty_program": "Törzsvásárlói program",
         "flight_search": "Járat kereső",
         "my_flights": "Járataim",
@@ -141,8 +141,21 @@
     "profile": {
         "flights_tabel": {
             "seat_column": "Hely",
-            "fare_class_column": "Osztály"
-        }
+            "fare_class_column": "Osztály",
+            "passenger_column" : "Utas",
+            "i_cancel_column" : "Lemondás",
+            "adult" : "felnőtt",
+            "child" : "gyermek"
+        },
+        "bookings" : "Foglalások",
+        "active_bookings" : "Aktív foglalások",
+        "previous_bookings" : "Korábbi foglalások",
+        "choose_flight": "Válasszon járatot!",
+        "no_active_bookings" : "Úgy tűnik nincs egy aktív foglalásod sem.",
+        "no_previous_bookings" : "Úgy tűnik nincsenek korábbi foglalásaid.",
+        "no_bookings" : "Úgy tűnik még nem utaztál velünk.",
+        "select_all_for_cancellation" : "Összes kijelölése lemondásra",
+        "cancel_selected" : "Kijelöltek lemondása"
     },
     "login_needed": "Hozzáférés megtagadva. Az adatok megtekintéséhez előbb be kell jelenetkeznie!",
     "missing_data": "Hiányzó adat!",
@@ -156,6 +169,7 @@
     "logout_successful": "Sikeres kijelentkezés!",
     "no_active_session": "Nincs aktív session!",
     "server_error" : "Sajnos, hiba történt a szerverben. Kérjük, próbálja meg újra később!",
+    "missing_url_parameter" : "Hiányzó URL paraméter!",
     "loyalty_program": {
         "title": "Hűségprogram",
         "num_of_my_flights": "Repüléseim száma",

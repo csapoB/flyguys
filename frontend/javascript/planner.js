@@ -18,7 +18,7 @@ export async function plannerInit(current_language) {
     // Datepickerek
     let $departure = $("#departure_input");
     let available_departure_dates = (await (await fetch("/api/availabledeparturedatesfiltered", { method: "GET" })).json()).departuredates
-    let $departure_datepicker = $departure.datepicker({
+    $departure.datepicker({
         beforeShowDay: function (d) {
             let year = d.getFullYear(),
                 month = ("0" + (d.getMonth() + 1)).slice(-2),

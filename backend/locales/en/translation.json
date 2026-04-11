@@ -16,7 +16,7 @@
         "title_services": "Services",
         "title_contact": "Contacts",
         "company_infos": "Company informations",
-        "news": "News",
+        "magazine": "Magazine",
         "loyalty_program": "Loyalty Program",
         "flight_search": "Flight searcher",
         "my_flights": "My flights",
@@ -141,8 +141,21 @@
     "profile": {
         "flights_tabel": {
             "seat_column": "Seat",
-            "fare_class_column": "Fare class"
-        }
+            "fare_class_column": "Fare class",
+            "passenger_column" : "Passenger",
+            "i_cancel_column" : "Cancel",
+            "adult" : "adult",
+            "child" : "child"
+        },
+        "bookings" : "Bookings",
+        "active_bookings" : "Active bookings",
+        "previous_bookings" : "Previous bookings",
+        "choose_flight": "Choose a flight!",
+        "no_active_bookings" : "It seems like you have no active bookings.",
+        "no_previous_bookings" : "It seems like you have no previous bookings.",
+        "no_bookings" : "It seems like you have not travelled with us.",
+        "select_all_for_cancellation" : "Select all for cancellation",
+        "cancel_selected" : "Cancel selected"
     },
     "login_needed": "Access denied. You need to log in to access data!",
     "missing_data": "Missing data!",
@@ -156,6 +169,7 @@
     "logout_unsuccessful": "Logout unsuccessful!",
     "logout_successful": "Logout successful!",
     "server_error" : "A server error has occured. Please, try again later!",
+    "missing_url_parameter" : "Missing URL parameter!",
     "loyalty_program": {
         "title": "Loyalty Program",
         "num_of_my_flights": "Number of my flights",

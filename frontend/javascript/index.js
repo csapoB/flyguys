@@ -2,11 +2,12 @@ import { getNavbar, getFooter, getLocale, getIndex, getPlannerPassengersPopover 
 import { plannerInit } from "./planner.js";
 import { modalInit } from "./modal.js";
 import { plannerResizer } from "./plannerresizer.js";
-import { initCheapestFlights } from "./toolbox.js";
+import { initCheapestFlights, errorPageGenerator } from "./toolbox.js";
 import { indexResizer } from "./indexresizer.js";
 
 
 $(async function () {
+
 
     let getlocale = await getLocale(); // megadja, hogy a böngésző nyelve magyar vagy angol (default) 
 
@@ -24,7 +25,6 @@ $(async function () {
         language = url_splitted[3];
     }
 
-
     $("html").prop("lang", language);
 
     await getNavbar(language, url_splitted);
@@ -40,11 +40,18 @@ $(async function () {
 
     plannerResizer();
 
-    let $keret = $("#keret");
     $("#keret_cim").text(getindex.body.cheapest_flights.title);
-    await initCheapestFlights((await (await fetch("/api/cheapestflights", { method: "GET", headers: { "Accept-Language": language } })).json()).results, language, getindex);
+    try {
+        await initCheapestFlights(language, getindex);
+    } catch (error) {
+        let $keret = $("#keret");
+        if ($keret.children().length == 2) {
+            $keret.children().eq(1).remove();
+        }
+        console.error(error);
+        errorPageGenerator($keret, (await (await fetch("/api/geterrors", { method: "GET", headers: { "Accept-Language": language } })).json()).errors.client_error);
 
-    indexResizer();
+    }
 
 });
 

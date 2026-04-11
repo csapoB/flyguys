@@ -1,12 +1,14 @@
-import { getIndex, getModal } from "./locale.js";
-import { dateFormatter, generateToast, initCheapestFlights, initFlights } from "./toolbox.js";
+import { getFlights, getIndex, getLoyaltyProgram, getModal, getProfile } from "./locale.js";
+import { dateFormatter, generateToast, initCheapestFlights, initFlights, initHusegprogram, initProfile } from "./toolbox.js";
 
 export async function modalInit(current_language, end_point) {
 
-    //let getcommonmessages = await getCommonMessages(current_language);
+
     let getmodal = await getModal(current_language);
     let getindex = await getIndex(current_language);
-
+    let getflights = await getFlights(current_language);
+    let getloyaltyprogram = await getLoyaltyProgram(current_language);
+    let getprofile = await getProfile(current_language);
     await checkLoginStatus();
     $("#login_button").on("click", async function () {
         await login_modal(current_language);
@@ -58,10 +60,16 @@ export async function modalInit(current_language, end_point) {
 
                 switch (end_point) {
                     case "index":
-                        await initCheapestFlights((await (await fetch("/api/cheapestflights", { method: "GET", headers: { "Accept-Language": current_language } })).json()).results, current_language, getindex);
+                        await initCheapestFlights(current_language, getindex);
                         break;
                     case "flights":
-                        await initFlights(current_language);
+                        await initFlights(current_language, getflights);
+                        break;
+                    case "husegprogram":
+                        await initHusegprogram(current_language, getloyaltyprogram);
+                        break;
+                    case "profil":
+                        await initProfile(current_language, getprofile);
                         break;
                     default:
                         break;
@@ -166,10 +174,16 @@ export async function modalInit(current_language, end_point) {
 
                 switch (end_point) {
                     case "index":
-                        await initCheapestFlights((await (await fetch("/api/cheapestflights", { method: "GET", headers: { "Accept-Language": current_language } })).json()).results, current_language, getindex);
+                        await initCheapestFlights(current_language, getindex);
                         break;
                     case "flights":
-                        await initFlights(current_language);
+                        await initFlights(current_language, getflights);
+                        break;
+                    case "husegprogram":
+                        await initHusegprogram(current_language, getloyaltyprogram)
+                        break;
+                    case "profil":
+                        await initProfile(current_language, getprofile);
                         break;
                     default:
                         break;
@@ -183,8 +197,8 @@ export async function modalInit(current_language, end_point) {
             }
 
         } catch (error) {
-            console.error('ERROR: ', error);
-            generateToast(getmodal.server_error_during_logout, "danger");
+            console.error(error);
+            generateToast(getmodal.client_error_during_logout, "danger");
         }
 
 

@@ -56,7 +56,7 @@ export async function getFooter(lang) {
     let getfooter = (await (await fetch("/api/getfooter", { method: "GET", headers: { "Accept-Language": lang } })).json()).footer;
     $("#title_about_us_footer").text(getfooter.title_about_us);
     $("#company_infos_footer").text(getfooter.company_infos);
-    $("#news_footer").text(getfooter.news);
+    $("#magazine_footer").text(getfooter.magazine);
     $("#title_services_footer").text(getfooter.title_services);
     $("#loyalty_program_footer").text(getfooter.loyalty_program);
     $("#flight_search_footer").text(getfooter.flight_search);
