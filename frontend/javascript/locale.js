@@ -1,6 +1,5 @@
 export async function getNavbar(lang, url_splitted) {
     let getnavbar = (await (await fetch("/api/getnavbar", { method: "GET", headers: { "Accept-Language": lang } })).json()).navbar;
-    
     $("#back_to_main_page").prop("href", `/${lang}`)
     let $about_us_nav = $("#about_us_nav");
     $about_us_nav.text(getnavbar.about_us);
@@ -17,12 +16,20 @@ export async function getNavbar(lang, url_splitted) {
     let url = ((url_splitted.length > 0) ? "/" : "") + url_splitted.join("/");
     $language_nav.prop("href", lang == "hu" ? "/en" + url : "/hu" + url);
     document.getElementById("language_nav").dataset.langCode = lang;
-    $("#login_button").text(getnavbar.log_in);
-    $("#admin_button").text(getnavbar.admin);
-    $("#profile_button").text(getnavbar.my_profile);
-    $("#logout_button").text(getnavbar.log_out);
+    $("#login_button").text(getnavbar.login);
+    let $admin_button = $("#admin_button");
+    $admin_button.text(getnavbar.admin);
+    $admin_button.prop("href", `/${lang}/admin`);
+    let $profile_button = $("#profile_button");
+    $profile_button.prop("href", `/${lang}/profil`);
+    $profile_button.text(getnavbar.my_profile);
+    $("#logout_button").text(getnavbar.logout);
     $.datepicker.setDefaults($.datepicker.regional[(lang) == "hu" ? "hu" : "en-GB"]);
 
+}
+
+export async function getIndex(lang) {
+    return (await (await fetch("/api/getindex", { method: "GET", headers: { "Accept-Language": lang } })).json()).index;
 }
 
 export async function getPlanner(lang) {
@@ -49,7 +56,7 @@ export async function getFooter(lang) {
     let getfooter = (await (await fetch("/api/getfooter", { method: "GET", headers: { "Accept-Language": lang } })).json()).footer;
     $("#title_about_us_footer").text(getfooter.title_about_us);
     $("#company_infos_footer").text(getfooter.company_infos);
-    $("#news_footer").text(getfooter.news);
+    $("#magazine_footer").text(getfooter.magazine);
     $("#title_services_footer").text(getfooter.title_services);
     $("#loyalty_program_footer").text(getfooter.loyalty_program);
     $("#flight_search_footer").text(getfooter.flight_search);
@@ -84,4 +91,17 @@ export async function getModal(lang) {
 
 export async function getMap(lang) {
     return (await (await fetch("/api/getmap", { method: "GET", headers: { "Accept-Language": lang } })).json()).map;
+}
+
+export async function getSeatChooser(lang) {
+    return (await (await fetch("/api/getseatchooser", { method: "GET", headers: { "Accept-Language": lang } })).json()).seat_chooser;
+}
+export async function getProfile(lang) {
+    return (await (await fetch("/api/getprofile", { method: "GET", headers: { "Accept-Language": lang } })).json()).profile;
+}
+export async function getLoyaltyProgram(lang) {
+    return (await (await fetch("/api/getloyaltyprogram", { method: "GET", headers: { "Accept-Language": lang } })).json()).loyalty_program;
+}
+export async function getCommonMessages(lang) {
+    return (await (await fetch("/api/getcommonmessages", { method: "GET", headers: { "Accept-Language": lang } })).json()).common_messages;
 }

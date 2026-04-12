@@ -1,6 +1,5 @@
-﻿import { getNavbar } from "./locale.js";
-import { getLocale } from "./locale.js";
-import { modalInit } from "./modal.js";
+﻿import { getSeatChooser } from "./locale.js";
+import { infoPageGenerator, errorPageGenerator, showLogin, initI18n } from "./toolbox.js";
 
 let kivalaszottUlesekOda = [];
 let kivalaszottUlesekVissza = [];
@@ -16,26 +15,11 @@ const fareClassNames = {
 
 $(document).ready(async function () {
 
+    let language = await initI18n("husegprogram");
 
-    let getlocale = await getLocale();
+    let getseatchooser = await getSeatChooser(language);
 
-    let language;
-
-    let old_url = window.location.href.split("/")
-    if (old_url[3].includes("helyfoglalas")) {
-        old_url.splice(3, 0, getlocale);
-        let new_url = old_url.join("/")
-        history.pushState({}, "", new_url);
-        language = getlocale;
-
-    } else {
-        language = old_url[3];
-    }
-
-    $("html").prop("lang", language);
-
-    await getNavbar(language, old_url);
-    await modalInit(language);
+    $(document).prop('title', `${getseatchooser.title}`);
 
     let params = new URLSearchParams(document.location.search);
     let flight_id_to = params.get("flight_id_to");
@@ -45,76 +29,113 @@ $(document).ready(async function () {
     isRoundTrip = flight_id_back != null;
 
     // Odaut
-    let odaAdatok = await getHelyek(flight_id_to);
+    let odaAdatok = await getHelyek(flight_id_to, language);
     if (odaAdatok && odaAdatok.length > 0) {
-        ulesek_general($('#helyek'), odaAdatok, 'oda');
-    }
 
-    // Visszaut
-    if (isRoundTrip) {
-        $('#visszaut_section').show();
-        $('#visszaut_card').show();
-        let visszaAdatok = await getHelyek(flight_id_back);
-        if (visszaAdatok && visszaAdatok.length > 0) {
-            ulesek_general($('#helyekvissza'), visszaAdatok, 'vissza');
-        }
-    } else {
-        $('#visszaut_section').hide();
-        $('#visszaut_card').hide();
-    }
+        try {
+            let $helyek = $('#helyek');
 
-    $('#lefoglal').prop('disabled', true);
-    frissitAllapot();
+            $("#trip_to_title").text(`${getseatchooser.trip_to} - ${getseatchooser.title}`);
+            $("#trip_to_selected_seats_title").text(`${getseatchooser.trip_to} - ${getseatchooser.selected_seats}`);
+            $("#trip_to_no_seats_selected").text(getseatchooser.no_seats_selected);
 
-    $('#lefoglal').click(function () {
-        let flight_id_to = params.get("flight_id_to");
-        let childleft = childrens;
-        kivalaszottUlesekOda.forEach(async function (u) {
-            let isAdult;
-            if (childleft > 0) {
-                isAdult = 0;
-                childleft = childleft - 1;
-            }
-            else {
-                isAdult = 1;
-            }
-            if (u.hely.length > 2) {
-                await helyFoglal(flight_id_to, u.hely[0] + u.hely[1], u.hely[2], isAdult);
-            }
-            else {
-                await helyFoglal(flight_id_to, u.hely[0], u.hely[1], isAdult);
-            }
-            childleft--;
-        });
-        if (isRoundTrip) {
-            let flight_id_back = params.get("flight_id_back");
-            childleft = childrens;
-            kivalaszottUlesekVissza.forEach(async function (u) {
-                let isAdult;
-                if (childleft > 0) {
-                    isAdult = 0;
-                    childleft = childleft - 1;
+            ulesek_general($helyek, odaAdatok, 'oda', getseatchooser);
+
+            // Visszaut
+            if (isRoundTrip) {
+                $('#visszaut_section').show();
+                $('#visszaut_card').show();
+                let visszaAdatok = await getHelyek(flight_id_back, language);
+                if (visszaAdatok && visszaAdatok.length > 0) {
+                    let $helyekvissza = $('#helyekvissza');
+                    $("#trip_back_title").text(`${getseatchooser.trip_back} - ${getseatchooser.title}`);
+                    $("#trip_back_selected_seats_title").text(`${getseatchooser.trip_back} - ${getseatchooser.selected_seats}`);
+                    $("#trip_back_no_seats_selected").text(getseatchooser.no_seats_selected);
+                    ulesek_general($helyekvissza, visszaAdatok, 'vissza', getseatchooser);
                 }
-                else {
-                    isAdult = 1;
+            } else {
+                $('#visszaut_section').hide();
+                $('#visszaut_card').hide();
+            }
+
+            $('#lefoglal').prop('disabled', true);
+            frissitAllapot(getseatchooser);
+
+            $('#lefoglal').click(function () {
+                let flight_id_to = params.get("flight_id_to");
+                let childleft = childrens;
+                kivalaszottUlesekOda.forEach(async function (u) {
+                    let isAdult;
+                    if (childleft > 0) {
+                        isAdult = 0;
+                        childleft = childleft - 1;
+                    }
+                    else {
+                        isAdult = 1;
+                    }
+                    if (u.hely.length > 2) {
+                        await helyFoglal(flight_id_to, u.hely[0] + u.hely[1], u.hely[2], isAdult);
+                    }
+                    else {
+                        await helyFoglal(flight_id_to, u.hely[0], u.hely[1], isAdult);
+                    }
+                    childleft--;
+                });
+                if (isRoundTrip) {
+                    let flight_id_back = params.get("flight_id_back");
+                    childleft = childrens;
+                    kivalaszottUlesekVissza.forEach(async function (u) {
+                        let isAdult;
+                        if (childleft > 0) {
+                            isAdult = 0;
+                            childleft = childleft - 1;
+                        }
+                        else {
+                            isAdult = 1;
+                        }
+                        if (u.hely.length > 2) {
+                            await helyFoglal(flight_id_back, u.hely[0] + u.hely[1], u.hely[2], isAdult);
+                        }
+                        else {
+                            await helyFoglal(flight_id_back, u.hely[0], u.hely[1], isAdult);
+                        }
+                    });
                 }
-                if (u.hely.length > 2) {
-                    await helyFoglal(flight_id_back, u.hely[0] + u.hely[1], u.hely[2], isAdult);
-                }
-                else {
-                    await helyFoglal(flight_id_back, u.hely[0], u.hely[1], isAdult);
-                }
+                let osszesen = 0;
+                kivalaszottUlesekOda.forEach(u => osszesen += u.ar);
+                kivalaszottUlesekVissza.forEach(u => osszesen += u.ar);
+                alert("Sikeres foglalás! 5 másodperc múlva átirányítunk.");
+                setTimeout(function () {
+                    window.location.replace(`/${language}`);
+                }, 5000);
             });
+
+            $("#sum_currency").html(getseatchooser.currency);
+            $("#title_sum").text(getseatchooser.sum);
+
+            $("#trips_frame").css("display", "");
+        } catch (error) {
+            errorHandler(error.message);
         }
-        let osszesen = 0;
-        kivalaszottUlesekOda.forEach(u => osszesen += u.ar);
-        kivalaszottUlesekVissza.forEach(u => osszesen += u.ar);
-        alert("Sikeres foglalás! 5 másodperc múlva átirányítunk.");
-        setTimeout(function () {
-            window.location.replace(`/${language}`);
-        }, 5000);
-    })
-})
+
+    } else {
+        let $frame = $("#frame");
+        $frame.html("");
+        let $error_div = $("<div>", {
+            "class": "container min-vh-100 d-flex flex-column justify-content-evenly"
+        });
+
+        infoPageGenerator($error_div, getseatchooser.errors.not_logged_in);
+        $frame.append($error_div);
+
+
+        showLogin(language);
+
+    }
+
+
+
+});
 
 async function helyFoglal(flightID, rowID, columnID, isAdult) {
     try {
@@ -134,13 +155,13 @@ async function helyFoglal(flightID, rowID, columnID, isAdult) {
     }
 }
 
-async function getHelyek(id) {
+async function getHelyek(id, lang) {
     if (!id) {
         console.error("Nincs flight_id megadva");
         return null;
     }
     try {
-        let vissza = await fetch("/api/helyfoglalas?id=" + id, { method: "GET" });
+        let vissza = await fetch("/api/helyfoglalas?id=" + id, { method: "GET", headers: { "Accept-Language": lang } });
         let json = await vissza.json();
         if (!json.helyek) {
             console.error(json.message || "Ismeretlen hiba");
@@ -154,7 +175,7 @@ async function getHelyek(id) {
 }
 
 // Ulesek legeneralasa
-function ulesek_general(hova, adatok, irany) {
+function ulesek_general(hova, adatok, irany, i18n_values) {
     if (!adatok || adatok.length === 0) {
         hova.append('<div class="alert alert-danger">Nem sikerült betölteni az ülőhelyeket.</div>');
         return;
@@ -168,7 +189,8 @@ function ulesek_general(hova, adatok, irany) {
         while (x < i * 6 + 6) {
             let ulesAdat = adatok[x];
             let ulesHelye = ulesAdat.RowID + ulesAdat.ColumnID;
-            let ulesAra = ulesAdat.Price;
+            let ulesAra = ulesAdat.PriceInHUF;
+            console.log(ulesAra)
 
             let $hely = $('<div class="ules tipus' + ulesAdat.FareClassID + '">' + ulesAdat.ColumnID + '</div>');
             if (ulesAdat.IsOccupied == 0) {
@@ -193,7 +215,7 @@ function ulesek_general(hova, adatok, irany) {
                             }
                         }
                     }
-                    frissitAllapot();
+                    frissitAllapot(i18n_values);
                 })
             }
             else {
@@ -213,10 +235,10 @@ function ulesek_general(hova, adatok, irany) {
 }
 
 // Allapot frissitese
-function frissitAllapot() {
-    megjelenitKijeloltek($('#kivalasztottak_oda'), kivalaszottUlesekOda);
+function frissitAllapot(i18n_values) {
+    megjelenitKijeloltek($('#kivalasztottak_oda'), kivalaszottUlesekOda, i18n_values);
     if (isRoundTrip) {
-        megjelenitKijeloltek($('#kivalasztottak_vissza'), kivalaszottUlesekVissza);
+        megjelenitKijeloltek($('#kivalasztottak_vissza'), kivalaszottUlesekVissza, i18n_values);
     }
 
     // Osszes ar
@@ -237,20 +259,34 @@ function frissitAllapot() {
     $('#lefoglal').prop('disabled', !(odaOk && visszaOk));
 }
 
-function megjelenitKijeloltek($lista, ulesek) {
+function megjelenitKijeloltek($lista, ulesek, i18n_values) {
     $lista.empty();
     if (ulesek.length == 0) {
-        $lista.append('<li class="list-group-item italic">Nincs kiválasztott hely!</li>');
+        $lista.append(`<li class="list-group-item italic">${i18n_values.no_seats_selected}</li>`);
     }
     else {
         for (let i = 0; i < ulesek.length; i++) {
             let fc = fareClassNames[ulesek[i].tipus];
             $lista.append(
                 '<li class="list-group-item d-flex justify-content-between align-items-center">' +
-                '<span>' + ulesek[i].hely + ' ülés <span class="' + fc.badge + '">' + fc.nev + '</span></span>' +
-                '<span class="fw-bold">' + ulesek[i].ar + ' Ft</span>' +
+                '<span>' + ulesek[i].hely + ` ${i18n_values.seat} <span class="` + fc.badge + '">' + fc.nev + '</span></span>' +
+                '<span class="fw-bold">' + ulesek[i].ar + `${i18n_values.currency}</span>` +
                 '</li>'
             );
         }
     }
+}
+
+function errorHandler(message, lang) {
+    let $frame = $("#frame");
+    $frame.html("");
+    let $error_div = $("<div>", {
+        "class": "container min-vh-100 d-flex flex-column justify-content-evenly"
+    });
+
+    errorPageGenerator($error_div, message);
+    $frame.append($error_div);
+
+
+    showLogin(lang);
 }

@@ -1,69 +1,51 @@
-import { getLocale } from "./locale.js";
-import { getNavbar } from "./locale.js";
+import { getLocale, getNavbar, getFooter, getAboutUs } from "./locale.js";
 import { modalInit } from "./modal.js";
-import { getFooter } from "./locale.js";
-import { getAboutUs } from "./locale.js";
+import { initI18n } from "./toolbox.js";
+
 $(async function () {
 
-    let getlocale = await getLocale();
+    let language = await initI18n("rolunk");
 
-    let language;
-
-    let old_url = window.location.href.split("/")
-    if (old_url[3].includes("rolunk")) {
-        old_url.splice(3, 0, getlocale);
-        let new_url = old_url.join("/")
-        history.pushState({}, "", new_url);
-        language = getlocale;
-
-    } else {
-        language = old_url[3];
-    }
-
-    $("html").prop("lang", language);
-
-    await getNavbar(language, old_url);
-    await modalInit(language);
     await getFooter(language);
     let getaboutus = await getAboutUs(language);
-    
+    $(document).prop('title', `${getaboutus.title}`);
     contentFeltolt(getaboutus);
 });
 
 function contentFeltolt(i18n_values) {
     let $rolunkDiv = $('<div class="col-sm-8 card"></div>');
-    $rolunkDiv.append(`<h2 id="cim">${i18n_values.about_us_section.title}</h2>`);
+    $rolunkDiv.append(`<h2 class="cim">${i18n_values.about_us_section.title}</h2>`);
     $rolunkDiv.append(i18n_values.about_us_section.content);
 
     $('#rolunk').append($rolunkDiv);
 
     let $tortenetDiv = $('<div class="col-sm-8 card"></div>');
-    $tortenetDiv.append(`<h2 id="cim">${i18n_values.our_story_section.title}</h2>`);
+    $tortenetDiv.append(`<h2 class="cim">${i18n_values.our_story_section.title}</h2>`);
     $tortenetDiv.append(i18n_values.our_story_section.content);
 
     $('#tortenet').append($tortenetDiv);
 
     let $uticelokDiv = $('<div class="col-sm-8 card"></div>');
-    $uticelokDiv.append(`<h2 id="cim">${i18n_values.destinations_section.title}</h2>`);
+    $uticelokDiv.append(`<h2 class="cim">${i18n_values.destinations_section.title}</h2>`);
     $uticelokDiv.append(i18n_values.destinations_section.content);
 
     $('#uticelok').append($uticelokDiv);
 
 
     let $elkotelezetsegunkDiv = $('<div class="col-sm-8 card"></div>');
-    $elkotelezetsegunkDiv.append(`<h2 id="cim">${i18n_values.our_commitment_section.title}</h2>`);
+    $elkotelezetsegunkDiv.append(`<h2 class="cim">${i18n_values.our_commitment_section.title}</h2>`);
     $elkotelezetsegunkDiv.append(i18n_values.our_commitment_section.content);
 
     $('#elkotelezetsegunk').append($elkotelezetsegunkDiv);
 
     let $elmenyDiv = $('<div class="col-sm-8 card"></div>');
-    $elmenyDiv.append(`<h2 id="cim">${i18n_values.the_experience_section.title}</h2>`);
+    $elmenyDiv.append(`<h2 class="cim">${i18n_values.the_experience_section.title}</h2>`);
     $elmenyDiv.append(i18n_values.the_experience_section.content);
 
     $('#elmeny').append($elmenyDiv);
 
     let $csatlakozzDiv = $('<div class="col-sm-8 card"></div>');
-    $csatlakozzDiv.append(`<h2 id="cim">${i18n_values.join_us_section.title}</h2>`);
+    $csatlakozzDiv.append(`<h2 class="cim">${i18n_values.join_us_section.title}</h2>`);
     $csatlakozzDiv.append(i18n_values.join_us_section.content);
 
     $('#csatlakozz').append($csatlakozzDiv);

@@ -103,6 +103,14 @@ router.get('/profil', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/profile.html'));
 });
 
+router.get('/en/profil', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/profile.html'));
+});
+
+router.get('/hu/profil', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/profile.html'));
+});
+
 router.get('/admin', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/admin.html'));
 });

@@ -25,14 +25,6 @@ const upload = multer({ storage });
 
 
 //!Endpoints:
-//?GET /api/test
-router.get('/test', (request, response) => {
-    response.status(200).json({
-        message: 'Ez a végpont működik.'
-    });
-});
-
-//?GET /api/testsql
 router.get('/airports', async (request, response) => {
     try {
         const airports = await database.selectAllAirportsInHungarian();
@@ -40,15 +32,16 @@ router.get('/airports', async (request, response) => {
             results: airports
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
 router.get('/LoginCheck', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            return response.status(220).json({
+            return response.status(401).json({
                 allapot: false
             })
         }
@@ -59,8 +52,9 @@ router.get('/LoginCheck', async (request, response) => {
             })
         }
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: 'Ez a végpont nem működik.'
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -68,7 +62,7 @@ router.get('/LoginCheck', async (request, response) => {
 router.get('/AdminCheck', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            return response.status(220).json({
+            return response.status(401).json({
                 admin: false
             })
         }
@@ -78,8 +72,9 @@ router.get('/AdminCheck', async (request, response) => {
             })
         }
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -94,8 +89,9 @@ router.get('/availableflights', async (request, response) => {
             result: result
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -115,8 +111,9 @@ router.get('/availabledepartureairportsfiltered', async (request, response) => {
             results: result
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -134,8 +131,40 @@ router.get('/availablearrivalairportsfiltered', async (request, response) => {
             results: result
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.get('/flightsofuser', async (request, response) => {
+    try {
+
+        if (request.session && request.session.user && request.session.user.id) {
+            let active_flights;
+            let previous_flights;
+            if (request.get("Accept-Language") == "hu") {
+                active_flights = await database.selectActiveFlightsByUserIdHun(request.session.user.id);
+                previous_flights = await database.selectPreviousFlightsByUserIdHun(request.session.user.id);
+            } else {
+                active_flights = await database.selectActiveFlightsByUserIdEn(request.session.user.id);
+                previous_flights = await database.selectPreviousFlightsByUserIdEn(request.session.user.id);
+            }
+            response.status(200).json({
+                flights: { active_flights, previous_flights }
+            });
+        } else {
+
+            response.status(401).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        }
+
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -154,8 +183,9 @@ router.get('/availabledeparturedatesfiltered', async (request, response) => {
             departuredates: departuredates
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -174,8 +204,9 @@ router.get('/availablearrivaldatesfiltered', async (request, response) => {
             arrivaldates: arrivaldates
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -195,8 +226,9 @@ router.get('/availablereturndates', async (request, response) => {
             returndates: returndates
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -216,8 +248,9 @@ router.get('/swappableairportswithsamedeparturedates', async (request, response)
             airports: airports
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -237,8 +270,9 @@ router.get('/swappableairports', async (request, response) => {
             airports: airports
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -252,16 +286,22 @@ router.get('/hu/flights', async (request, response) => {
             });
         } else {
 
-            let data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren);
-            data.map(x => x.BasePrice = `${x.BasePrice} HUF`);
+            let data;
+            if (LoggedInCheck(request)) {
+                data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), request.session.user.id);
+            } else {
+                data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL");
+            }
+
             response.status(200).json({
                 flights: data
             });
 
         }
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -276,17 +316,144 @@ router.get('/en/flights', async (request, response) => {
         } else {
 
 
-            let current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
-            let data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, request.query.numOfAdults + request.query.numOfChildren);
-            data.map(x => x.BasePrice = `${Math.round(x.BasePrice * current_eur_exch_rate)} EUR`);
+            let data;
+            let current_eur_exch_rate;
+
+            try {
+                current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+            } catch {
+                current_eur_exch_rate = 0.00259;
+            }
+            if (LoggedInCheck(request)) {
+                data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), request.session.user.id);
+            } else {
+                data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL");
+            }
+
+
+            data.map(x => x.PriceInHUF = Math.round(x.PriceInHUF * current_eur_exch_rate));
 
             response.status(200).json({
                 flights: data
             });
         }
-    } catch (error) {
+    } catch {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.get('/cheapestflights', async (request, response) => {
+    try {
+        let one_way;
+        if (request.get("Accept-Language") == "hu") {
+            if (LoggedInCheck(request)) {
+
+                one_way = await database.selectTop4CheapestOneWayFlightsHun(request.session.user.id);
+            } else {
+                one_way = await database.selectTop4CheapestOneWayFlightsHun("NULL");
+            }
+
+            //return_ = await database.selectCheapestReturnFlightsHun();
+        } else {
+            let current_eur_exch_rate;
+
+            try {
+                current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+            } catch {
+                current_eur_exch_rate = 0.00259;
+            }
+
+            if (LoggedInCheck(request)) {
+                one_way = await database.selectTop4CheapestOneWayFlightsEn(request.session.user.id);
+            } else {
+                one_way = await database.selectTop4CheapestOneWayFlightsEn("NULL");
+            }
+            //return_ = await database.selectCheapestReturnFlightsEn()
+            one_way.map(x => x.PriceInHUF = Math.round(x.PriceInHUF * current_eur_exch_rate));
+            //return_.map(x => x.PriceInHUF = `${Math.round(x.PriceInHUF * current_eur_exch_rate)}`);
+
+        }
+
+        response.status(200).json({
+            results: { "one_way": one_way }
+        });
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.get('/activereservations', async (request, response) => {
+    try {
+
+        if (request.session && request.session.user && request.session.user.id) {
+
+            if (request.query.flight_id == undefined) {
+
+                response.status(400).json({
+                    message: request.t("errors.missing_url_parameter", { returnObjects: true })
+                });
+            } else {
+                const active_reservations = await database.selectActiveReservationsByUserIdAndFlightId(request.session.user.id, request.query.flight_id);
+
+                response.status(200).json({
+                    reservations: active_reservations
+                });
+            }
+
+
+        } else {
+
+            response.status(401).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        }
+
+
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.get('/previousreservations', async (request, response) => {
+    try {
+
+        if (request.session && request.session.user && request.session.user.id) {
+
+            if (request.query.flight_id == undefined) {
+
+                response.status(400).json({
+                    message: request.t("errors.missing_url_parameter", { returnObjects: true })
+                });
+            } else {
+                const previous_reservations = await database.selectPreviousReservationsByUserIdAndFlightId(request.session.user.id, request.query.flight_id);
+
+                response.status(200).json({
+                    reservations: previous_reservations
+                });
+            }
+
+
+        } else {
+
+            response.status(401).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        }
+
+
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -298,8 +465,23 @@ router.get('/geterrors', (request, response) => {
             errors: request.t("errors", { returnObjects: true })
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.get('/getindex', (request, response) => {
+    try {
+
+        response.status(200).json({
+            index: request.t("index", { returnObjects: true })
+        });
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -311,8 +493,9 @@ router.get('/getflights', (request, response) => {
             flights: request.t("flights", { returnObjects: true })
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -324,8 +507,9 @@ router.get('/getnavbar', (request, response) => {
             navbar: request.t("navbar", { returnObjects: true })
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -337,8 +521,9 @@ router.get('/getplanner', (request, response) => {
             planner: request.t("planner", { returnObjects: true })
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -350,8 +535,9 @@ router.get('/getplannerpassengerspopover', (request, response) => {
             planner_passengers_popover: request.t("planner_passengers_popover", { returnObjects: true })
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -363,8 +549,9 @@ router.get('/getfooter', (request, response) => {
             footer: request.t("footer", { returnObjects: true })
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -376,8 +563,9 @@ router.get('/getlocale', (request, response) => {
             locale: request.t("locale", { returnObjects: true })
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -389,8 +577,9 @@ router.get('/getmodal', (request, response) => {
             modal: request.t("modal", { returnObjects: true })
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -402,8 +591,9 @@ router.get('/getmap', (request, response) => {
             map: request.t("map", { returnObjects: true })
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -415,8 +605,64 @@ router.get('/getaboutus', (request, response) => {
             about_us: request.t("about_us", { returnObjects: true })
         });
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: error
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.get('/getseatchooser', (request, response) => {
+    try {
+
+        response.status(200).json({
+            seat_chooser: request.t("seat_chooser", { returnObjects: true })
+        });
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.get('/getprofile', (request, response) => {
+    try {
+
+        response.status(200).json({
+            profile: request.t("profile", { returnObjects: true })
+        });
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.get('/getloyaltyprogram', (request, response) => {
+    try {
+
+        response.status(200).json({
+            loyalty_program: request.t("loyalty_program", { returnObjects: true })
+        });
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.get('/checklogin', (request, response) => {
+    try {
+        response.status(200).json({
+            logged_in: LoggedInCheck(request)
+        });
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -428,7 +674,7 @@ router.post('/login', async (request, response) => {
             const login = await database.Login(email);
             if (!login) {
                 return response.status(400).json({
-                    message: 'Rossz email vagy jelszó'
+                    error: request.t("modal.error.wrong_email_or_password", { returnObjects: true })
                 });
             }
             else {
@@ -441,30 +687,31 @@ router.post('/login', async (request, response) => {
                     console.log(request.session.user)
                     if (request.session.user.role === 1) {
                         response.status(201).json({
-                            message: 'Sikeres bejelentkezés',
+                            message: request.t("modal.success.login_successful", { returnObjects: true }),
                             admin: true
                         });
                     }
                     response.status(201).json({
-                        message: 'Sikeres bejelentkezés',
+                        message: request.t("modal.success.login_successful", { returnObjects: true }),
                         admin: false
                     });
                 }
                 else {
                     response.status(400).json({
-                        message: 'Rossz email vagy jelszó'
+                        error: request.t("modal.error.wrong_password", { returnObjects: true })
                     });
                 }
             }
         }
         else {
             response.status(400).json({
-                message: 'A felhasználó nem adta meg valamelyik adatot'
+                error: request.t("modal.error.wrong_email_or_password", { returnObjects: true })
             });
         }
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: 'Ez a végpont nem működik.'
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -474,27 +721,28 @@ router.post('/register', async (request, response) => {
         const { nev, email, jelszo, szuldatum } = request.body
         if (!nev || !email || !jelszo || !szuldatum) {
             return response.status(400).json({
-                message: 'A felhasználó nem adta meg valamelyik adatot'
+                error: request.t("errors.missing_data", { returnObjects: true })
             });
         }
         else {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
-            const register = await database.Register(nev, email, hashedPassword, szuldatum, 1);
+            const register = await database.Register(nev, email, hashedPassword, szuldatum);
             if (!register) {
                 return response.status(400).json({
-                    message: 'Sikertelen regisztráció'
+                    error: request.t("modal.error.registration_unsuccessful", { returnObjects: true })
                 });
             }
             else {
                 response.status(200).json({
-                    message: 'Sikeres Regisztráció',
+                    message: request.t("modal.success.registration_successful", { returnObjects: true }),
                 });
             }
         }
     } catch (error) {
+        console.error(error)
         response.status(500).json({
-            message: 'Ez a végpont nem működik.'
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -503,48 +751,177 @@ router.post('/register', async (request, response) => {
 router.post('/logout', async (request, response) => {
     try {
         if (!request.session) {
-            return response.status(200).json({
-                message: 'Nincs aktív session'
+            return response.status(400).json({
+                message: request.t("errors.no_active_session", { returnObjects: true })
             });
         }
         request.session.destroy(err => {
             if (err) {
-                console.error('Session destroy hiba:', err);
-                return response.status(500).json({ message: 'Sikertelen kijelentkezés' })
+                console.error('Session destroy error:', err);
+                return response.status(500).json({ error: request.t("modal.error.logout_unsuccessful", { returnObjects: true }) })
             }
             response.clearCookie('connect.sid');
             return response.status(200).json({
-                message: 'Sikeres Kijelentkezés'
+                message: request.t("modal.success.logout_successful", { returnObjects: true })
             })
         })
     } catch (error) {
-        console.error('Logout Hiba:', error);
-        return response.status(500).json({ message: 'Szerverhiba a kijelentkezés' });
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
     }
 });
 
 router.get('/husegprogram', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            return response.status(220).json({
-                message: "Nem vagy bejelentkezve!"
+            return response.status(401).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
             })
         }
         else {
             const user = await database.Husegprogram(request.session.user.id);
             response.status(200).json({
-                message: "Siker",
                 result: user
             })
         }
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: 'Ez a végpont nem működik.'
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
 
+router.get('/profil', async (request, response) => {
+    try {
+        const user = await database.Profil(request.session.user.id);
+        response.status(200).json({
+            result: user
+        })
+
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.post('/verifypassword', async (request, response) => {
+    try {
+        if (!LoggedInCheck(request)) {
+            return response.status(401).json({
+                error: request.t("errors.login_needed_post", { returnObjects: true })
+            });
+        }
+
+        const { password } = request.body;
+
+        const user = await database.getUserById(request.session.user.id);
+
+        if (!user) {
+            return response.status(400).json({
+                message: request.t("profile.error.user_not_found", { returnObjects: true })
+            });
+        }
+
+        if (!(await bcrypt.compare(password, user[0].UserPassword)) || !password) {
+            response.status(400).json({
+                error: request.t("modal.error.wrong_password", { returnObjects: true }),
+                verified: false
+            });
+            
+        } else {
+            response.status(200).json({
+                message: request.t("modal.success.password_verified", { returnObjects: true }),
+                verified: true
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.put('/updateprofile', async (request, response) => {
+    try {
+        if (!LoggedInCheck(request)) {
+            return response.status(401).json({
+                error: request.t("errors.login_needed_post", { returnObjects: true })
+            });
+        }
+
+        const { userName, email, password } = request.body;
+
+        if (!userName || !email || !password) {
+            return response.status(400).json({
+                error: request.t("errors.missing_data", { returnObjects: true })
+            });
+        }
+
+        const user = await database.getUserById(request.session.user.id);
+
+        if (!user) {
+            return response.status(400).json({
+                error: request.t("profile.error.user_not_found", { returnObjects: true })
+            });
+        }
+
+        // Verify password first
+        if (!(await bcrypt.compare(password, user[0].UserPassword))) {
+            return response.status(400).json({
+                error: request.t("modal.error.wrong_password", { returnObjects: true })
+            });
+        }
+
+        // Update profile
+        await database.updateUserProfile(request.session.user.id, userName, email);
+
+        response.status(200).json({
+            message: request.t("modal.success.profile_updated_successfully", { returnObjects: true })
+        });
+
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.put('/cancelreservations', async (request, response) => {
+    try {
+        if (!LoggedInCheck(request)) {
+            response.status(401).json({
+                error: request.t("errors.login_needed_post", { returnObjects: true })
+            });
+        } else {
+
+            let {reservations} = request.body;
+
+            if (reservations == undefined) {
+                response.status(400).json({
+                    error: request.t("errors.missing_data", { returnObjects: true })
+                });
+            } else {
+                await database.cancelReservations(reservations);
+                response.status(200).json({
+                    message: request.t("modal.success.bookings_have_been_cancelled_successfully", { returnObjects: true })
+                });
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
 
 function LoggedInCheck(request) {
     let vissza = false;
@@ -564,7 +941,9 @@ function LoggedInCheck(request) {
 router.get('/helyfoglalas', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            throw new Error("Nem vagy bejelentkezve!")
+            response.status(401).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
         }
         else {
             let id = request.query.id;
@@ -572,14 +951,26 @@ router.get('/helyfoglalas', async (request, response) => {
                 throw new Error("Nincs járat id")
             }
             const helyek = await database.selectAvailableSeatsOnFlight(id, request.session.user.id);
+
+            if (request.get("Accept-Language") == "en") {
+                let current_eur_exch_rate;
+
+                try {
+                    current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+                } catch {
+                    current_eur_exch_rate = 0.00259;
+                }
+
+                helyek.map(x => x.PriceInHUF = Math.round(x.PriceInHUF * current_eur_exch_rate))
+            }
             response.status(200).json({
                 helyek: helyek
             })
         }
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -587,7 +978,9 @@ router.get('/helyfoglalas', async (request, response) => {
 router.post('/helyfoglalas', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            throw new Error("Nem vagy bejelentkezve!")
+            response.status(401).json({
+                error: request.t("errors.login_needed_post", { returnObjects: true })
+            });
         }
         else {
             const { flightID, rowID, columnID, isAdult } = request.body;
@@ -597,7 +990,7 @@ router.post('/helyfoglalas', async (request, response) => {
             }
 
             if (!flightID || !rowID || !columnID) {
-                throw new Error("Hiányzó adat.")
+                throw new Error(request.t("missing_data"))
             }
             const siker = await database.SeatReservation(request.session.user.id, flightID, rowID, columnID, parsedIsAdult);
             if (!siker) {
@@ -608,9 +1001,9 @@ router.post('/helyfoglalas', async (request, response) => {
             })
         }
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });

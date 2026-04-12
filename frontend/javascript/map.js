@@ -2,25 +2,13 @@ import { getNavbar } from "./locale.js";
 import { getLocale } from "./locale.js";
 import { getFooter } from "./locale.js";
 import { getMap } from "./locale.js";
-import { modalInit } from "./modal.js";
 import { plannerMapInit } from "./plannermap.js";
+import { plannerResizer } from "./plannerresizer.js";
+import { initI18n } from "./toolbox.js";
 
 $(async function () {
 
-  let getlocale = await getLocale(); // megadja, hogy a böngésző nyelve magyar vagy angol (default) 
-
-  let language;
-
-  let old_url = window.location.href.split("/")
-  if (old_url[3] == "map") {
-    old_url.splice(3, 0, getlocale);
-    let new_url = old_url.join("/")
-    history.pushState({}, "", new_url);
-    language = getlocale;
-
-  } else {
-    language = old_url[3];
-  }
+  let language = await initI18n("map");
 
   (g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })({
     key: "AIzaSyCGmwlN95_KmdNN5xAq2VO7qJCWSrNkuaA",
@@ -28,21 +16,20 @@ $(async function () {
     language: language
   });
 
+  let getmap = await getMap(language);
+  $(document).prop('title', `${getmap.title}`);
 
-  $("html").prop("lang", language);
-
-  await initMap(language);
-
-  await getNavbar(language, old_url);
-  await modalInit(language);
+  await initMap(language, getmap);
 
   await plannerMapInit(language);
+
+  plannerResizer();
 
   await getFooter(language);
 
 });
 
-async function initMap(language) {
+async function initMap(language, i18n_values) {
   /* 
   Tömb elemei:
       0 - marker objektum
@@ -162,17 +149,15 @@ async function initMap(language) {
   });
 
   // /api/availabledepartureairportsfiltered
-  initMapMarkers("/api/availabledepartureairportsfiltered", "origin", origin_markers, map, language, {glyphColor: '#FFFFFF', borderColor: '#dc3545', background: '#dc3545' });
-  initMapMarkers("/api/availablearrivalairportsfiltered", "destination", destination_markers, null, language, {glyphColor: '#dc3545', borderColor: '#dc3545', background: '#D1D1D1' });
+  initMapMarkers("/api/availabledepartureairportsfiltered", "origin", origin_markers, map, language, {glyphColor: '#FFFFFF', borderColor: '#dc3545', background: '#dc3545' }, i18n_values);
+  initMapMarkers("/api/availablearrivalairportsfiltered", "destination", destination_markers, null, language, {glyphColor: '#dc3545', borderColor: '#dc3545', background: '#D1D1D1' }, i18n_values);
   
 }
 
-async function initMapMarkers(api, input_name, markers_array, map, language, custom_pin_obj) {
+async function initMapMarkers(api, input_name, markers_array, map, language, custom_pin_obj, i18n_values) {
 
   const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
   let pins = (await (await fetch(`${api}`, { method: "GET", headers: { "Accept-Language": language } })).json()).results;
-
-  let getmap = await getMap(language);
 
   for (let i = 0; i < pins.length; i++) {
     let cordinates = pins[i].GeographicCoordinates.split(',').map(x => parseFloat(x));
@@ -196,7 +181,7 @@ async function initMapMarkers(api, input_name, markers_array, map, language, cus
 
 
     let btn = $('<button>', {
-      text: getmap.choose_button,
+      text: i18n_values.choose_button,
       class: 'pin-btn',
       on: {
         "click": () => {

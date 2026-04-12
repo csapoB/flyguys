@@ -1,5 +1,5 @@
-import { getPlanner } from "./locale.js";
-import { getPlannerPassengersPopover } from "./locale.js";
+import { getPlannerPassengersPopover, getPlanner } from "./locale.js";
+import { dateFormatter, popoverManualTrigger } from "./toolbox.js";
 export async function plannerInit(current_language) {
 
 
@@ -18,7 +18,7 @@ export async function plannerInit(current_language) {
     // Datepickerek
     let $departure = $("#departure_input");
     let available_departure_dates = (await (await fetch("/api/availabledeparturedatesfiltered", { method: "GET" })).json()).departuredates
-    let $departure_datepicker = $departure.datepicker({
+    $departure.datepicker({
         beforeShowDay: function (d) {
             let year = d.getFullYear(),
                 month = ("0" + (d.getMonth() + 1)).slice(-2),
@@ -60,7 +60,6 @@ export async function plannerInit(current_language) {
 
                         returnEnabler(available_return_dates, current_language);
 
-                        
                         airportSwapperEnabler(origin[0], destination[0], "", "");
 
                     }
@@ -181,7 +180,7 @@ export async function plannerInit(current_language) {
 
     // Utasok popover
     let passengers = await passengers_popoverInit("passengers_input", "passengers_popover");
-    popoverManualTrigger(passengers[0], passengers[1]);
+    //popoverManualTrigger(passengers[0], passengers[1]);
 
 
     $("#search_flights").on("click", function (e) {
@@ -269,69 +268,12 @@ export async function passengers_popoverInit(input_field_id, content_div_id) {
         container: "body",
         content: passengers_popover_contentGenerator(content_div_id, getplanner_passengers_popover),
         placement: "bottom",
-        trigger: "manual" // A popover mikor jelenjen meg. "manual": a fejlesztő írja meg hozzá a szabályrendszert
+        trigger: "click" // A popover mikor jelenjen meg. "manual": a fejlesztő írja meg hozzá a szabályrendszert
     });
 
     return [$input_field, popover];
 }
 
-// Eseménykezelő a beviteli mezőhöz, valamint a popoverhez
-export function popoverManualTrigger($input_field, popover_obj) {
-    let popover_div;
-    $input_field.on("click.popover", function () {
-
-        if (popover_obj.tip == null) {
-
-            popover_obj.show();
-
-            popover_div = document.getElementById(popover_obj.tip.id); // Az popover_div id-ja minden megjelenésnél újragenerálódik => más lesz, mint az előző
-            popover_div.tabIndex = -1; // A tabindex beállítása azért szükséges, hogy az elemet (popover_div) a böngésző focusable-nek tekintse
-            popover_div.addEventListener("blur", (event) => {
-
-                if (event.relatedTarget == null) { // Ha az elem amire kattintottunk nem focusable, akkor lesz null az event.relatedTarget értéke
-                    popover_obj.hide();
-                } else {
-                    if (event.relatedTarget.id != $input_field.prop("id")) { // Ha nem az input_fiealdbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
-                        popover_obj.hide();
-                    }
-                }
-            });
-        }
-    });
-
-    $input_field.on("focus.popover", function () {
-
-        if (popover_obj.tip == null) {
-
-            popover_obj.show();
-
-            popover_div = document.getElementById(popover_obj.tip.id); // Az popover_div id-ja minden megjelenésnél újragenerálódik => más lesz, mint az előző
-            popover_div.tabIndex = -1; // A tabindex beállítása azért szükséges, hogy az elemet (popover_div) a böngésző focusable-nek tekintse
-            popover_div.addEventListener("blur", (event) => {
-
-                if (event.relatedTarget == null) { // Ha az elem amire kattintottunk nem focusable, akkor lesz null az event.relatedTarget értéke
-                    popover_obj.hide();
-                } else {
-                    if (event.relatedTarget.id != $input_field.prop("id")) { // Ha nem az input_fiealdbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
-                        popover_obj.hide();
-                    }
-                }
-            });
-        }
-    });
-
-    $input_field.on("blur.popover", function (event) {
-
-        
-        if (event.relatedTarget == null) { // Ha az elem amire kattintottunk nem focusable, akkor lesz null az event.relatedTarget értéke
-            popover_obj.hide();
-        } else {
-            if (event.relatedTarget.id != popover_div.id) { // Ha nem a popover_divbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
-                popover_obj.hide();
-            }
-        }
-    });
-}
 
 function airports_popover_contentGenerator(input_field_id, content_div_id, popover_obj, airports_data_from_api) {
 
@@ -523,7 +465,7 @@ function airports_popover_contentGenerator(input_field_id, content_div_id, popov
 
     return $popover_content;
 }
-
+// probléma : annyi utast lehessen megadni maximum, ahány szabad férőhely van a járaton
 function passengers_popover_contentGenerator(content_div_id, popover_content_i18n_values) {
 
     let $popover_content = $("<div>", {
@@ -535,13 +477,15 @@ function passengers_popover_contentGenerator(content_div_id, popover_content_i18
     $passengers_input.data("num_of_children", 0);
 
     let $adults_div = $("<div>", {
-        "class": "mt-2 pb-3 pt-2 mb-2 border-bottom"
+        "class": "mt-2 pb-3 pt-2 mb-2 border-bottom acDivs"
     });
 
     let $label_adults = $("<span>", {
         "class": "me-2",
         "text": `${popover_content_i18n_values.adults_inc_dec}:`
     });
+
+    let $acont = $("<div>");
 
     let $minus_adult = $("<span>", {
         "class": "text-danger",
@@ -575,7 +519,7 @@ function passengers_popover_contentGenerator(content_div_id, popover_content_i18
             "click": function () {
                 // A felnőttek számát növeli egyel, ha kisebb vagy egyenlő, mint 16
                 let serv = parseInt($("#counter_adults").text());
-                if (serv <= 16) {
+                if ((serv + parseInt($("#counter_children").text())) <= 180) {
                     serv++;
                     $("#counter_adults").text(serv);
                     let counter_children = parseInt($("#counter_children").text());
@@ -588,19 +532,22 @@ function passengers_popover_contentGenerator(content_div_id, popover_content_i18
     });
 
     $adults_div.append($label_adults);
-    $adults_div.append($minus_adult);
-    $adults_div.append($counter_adults);
-    $adults_div.append($plus_adult);
+    $acont.append($minus_adult);
+    $acont.append($counter_adults);
+    $acont.append($plus_adult);
+    $adults_div.append($acont);
 
 
     let $children_div = $("<div>", {
-        "class": "mt-2 pb-3 pt-2 mb-2"
+        "class": "mt-2 pb-3 pt-2 mb-2 acDivs"
     });
 
     let $label_children = $("<span>", {
         "class": "me-2",
         "text": `${popover_content_i18n_values.children_inc_dec}:`
     });
+
+    let $ccont = $("<div>");
 
     let $minus_child = $("<span>", {
         "class": "text-danger",
@@ -633,7 +580,7 @@ function passengers_popover_contentGenerator(content_div_id, popover_content_i18
             "click": function () {
                 // a gyerekek számát növeli egyel, ha kisebb vagy egyenlő, mint 16
                 let serv = parseInt($("#counter_children").text());
-                if (serv <= 16) {
+                if ((serv + parseInt($("#counter_adults").text())) <= 180) {
                     serv++;
                     $("#counter_children").text(serv);
                     let counter_adults = parseInt($("#counter_adults").text());
@@ -645,9 +592,10 @@ function passengers_popover_contentGenerator(content_div_id, popover_content_i18
     });
 
     $children_div.append($label_children);
-    $children_div.append($minus_child);
-    $children_div.append($counter_children);
-    $children_div.append($plus_child);
+    $ccont.append($minus_child);
+    $ccont.append($counter_children);
+    $ccont.append($plus_child);
+    $children_div.append($ccont);
 
     $popover_content.append($adults_div);
     $popover_content.append($children_div);
@@ -828,15 +776,3 @@ export async function airportSwapperEnabler($origin_input, $destination_input, d
 
 }
 
-export function dateFormatter(dateText, language) {
-    let dateText_array;
-    if (language == "en") {
-        dateText_array = dateText.split("/");
-        dateText_array.reverse();
-
-    } else {
-        dateText_array = dateText.split(".");
-        dateText_array.pop();
-    }
-    return dateText_array.join("-");
-}

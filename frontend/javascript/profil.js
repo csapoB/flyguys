@@ -1,23 +1,19 @@
-import { getNavbar } from "./locale.js";
-import { modalInit } from "./modal.js";
-$(async function(){
+import { getProfile } from "./locale.js";
+import { initI18n, errorPageGenerator, initProfile } from "./toolbox.js";
+$(async function () {
 
-    await getNavbar("hu", "http://127.0.0.1:3000/profil".split("/"));
-    await modalInit("hu");
 
+    let language = await initI18n("profil"); 
+    let getprofile = await getProfile(language);
     try {
-        const response = await fetch('api/LoginCheck', {
-            method: 'GET',
-        });
+        await initProfile(language, getprofile);
 
-        const data = await response.json();
-        if (!data.allapot) {
-            window.location.href="/"
-        }
-        else{
-            alert("Be vagy jeletnkezve")
-        }
     } catch (error) {
-        console.log("hiba: " + error)
+        let $cont = $("#cont");
+        $cont.html("")
+        errorPageGenerator($cont, (await (await fetch("/api/geterrors", { method: "GET", headers: { "Accept-Language": language } })).json()).errors.client_error);
     }
+    
 });
+
+

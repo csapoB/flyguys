@@ -1,4 +1,4 @@
-$(function () {
+export function plannerResizer() {
     
     let x = window.matchMedia("(max-width: 992px)");
     resizer(x);
@@ -6,7 +6,7 @@ $(function () {
         resizer(x);
     });
 
-});
+}
 
 function resizer(x) {
     

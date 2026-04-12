@@ -1,4 +1,4 @@
-export function flightsResizer () {
+export function flightsResizer() {
 
     let xl = window.matchMedia("(max-width: 1400px)");
     let md = window.matchMedia("(max-width: 992px)");
@@ -18,7 +18,7 @@ export function flightsResizer () {
         resizersm(sm);
     });
 
-};
+}
 
 function resizerlg(x) {
 
@@ -37,19 +37,20 @@ function resizerlg(x) {
 
 function resizermd(x) {
 
+
     let $svg_resizer_48 = $(".svg_resizer_48");
     let $svg_resizer_32 = $(".svg_resizer_32");
 
     if (x.matches) { // If media query matches
 
-        
+    
 
         $svg_resizer_48.width("24");
         $svg_resizer_48.height("24");
         $svg_resizer_32.width("16");
         $svg_resizer_32.height("16");
 
-        
+
 
     } else {
 
@@ -64,17 +65,23 @@ function resizermd(x) {
 
 function resizersm(x) {
 
+
     let $svg_resizer_48 = $(".svg_resizer_48");
     let $svg_resizer_32 = $(".svg_resizer_32");
 
     if (x.matches) {
 
-            $svg_resizer_48.width("18");
-            $svg_resizer_48.height("18");
-            $svg_resizer_32.width("12");
-            $svg_resizer_32.height("12");
+        $(".destination").removeClass("flex-column");
+        $(".destination").addClass("flex-row my-3");
+        $svg_resizer_48.width("18");
+        $svg_resizer_48.height("18");
+        $svg_resizer_32.width("12");
+        $svg_resizer_32.height("12");
 
-        } 
+    } else {
+        $(".destination").removeClass("flex-row my-3");
+        $(".destination").addClass("flex-column");
+    }
 
 }
 

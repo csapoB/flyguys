@@ -27,7 +27,8 @@
     <script type="module" src="../javascript/index.js"></script>
     <script type="module" src="../javascript/modal.js"></script>
     <script type="module" src="../javascript/planner.js"></script>
-    <script src="../javascript/plannerresizer.js"></script>
+    <script type="module" src="../javascript/toolbox.js"></script>
+    <script type="module" src="../javascript/plannerresizer.js"></script>
 
     <!-- Zalando Sans Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -91,9 +92,9 @@
         </div>
     </nav>
 
-    <main class="flex-grow-1 mt-2">
+    <main class="flex-grow-1 mt-5">
         <div class="container">
-            <div class="border rounded">
+            <div class="border rounded shadow">
                 <form id="planner_form" action="/flights" method="get">
                     <div class="row">
                         <div id="origin_and_destination_div" class="col-md-12 col-lg-4 pe-0 border-end">
@@ -200,6 +201,7 @@
         </div>
         <div class="container-fluid py-5" id="keret">
             <div class="row text-center">
+                <h1 id="keret_cim" class="display-3 py-3">Legolcsóbb járatok</h1>
             </div>
         </div>
     </main>
@@ -216,7 +218,7 @@
                                     információk</a>
                             </li>
                             <li>
-                                <a id="news_footer" href="#" class="text-decoration-none">Hírek</a>
+                                <a id="magazine_footer" href="#" class="text-decoration-none">Magazin</a>
                             </li>
                         </ul>
                     </div>
@@ -270,6 +272,9 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        
     </div>
 </body>
 

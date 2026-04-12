@@ -1,14 +1,7 @@
 import { getPlanner } from "./locale.js";
-import { passengers_popoverInit } from "./planner.js";
-import { popoverManualTrigger } from "./planner.js";
-import { inputDisabler } from "./planner.js";
-import { inputSwitcher } from "./planner.js";
-import { airportSelector } from "./planner.js";
-import { returnEnabler } from "./planner.js";
-import { turnOff } from "./planner.js";
-import { turnOn } from "./planner.js";
-import { airportSwapperEnabler } from "./planner.js";
-import { dateFormatter } from "./planner.js";
+import { popoverManualTrigger, dateFormatter} from "./toolbox.js";
+import { inputDisabler, passengers_popoverInit, inputSwitcher, airportSelector, returnEnabler, turnOff, airportSwapperEnabler } from "./planner.js";
+
 
 export async function plannerMapInit(current_language) {
 

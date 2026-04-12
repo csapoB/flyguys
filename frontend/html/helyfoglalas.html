@@ -23,6 +23,7 @@
     <script src="../javascript/datepicker-en-GB.js"></script>
     <script type="module" src="../javascript/locale.js"></script>
     <script type="module" src="../javascript/helyfoglalas.js"></script>
+    <script type="module" src="../javascript/toolbox.js"></script>
     <script type="module" src="../javascript/modal.js"></script>
     <!-- <script src="../javascript/indexmeadiaquery.js"></script> -->
 
@@ -50,18 +51,36 @@
         <div class="collapse navbar-collapse mt-3 mt-lg-0" id="navbarContent">
 
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex">
-                    <li class="nav-item">
-                        <a id="about_us_nav" class="nav-link" href="#rolunk">Rólunk</a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="planner_nav" class="nav-link" href="/map">Tervezés</a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="loyalty_program_nav" class="nav-link" href="/husegprogram">Hűségprogram</a>
-                    </li>
-                </ul>
-            <div class="d-flex flex-column flex-lg-row gap-2 align-items-start align-items-lg-center ms-lg-auto mt-2 mt-lg-0">
-                <a class="nav-link" data-lang-code="hu" href="/en" id="language_nav"><span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" height="24" width="32"><defs><clipPath><path d="M-85 0h682v512H-85z"></path></clipPath></defs><g clip-path="url(#a)" transform="translate(80) scale(.94)"><path fill="#012169" d="M-256 0H768v512H-256z"></path><path fill="#fff" d="M-256 0v57l910 455h114v-57L-141 0h-115zM768 0v57l-909 455h-115v-57L654 0h114z"></path><path fill="#fff" d="M171 0v512h170V0H171zm-427 171v170H768V171H-256z"></path><path fill="#c8102e" d="M-256 205v102H768V205H-256zM205 0v512h102V0H205zm-461 512L85 341h77l-342 171h-76zm0-512L85 171H9L-256 38V0zm606 171L692 0h76L427 171h-77zm418 341L427 341h76l265 133v38z"></path></g></svg></span></a>
+                <li class="nav-item">
+                    <a id="about_us_nav" class="nav-link" href="#rolunk">Rólunk</a>
+                </li>
+                <li class="nav-item">
+                    <a id="planner_nav" class="nav-link" href="/map">Tervezés</a>
+                </li>
+                <li class="nav-item">
+                    <a id="loyalty_program_nav" class="nav-link" href="/husegprogram">Hűségprogram</a>
+                </li>
+            </ul>
+            <div
+                class="d-flex flex-column flex-lg-row gap-2 align-items-start align-items-lg-center ms-lg-auto mt-2 mt-lg-0">
+                <a class="nav-link" data-lang-code="hu" href="/en" id="language_nav"><span><svg
+                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" height="24" width="32">
+                            <defs>
+                                <clipPath>
+                                    <path d="M-85 0h682v512H-85z"></path>
+                                </clipPath>
+                            </defs>
+                            <g clip-path="url(#a)" transform="translate(80) scale(.94)">
+                                <path fill="#012169" d="M-256 0H768v512H-256z"></path>
+                                <path fill="#fff"
+                                    d="M-256 0v57l910 455h114v-57L-141 0h-115zM768 0v57l-909 455h-115v-57L654 0h114z">
+                                </path>
+                                <path fill="#fff" d="M171 0v512h170V0H171zm-427 171v170H768V171H-256z"></path>
+                                <path fill="#c8102e"
+                                    d="M-256 205v102H768V205H-256zM205 0v512h102V0H205zm-461 512L85 341h77l-342 171h-76zm0-512L85 171H9L-256 38V0zm606 171L692 0h76L427 171h-77zm418 341L427 341h76l265 133v38z">
+                                </path>
+                            </g>
+                        </svg></span></a>
                 <a class="btn btn-danger" id="login_button" data-bs-toggle="modal" href="#monadModal">Bejelentkezés</a>
                 <a class="btn btn-outline-dark" id="admin_button" href="/admin">Admin</a>
                 <a class="btn btn-outline-dark" id="profile_button" href="/profil">Profilom</a>
@@ -69,8 +88,8 @@
             </div>
         </div>
     </nav>
-    <div class="container-fluid my-4">
-        <div class="row">
+    <div id="frame" class="container-fluid my-4">
+        <div id="trips_frame" style="display: none;" class="row">
             <!-- Bal oldal: ülőhelyek -->
             <div class="col-lg-8">
                 <!-- Odaút helyek -->
@@ -87,7 +106,7 @@
                 </div>
                 <div class="text-center mb-4">
                     <div class="repulotest mx-auto">
-                        <h4 class="mb-4">Odaút - Válassz helyet!</h4>
+                        <h4 id="trip_to_title" class="mb-4">Odaút - Válassz helyet!</h4>
                         <div id="helyek"></div>
                     </div>
                 </div>
@@ -95,7 +114,7 @@
                 <!-- Visszaút helyek -->
                 <div id="visszaut_section" style="display:none;" class="text-center mb-4">
                     <div class="repulotest mx-auto">
-                        <h4 class="mb-4">Visszaút - Válassz helyet!</h4>
+                        <h4 id="trip_back_title" class="mb-4">Visszaút - Válassz helyet!</h4>
                         <div id="helyekvissza"></div>
                     </div>
                 </div>
@@ -108,11 +127,12 @@
                     <div class="card shadow-sm mb-3">
                         <div class="card-body">
                             <h5 class="card-title border-bottom pb-2">
-                                Odaút - Kiválasztott helyek
+                                <span id="trip_to_selected_seats_title">Odaút - Kiválasztott helyek</span>
                                 <span class="badge bg-secondary" id="oda_szamlalo">0 / 1</span>
                             </h5>
                             <ul id="kivalasztottak_oda" class="list-group list-group-flush mb-0">
-                                <li class="list-group-item italic">Nincs kiválasztott hely!</li>
+                                <li id="trip_to_no_seats_selected" class="list-group-item italic">Nincs kiválasztott
+                                    hely!</li>
                             </ul>
                         </div>
                     </div>
@@ -121,11 +141,12 @@
                     <div class="card shadow-sm mb-3" id="visszaut_card" style="display:none;">
                         <div class="card-body">
                             <h5 class="card-title border-bottom pb-2">
-                                Visszaút - Kiválasztott helyek
+                                <span id="trip_back_selected_seats_title">Visszaút - Kiválasztott helyek</span>
                                 <span class="badge bg-secondary" id="vissza_szamlalo">0 / 1</span>
                             </h5>
                             <ul id="kivalasztottak_vissza" class="list-group list-group-flush mb-0">
-                                <li class="list-group-item italic">Nincs kiválasztott hely!</li>
+                                <li id="trip_back_no_seats_selected" class="list-group-item italic">Nincs kiválasztott
+                                    hely!</li>
                             </ul>
                         </div>
                     </div>
@@ -134,8 +155,9 @@
                     <div class="card shadow-sm booking-summary-card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center fw-bold mb-3">
-                                <p class="mb-0 fs-5">Összesen:</p>
-                                <span class="fs-5 text-danger"><span id="ar">0</span> Ft</span>
+                                <p id="title_sum" class="mb-0 fs-5">Összesen:</p>
+                                <span class="fs-5 text-danger"><span id="ar">0</span><span id="sum_currency">
+                                        Ft</span></span>
                             </div>
                             <input type="button" value="Lefoglalás" class="btn btn-danger w-100 btn-lg" id="lefoglal"
                                 disabled>
@@ -152,6 +174,9 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+
     </div>
 </body>
 

@@ -1,117 +1,229 @@
 {
-    "locale" : "hu",
-
-    "index" : {
-        "body" : {
-
+    "locale": "hu",
+    "index": {
+        "title": "FlyGuys",
+        "body": {
+            "cheapest_flights": {
+                "title": "Legolcsóbb járatok",
+                "currency": "&nbspFt",
+                "per_person": " &nbsp/ fő",
+                "choose_seats": "Válasszon ülőhelyet!"
+            }
         }
-        
     },
-
-    "footer" : {
-        "title_about_us" : "Rólunk",
-        "title_services" : "Szolgáltatásaink",
-        "title_contact" : "Elérhetőségeink",
-        "company_infos" : "Vállalati információk",
-        "news" : "Hírek",
-        "loyalty_program" : "Törzsvásárlói program",
-        "flight_search" : "Járat kereső",
-        "my_flights" : "Járataim",
-        "travel_planner" : "Útvonaltervező",
-        "all_rights_reserved" : "© FlyGuys. Minden jog fenntartva."
+    "footer": {
+        "title_about_us": "Rólunk",
+        "title_services": "Szolgáltatásaink",
+        "title_contact": "Elérhetőségeink",
+        "company_infos": "Vállalati információk",
+        "magazine": "Magazin",
+        "loyalty_program": "Törzsvásárlói program",
+        "flight_search": "Járat kereső",
+        "my_flights": "Járataim",
+        "travel_planner": "Útvonaltervező",
+        "all_rights_reserved": "© FlyGuys. Minden jog fenntartva."
     },
-
-    "navbar" : {
-        "about_us" : "Rólunk",
-        "planner" : "Tervezés",
-        "loyalty_program" : "Hűségprogram",
-        "language_code" : "hu",
-        "language" : "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 480\" height=\"24\" width=\"32\"><defs><clipPath><path d=\"M-85 0h682v512H-85z\"></path></clipPath></defs><g clip-path=\"url(#a)\" transform=\"translate(80) scale(.94)\"><path fill=\"#012169\" d=\"M-256 0H768v512H-256z\"></path><path fill=\"#fff\" d=\"M-256 0v57l910 455h114v-57L-141 0h-115zM768 0v57l-909 455h-115v-57L654 0h114z\"></path><path fill=\"#fff\" d=\"M171 0v512h170V0H171zm-427 171v170H768V171H-256z\"></path><path fill=\"#c8102e\" d=\"M-256 205v102H768V205H-256zM205 0v512h102V0H205zm-461 512L85 341h77l-342 171h-76zm0-512L85 171H9L-256 38V0zm606 171L692 0h76L427 171h-77zm418 341L427 341h76l265 133v38z\"></path></g></svg>",
-        "log_in" : "Bejelentkezés",
-        "admin" : "Admin",
-        "my_profile" : "Profilom",
-        "log_out" : "Kijelentkezés"
-
+    "navbar": {
+        "about_us": "Rólunk",
+        "planner": "Tervezés",
+        "loyalty_program": "Hűségprogram",
+        "language_code": "hu",
+        "language": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 480\" height=\"24\" width=\"32\"><defs><clipPath><path d=\"M-85 0h682v512H-85z\"></path></clipPath></defs><g clip-path=\"url(#a)\" transform=\"translate(80) scale(.94)\"><path fill=\"#012169\" d=\"M-256 0H768v512H-256z\"></path><path fill=\"#fff\" d=\"M-256 0v57l910 455h114v-57L-141 0h-115zM768 0v57l-909 455h-115v-57L654 0h114z\"></path><path fill=\"#fff\" d=\"M171 0v512h170V0H171zm-427 171v170H768V171H-256z\"></path><path fill=\"#c8102e\" d=\"M-256 205v102H768V205H-256zM205 0v512h102V0H205zm-461 512L85 341h77l-342 171h-76zm0-512L85 171H9L-256 38V0zm606 171L692 0h76L427 171h-77zm418 341L427 341h76l265 133v38z\"></path></g></svg>",
+        "login": "Bejelentkezés",
+        "admin": "Admin",
+        "my_profile": "Profilom",
+        "logout": "Kijelentkezés"
     },
-
-    "planner" : {
-        "origin_label" : "Indulási hely",
-        "destination_label" : "Érkezési hely",
-        "departure_label" : "Indulás",
-        "return_label" : "Visszaút",
-        "passengers_label" : "Utasok",
-        "search_flights_button" : "Foglalás",
-        "passengers_input" : "1 felnőtt, 0 gyermek"
-
+    "planner": {
+        "origin_label": "Indulási hely",
+        "destination_label": "Érkezési hely",
+        "departure_label": "Indulás",
+        "return_label": "Visszaút",
+        "passengers_label": "Utasok",
+        "search_flights_button": "Foglalás",
+        "passengers_input": "1 felnőtt, 0 gyermek"
     },
-
-    "planner_passengers_popover" : {
-        "adults_inc_dec" : "Felnőttek",
-        "children_inc_dec" : "Gyerekek",
-        "adult" : "felnőtt",
-        "adults" : "felnőtt",
-        "child" : "gyermek",
-        "children" : "gyermek"
+    "planner_passengers_popover": {
+        "adults_inc_dec": "Felnőttek",
+        "children_inc_dec": "Gyerekek",
+        "adult": "felnőtt",
+        "adults": "felnőtt",
+        "child": "gyermek",
+        "children": "gyermek"
     },
-
-    "flights" : {
-        "title" : "Járatok",
-        "choose_flight" : "Válasszon járatot",
-        "choose_seats" : "Válasszon ülőhelyet!"
+    "flights": {
+        "title": "Járatok",
+        "choose_flight": "Válasszon járatot",
+        "choose_seats": "Válasszon ülőhelyet!",
+        "currency": "&nbspFt",
+        "per_person": " &nbsp/ fő",
+        "errors": {
+            "no_flights_by_parameters": "Sajnos, nincs a feltételeknek megfelelő járat."
+        }
     },
-
-    "errors" : {
-        "bad_http_get_request" : "A HTTP-GET lekérdezés nem megfelelő!",
-        "no_flights_by_parameters" : "Sajnos, nincs a feltételeknek megfelelő járat.",
-        "bad_url_parameter" : "HIBA : Az URL paraméterek közül valamelyik hibás.",
-        "server_error" : "Sajnos, hiba történt a szerverben. Kérjük, próbálja meg újra később!"
-
+    "errors": {
+        "bad_http_get_request": "A HTTP-GET lekérdezés nem megfelelő!",
+        "bad_url_parameter": "HIBA : Az URL paraméterek közül valamelyik hibás.",
+        "client_error": "Sajnos hiba történt a kliens oldalon. Kérjük, próbálja meg újra később!",
+        "server_error": "Sajnos, hiba történt a szerverben. Kérjük, próbálja meg újra később!",
+        "login_needed_get": "Hozzáférés megtagadva. Az adatok megtekintéséhez előbb be kell jelenetkeznie!",
+        "login_needed_post": "Hozzáférés megtagadva. Az adatok módosításához előbb be kell jelenetkeznie!",
+        "missing_data": "A szükséges adatok hiányznak!",
+        "end_point_not_working": "Ez a végpont nem működik!",
+        "no_active_session": "Nincs aktív session!",
+        "missing_url_parameter": "Hiányzó URL paraméter!"
     },
-    
-    "modal" : {
-        "log_in" : "Bejelentkezés",
-        "registration" : "Regisztráció",
-        "email" : "E-mail",
-        "password" : "Jelszó",
-        "no_account" : "Nincs még fiókod? Hozz létre egyet!",
-        "first_name" : "Keresztnév",
-        "last_name" : "Vezetéknév",
-        "birth_date" : "Születési dátum"
-    },
-
-    "map" : {
-        "choose_button" : "Kiválaszt"
-    },
-
-    "about_us" : {
-
-        "about_us_section" : {
-            "title" : "Rólunk",
-            "content" : "<p>A FlyGuys-nál hisszük, hogy a repülésnek többről kell szólnia, mint egyszerű közlekedésről – legyen kényelmes, megbízható és valóban élvezetes. Magyarországon alapított, Európa szívében működő légitársaságként célunk, hogy új megközelítést hozzunk a kereskedelmi repülés világába: modern értékekkel, innovatív gondolkodással és kiemelkedő utasközpontú szolgáltatásokkal.</p>"
+    "modal": {
+        "title": {
+            "login": "Bejelentkezés",
+            "registration": "Regisztráció",
+            "edit_profile": "Profil szerkesztése",
+            "verify_password": "Jelszó ellenőrzése",
+            "cancel_bookings": "Foglalások lemondása"
         },
-        "our_story_section" : {
-            "title" : "Történetünk",
-            "content" : "<p>A FlyGuys egy világos küldetéssel jött létre: elérhetővé, hatékonnyá és emberközelivé tenni a légi közlekedést. Magyarországi bázisunkról indulva gyorsan fejlődünk, és egyre több európai és közel-keleti várossal kötjük össze utasainkat – legyen szó üzleti vagy szabadidős utazásról.</p><p>Mint startup légitársaság, rugalmasan alkalmazkodunk és bátran építünk modern megoldásokra. Ennek köszönhetően folyamatosan fejlesztjük szolgáltatásainkat, alkalmazzuk a legújabb repüléstechnikai innovációkat, és biztosítjuk, hogy flottánk a legmagasabb biztonsági, kényelmi és környezeti követelményeknek feleljen meg.</p>" 
+        "field": {
+            "email": "E-mail",
+            "password": "Jelszó",
+            "first_name": "Keresztnév",
+            "last_name": "Vezetéknév",
+            "birth_date": "Születési dátum (éééé.hh.nn.)"
         },
-        
-        "destinations_section" : {
-            "title" : "Úticéljaink",
-            "content" : "<p>Folyamatosan bővülő útvonalhálózatunk összeköti Magyarországot többek között:</p><ul><li>Nyugat-, Közép- és Kelet-Európa nagyvárosaival</li><li>A Balkán fontos központjaival</li><li>A mediterrán régió kedvelt úti céljaival</li><li>A Közel-Kelet legdinamikusabban fejlődő városaival</li></ul><p>Bármi is legyen az úticél – munka, pihenés vagy kaland –, a FlyGuys kényelmes csatlakozásokat, átgondolt menetrendeket és utasainkra szabott szolgáltatásokat kínál, hogy az utazás valóban gördülékeny legyen.</p>"
+        "error": {
+            "login_unsuccessful": "Sikertelen bejelentkezés!",
+            "logout_unsuccessful": "Sikertelen kijelentkezés!",
+            "missing_email_and_password_fields": "Kérjük, töltse ki az email és jelszó mezőket!",
+            "server_error_during_login": "A bejelentkezéskor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
+            "registration_unsuccessful": "Sikertelen regisztráció!",
+            "password_char_limit": "A jelszó legalább 6 karakter hosszú kell legyen!",
+            "server_error_during_registration": "A regisztrációkor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
+            "server_error_during_logout": "A kijelentkezéskor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
+            "missing_password_field": "Kérjük, adja meg a jelszavát!",
+            "wrong_password": "Hibás jelszó!",
+            "server_error_during_password_verification": "A jelszó ellenőrzésekor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
+            "missing_fields": "Kérjük, töltse ki az összes beviteli mezőt!",
+            "profile_update_failed": "A profiladatok frissítése meghiúsult!",
+            "server_error_during_profile_update": "A profiladatok frissítésekor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
+            "wrong_email_or_password": "Rossz email vagy jelszó!"
         },
-
-        "our_commitment_section" : {
-            "title" : "Elkötelezettségünk",
-            "content" : "<p>A FlyGuys-nál kiemelten fontos számunkra:</p><ul><li>Utasaink kényelme – modern kabinok, barátságos személyzet és utasközpontú szemlélet</li><li>Hatékonyság – pontos és stresszmentes működés</li><li>Biztonság és megbízhatóság – világszínvonalú karbantartás és üzemeltetés</li><li>Innováció – okos technológiai megoldások az utazás minden szakaszában</li><li>Fenntarthatóság – üzemanyag-hatékony működés és felelős növekedés</li></ul>"
+        "success": {
+            "login_successful": "Sikeres bejelentkezés!",
+            "logout_successful": "Sikeres kijelentkezés!",
+            "registration_successful": "Sikeres regisztráció!",
+            "password_verified_for_profile_edit": "Jelszó ellenőrizve! Most már szerkesztheti a profilját.",
+            "profile_updated_successfully": "A profiladatok sikeresen frissítve!",
+            "password_verified": "Jelszó ellenőrizve!",
+            "bookings_have_been_cancelled_successfully" : "A kijelölt foglalások törlése sikeres!"
         },
-
-        "the_experience_section" : {
-            "title" : "FlyGuys élmény",
-            "content" : "<p>Mi többek vagyunk egy légitársaságnál — utazópartnerek vagyunk. Csapatunk minden tagja, a check-intől a pilótafülkéig, azon dolgozik, hogy utasaink meleg, személyes és figyelmes kiszolgálásban részesüljenek. A FlyGuys-nál Ön nem csupán egy utas – Ön a történetünk része, miközben együtt formáljuk a modern európai légi közlekedést.</p>"
+        "button": {
+            "save": "Módosítások mentése",
+            "verification": "Ellenőrzés"
         },
-
-        "join_us_section" : {
-            "title" : "Csatlakozzon hozzánk az égben",
-            "content" : "<p>Ahogy tovább bővítjük úti céljainkat és szolgáltatásainkat, örömmel várjuk, hogy velünk repüljön, és megtapasztalja az utazás új szintjét.<br>FlyGuys — Your journey starts with us.</p>"
+        "caption": {
+            "no_account": "Nincs még fiókod? Hozz létre egyet!",
+            "cancel_selected_reservations": "Az alábbi foglalások törlésre kerülnek:"
+        }
+    },
+    "map": {
+        "title": "Tervezés",
+        "choose_button": "Kiválaszt",
+        "error": {
+            "map_not_loaded": "Ismeretlen hiba miatt a térkép nem tudott betöltődni."
+        }
+    },
+    "about_us": {
+        "title": "Rólunk",
+        "about_us_section": {
+            "title": "Rólunk",
+            "content": "<p>A FlyGuys-nál hisszük, hogy a repülésnek többről kell szólnia, mint egyszerű közlekedésről – legyen kényelmes, megbízható és valóban élvezetes. Magyarországon alapított, Európa szívében működő légitársaságként célunk, hogy új megközelítést hozzunk a kereskedelmi repülés világába: modern értékekkel, innovatív gondolkodással és kiemelkedő utasközpontú szolgáltatásokkal.</p>"
+        },
+        "our_story_section": {
+            "title": "Történetünk",
+            "content": "<p>A FlyGuys egy világos küldetéssel jött létre: elérhetővé, hatékonnyá és emberközelivé tenni a légi közlekedést. Magyarországi bázisunkról indulva gyorsan fejlődünk, és egyre több európai és közel-keleti várossal kötjük össze utasainkat – legyen szó üzleti vagy szabadidős utazásról.</p><p>Mint startup légitársaság, rugalmasan alkalmazkodunk és bátran építünk modern megoldásokra. Ennek köszönhetően folyamatosan fejlesztjük szolgáltatásainkat, alkalmazzuk a legújabb repüléstechnikai innovációkat, és biztosítjuk, hogy flottánk a legmagasabb biztonsági, kényelmi és környezeti követelményeknek feleljen meg.</p>"
+        },
+        "destinations_section": {
+            "title": "Úticéljaink",
+            "content": "<p>Folyamatosan bővülő útvonalhálózatunk összeköti Magyarországot többek között:</p><ul><li>Nyugat-, Közép- és Kelet-Európa nagyvárosaival</li><li>A Balkán fontos központjaival</li><li>A mediterrán régió kedvelt úti céljaival</li><li>A Közel-Kelet legdinamikusabban fejlődő városaival</li></ul><p>Bármi is legyen az úticél – munka, pihenés vagy kaland –, a FlyGuys kényelmes csatlakozásokat, átgondolt menetrendeket és utasainkra szabott szolgáltatásokat kínál, hogy az utazás valóban gördülékeny legyen.</p>"
+        },
+        "our_commitment_section": {
+            "title": "Elkötelezettségünk",
+            "content": "<p>A FlyGuys-nál kiemelten fontos számunkra:</p><ul><li>Utasaink kényelme – modern kabinok, barátságos személyzet és utasközpontú szemlélet</li><li>Hatékonyság – pontos és stresszmentes működés</li><li>Biztonság és megbízhatóság – világszínvonalú karbantartás és üzemeltetés</li><li>Innováció – okos technológiai megoldások az utazás minden szakaszában</li><li>Fenntarthatóság – üzemanyag-hatékony működés és felelős növekedés</li></ul>"
+        },
+        "the_experience_section": {
+            "title": "FlyGuys élmény",
+            "content": "<p>Mi többek vagyunk egy légitársaságnál — utazópartnerek vagyunk. Csapatunk minden tagja, a check-intől a pilótafülkéig, azon dolgozik, hogy utasaink meleg, személyes és figyelmes kiszolgálásban részesüljenek. A FlyGuys-nál Ön nem csupán egy utas – Ön a történetünk része, miközben együtt formáljuk a modern európai légi közlekedést.</p>"
+        },
+        "join_us_section": {
+            "title": "Csatlakozzon hozzánk az égben",
+            "content": "<p>Ahogy tovább bővítjük úti céljainkat és szolgáltatásainkat, örömmel várjuk, hogy velünk repüljön, és megtapasztalja az utazás új szintjét.<br>FlyGuys — Your journey starts with us.</p>"
+        }
+    },
+    "seat_chooser": {
+        "title": "Válassz helyet!",
+        "currency": "&nbspFt",
+        "trip_to": "Odaút",
+        "trip_back": "Visszaút",
+        "seat": "ülés",
+        "sum": "Összesen:",
+        "booking": "Lefoglalás",
+        "selected_seats": "Kiválasztott helyek",
+        "no_seats_selected": "Nincs kiválasztott hely!",
+        "errors": {
+            "not_logged_in": "A foglaláshoz be kell jelentkeznie.",
+            "no_adults": "A foglalásnál legalább 1 felnőtt utasnak lennie kell."
+        }
+    },
+    "profile": {
+        "flights_tabel": {
+            "seat_column": "Hely",
+            "fare_class_column": "Osztály",
+            "passenger_column": "Utas",
+            "i_cancel_column": "Lemondás",
+            "adult": "felnőtt",
+            "child": "gyermek"
+        },
+        "bookings": "Foglalások",
+        "active_bookings": "Aktív foglalások",
+        "previous_bookings": "Korábbi foglalások",
+        "choose_flight": "Válasszon járatot!",
+        "no_active_bookings": "Úgy tűnik nincs egy aktív foglalásod sem.",
+        "no_previous_bookings": "Úgy tűnik nincsenek korábbi foglalásaid.",
+        "no_bookings": "Úgy tűnik még nem utaztál velünk.",
+        "select_all_for_cancellation": "Összes kijelölése lemondásra",
+        "cancel_selected": "Kijelöltek lemondása",
+        "error": {
+            "user_not_found": "A felhasználható nem található meg ay adatbázisban!"
+        }
+    },
+    "loyalty_program": {
+        "title": "Hűségprogram",
+        "num_of_my_flights": "Repüléseim száma",
+        "no_rank": "Nincs rang",
+        "max_rank_reached": "Max rang elérve!",
+        "num_of_travels_to_reach_next_level": "utazás a következő szintig",
+        "bronze": {
+            "title": "Bronz",
+            "range": "Repüléseid száma: 0-5",
+            "discount": "Kedvezményekért repüljön még velünk!"
+        },
+        "silver": {
+            "title": "Ezüst",
+            "range": "Repüléseid száma: 6-15",
+            "discount": "Foglalásoknál 1%-os kedvezmény"
+        },
+        "gold": {
+            "title": "Arany",
+            "range": "Repüléseid száma: 16-25",
+            "discount": "Foglalásoknál 5%-os kedvezmény"
+        },
+        "platinum": {
+            "title": "Platina",
+            "range": "Repüléseid száma: 26-35",
+            "discount": "Foglalásoknál 7%-os kedvezmény"
+        },
+        "diamond": {
+            "title": "Gyémánt",
+            "range": "Repüléseid száma: 36+",
+            "discount": "Foglalásoknál 10%-os kedvezmény"
         }
     }
 }
