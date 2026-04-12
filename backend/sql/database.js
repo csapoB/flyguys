@@ -201,7 +201,7 @@ async function Profil(id){
 }
 
 async function selectActiveReservationsByUserIdAndFlightId(userId, flightId){
-    const query = 'SELECT not_cancelled_reservations.RowID, not_cancelled_reservations.ColumnID, fareclass.FareClassName, not_cancelled_reservations.IsAdult FROM not_cancelled_reservations INNER JOIN flight ON not_cancelled_reservations.FlightID = flight.FlightID INNER JOIN fareclass ON fareclass.FareClassID = not_cancelled_reservations.FareClassID WHERE flight.DepartureDateTime > NOW() AND not_cancelled_reservations.PassengerID = ? AND not_cancelled_reservations.FlightID = ? ORDER BY not_cancelled_reservations.RowID ASC, not_cancelled_reservations.ColumnID;';
+    const query = 'SELECT not_cancelled_reservations.ReservationID, not_cancelled_reservations.RowID, not_cancelled_reservations.ColumnID, fareclass.FareClassName, not_cancelled_reservations.IsAdult FROM not_cancelled_reservations INNER JOIN flight ON not_cancelled_reservations.FlightID = flight.FlightID INNER JOIN fareclass ON fareclass.FareClassID = not_cancelled_reservations.FareClassID WHERE flight.DepartureDateTime > NOW() AND not_cancelled_reservations.PassengerID = ? AND not_cancelled_reservations.FlightID = ? ORDER BY not_cancelled_reservations.RowID ASC, not_cancelled_reservations.ColumnID;';
     const [rows] = await pool.execute(query, [userId, flightId]);
     return rows;
 }
@@ -213,10 +213,18 @@ async function selectPreviousReservationsByUserIdAndFlightId(userId, flightId){
 }
 
 async function updateUserProfile(userId, userName, email){
-    const query = 'UPDATE useraccount SET UserName = ?, UserEmail = ? WHERE UserID = ?';
+    const query = 'UPDATE useraccount SET UserName = ?, UserEmail = ? WHERE UserID = ?;';
     const [result] = await pool.execute(query, [userName, email, userId]);
     return result;
 }
+
+async function cancelReservations(reservation_ids){
+    let formatted_reservation_ids = reservation_ids.map((x) => parseInt(x));
+    const query = `UPDATE reservation SET IsCancelled = 1 WHERE ReservationID IN (?);`;
+    const [result] = await pool.query(query, [formatted_reservation_ids]);
+    return result;
+}
+
 
 
 // SELECT reservations_with_prices.RowID, reservations_with_prices.ColumnID, reservations_with_prices.FareClassID FROM reservations_with_prices WHERE reservations_with_prices.IsCancelled = 0;
@@ -252,5 +260,6 @@ module.exports = {
     selectActiveFlightsByUserIdEn,
     selectActiveFlightsByUserIdHun,
     selectPreviousFlightsByUserIdEn,
-    selectPreviousFlightsByUserIdHun
+    selectPreviousFlightsByUserIdHun,
+    cancelReservations
 };

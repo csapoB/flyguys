@@ -34,14 +34,14 @@ router.get('/airports', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
 router.get('/LoginCheck', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            return response.status(220).json({
+            return response.status(401).json({
                 allapot: false
             })
         }
@@ -54,7 +54,7 @@ router.get('/LoginCheck', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -62,7 +62,7 @@ router.get('/LoginCheck', async (request, response) => {
 router.get('/AdminCheck', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            return response.status(220).json({
+            return response.status(401).json({
                 admin: false
             })
         }
@@ -74,7 +74,7 @@ router.get('/AdminCheck', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -91,7 +91,7 @@ router.get('/availableflights', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -113,7 +113,7 @@ router.get('/availabledepartureairportsfiltered', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -133,7 +133,7 @@ router.get('/availablearrivalairportsfiltered', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -156,15 +156,15 @@ router.get('/flightsofuser', async (request, response) => {
             });
         } else {
 
-            response.status(220).json({
-                message: request.t("login_needed")
+            response.status(401).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
             });
         }
 
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -185,7 +185,7 @@ router.get('/availabledeparturedatesfiltered', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -206,7 +206,7 @@ router.get('/availablearrivaldatesfiltered', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -228,7 +228,7 @@ router.get('/availablereturndates', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -250,7 +250,7 @@ router.get('/swappableairportswithsamedeparturedates', async (request, response)
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -272,7 +272,7 @@ router.get('/swappableairports', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -301,7 +301,7 @@ router.get('/hu/flights', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -340,7 +340,7 @@ router.get('/en/flights', async (request, response) => {
     } catch {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -383,7 +383,7 @@ router.get('/cheapestflights', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -396,21 +396,21 @@ router.get('/activereservations', async (request, response) => {
             if (request.query.flight_id == undefined) {
 
                 response.status(400).json({
-                    message: request.t("missing_url_parameter")
+                    message: request.t("errors.missing_url_parameter", { returnObjects: true })
                 });
             } else {
                 const active_reservations = await database.selectActiveReservationsByUserIdAndFlightId(request.session.user.id, request.query.flight_id);
-                
+
                 response.status(200).json({
-                    reservations : active_reservations
+                    reservations: active_reservations
                 });
             }
 
 
         } else {
 
-            response.status(220).json({
-                message: request.t("login_needed")
+            response.status(401).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
             });
         }
 
@@ -418,7 +418,7 @@ router.get('/activereservations', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -431,21 +431,21 @@ router.get('/previousreservations', async (request, response) => {
             if (request.query.flight_id == undefined) {
 
                 response.status(400).json({
-                    message: request.t("missing_url_parameter")
+                    message: request.t("errors.missing_url_parameter", { returnObjects: true })
                 });
             } else {
                 const previous_reservations = await database.selectPreviousReservationsByUserIdAndFlightId(request.session.user.id, request.query.flight_id);
-                
+
                 response.status(200).json({
-                    reservations : previous_reservations
+                    reservations: previous_reservations
                 });
             }
 
 
         } else {
 
-            response.status(220).json({
-                message: request.t("login_needed")
+            response.status(401).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
             });
         }
 
@@ -453,7 +453,7 @@ router.get('/previousreservations', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -467,7 +467,7 @@ router.get('/geterrors', (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -481,7 +481,7 @@ router.get('/getindex', (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -495,7 +495,7 @@ router.get('/getflights', (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -509,7 +509,7 @@ router.get('/getnavbar', (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -523,7 +523,7 @@ router.get('/getplanner', (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -537,7 +537,7 @@ router.get('/getplannerpassengerspopover', (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -551,7 +551,7 @@ router.get('/getfooter', (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -565,7 +565,7 @@ router.get('/getlocale', (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -579,7 +579,7 @@ router.get('/getmodal', (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -593,7 +593,7 @@ router.get('/getmap', (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -607,7 +607,7 @@ router.get('/getaboutus', (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -621,7 +621,7 @@ router.get('/getseatchooser', (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -635,7 +635,7 @@ router.get('/getprofile', (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -649,7 +649,7 @@ router.get('/getloyaltyprogram', (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -662,7 +662,7 @@ router.get('/checklogin', (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -674,7 +674,7 @@ router.post('/login', async (request, response) => {
             const login = await database.Login(email);
             if (!login) {
                 return response.status(400).json({
-                    message: request.t("wrong_email_or_password")
+                    error: request.t("modal.error.wrong_email_or_password", { returnObjects: true })
                 });
             }
             else {
@@ -687,31 +687,31 @@ router.post('/login', async (request, response) => {
                     console.log(request.session.user)
                     if (request.session.user.role === 1) {
                         response.status(201).json({
-                            message: request.t("login_successful"),
+                            message: request.t("modal.success.login_successful", { returnObjects: true }),
                             admin: true
                         });
                     }
                     response.status(201).json({
-                        message: request.t("login_successful"),
+                        message: request.t("modal.success.login_successful", { returnObjects: true }),
                         admin: false
                     });
                 }
                 else {
                     response.status(400).json({
-                        message: request.t("wrong_email_or_password")
+                        error: request.t("modal.error.wrong_password", { returnObjects: true })
                     });
                 }
             }
         }
         else {
             response.status(400).json({
-                message: request.t("missing_data_by_user")
+                error: request.t("modal.error.wrong_email_or_password", { returnObjects: true })
             });
         }
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -721,7 +721,7 @@ router.post('/register', async (request, response) => {
         const { nev, email, jelszo, szuldatum } = request.body
         if (!nev || !email || !jelszo || !szuldatum) {
             return response.status(400).json({
-                message: request.t("missing_data_by_user")
+                error: request.t("errors.missing_data", { returnObjects: true })
             });
         }
         else {
@@ -730,19 +730,19 @@ router.post('/register', async (request, response) => {
             const register = await database.Register(nev, email, hashedPassword, szuldatum);
             if (!register) {
                 return response.status(400).json({
-                    message: request.t("registration_unsuccessful")
+                    error: request.t("modal.error.registration_unsuccessful", { returnObjects: true })
                 });
             }
             else {
                 response.status(200).json({
-                    message: request.t("registration_successful"),
+                    message: request.t("modal.success.registration_successful", { returnObjects: true }),
                 });
             }
         }
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -751,24 +751,24 @@ router.post('/register', async (request, response) => {
 router.post('/logout', async (request, response) => {
     try {
         if (!request.session) {
-            return response.status(200).json({
-                message: request.t("no_active_session")
+            return response.status(400).json({
+                message: request.t("errors.no_active_session", { returnObjects: true })
             });
         }
         request.session.destroy(err => {
             if (err) {
                 console.error('Session destroy error:', err);
-                return response.status(500).json({ error: request.t("logout_unsuccessful") })
+                return response.status(500).json({ error: request.t("modal.error.logout_unsuccessful", { returnObjects: true }) })
             }
             response.clearCookie('connect.sid');
             return response.status(200).json({
-                message: request.t("logout_successful")
+                message: request.t("modal.success.logout_successful", { returnObjects: true })
             })
         })
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -776,8 +776,8 @@ router.post('/logout', async (request, response) => {
 router.get('/husegprogram', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            return response.status(220).json({
-                message: request.t("login_needed")
+            return response.status(401).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
             })
         }
         else {
@@ -789,7 +789,7 @@ router.get('/husegprogram', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -804,7 +804,7 @@ router.get('/profil', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -812,91 +812,116 @@ router.get('/profil', async (request, response) => {
 router.post('/verifypassword', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            return response.status(220).json({
-                message: request.t("login_needed")
+            return response.status(401).json({
+                error: request.t("errors.login_needed_post", { returnObjects: true })
             });
         }
 
         const { password } = request.body;
-        if (!password) {
-            return response.status(400).json({
-                message: request.t("missing_data_by_user")
-            });
-        }
 
         const user = await database.getUserById(request.session.user.id);
-        
+
         if (!user) {
             return response.status(400).json({
-                message: request.t("user_not_found")
+                message: request.t("profile.error.user_not_found", { returnObjects: true })
             });
         }
 
-        if (await bcrypt.compare(password, user[0].UserPassword)) {
-            response.status(200).json({
-                message: request.t("password_correct"),
-                verified: true
-            });
-        } else {
+        if (!(await bcrypt.compare(password, user[0].UserPassword)) || !password) {
             response.status(400).json({
-                message: request.t("wrong_password"),
+                error: request.t("modal.error.wrong_password", { returnObjects: true }),
                 verified: false
+            });
+            
+        } else {
+            response.status(200).json({
+                message: request.t("modal.success.password_verified", { returnObjects: true }),
+                verified: true
             });
         }
     } catch (error) {
         console.log(error);
         response.status(500).json({
-            message: request.t("end_point_not_working")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
 
-router.post('/updateprofile', async (request, response) => {
+router.put('/updateprofile', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            return response.status(220).json({
-                message: request.t("not_logged_in")
+            return response.status(401).json({
+                error: request.t("errors.login_needed_post", { returnObjects: true })
             });
         }
 
         const { userName, email, password } = request.body;
-        
+
         if (!userName || !email || !password) {
             return response.status(400).json({
-                message: request.t("missing_data_by_user")
+                error: request.t("errors.missing_data", { returnObjects: true })
             });
         }
 
         const user = await database.getUserById(request.session.user.id);
-        
+
         if (!user) {
             return response.status(400).json({
-                message: request.t("user_not_found")
+                error: request.t("profile.error.user_not_found", { returnObjects: true })
             });
         }
 
         // Verify password first
         if (!(await bcrypt.compare(password, user[0].UserPassword))) {
             return response.status(400).json({
-                message: request.t("wrong_password")
+                error: request.t("modal.error.wrong_password", { returnObjects: true })
             });
         }
 
         // Update profile
         await database.updateUserProfile(request.session.user.id, userName, email);
-        
+
         response.status(200).json({
-            message: request.t("profile_updated_successfully")
+            message: request.t("modal.success.profile_updated_successfully", { returnObjects: true })
         });
 
     } catch (error) {
         console.log(error);
         response.status(500).json({
-            message: request.t("end_point_not_working")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
 
+router.put('/cancelreservations', async (request, response) => {
+    try {
+        if (!LoggedInCheck(request)) {
+            response.status(401).json({
+                error: request.t("errors.login_needed_post", { returnObjects: true })
+            });
+        } else {
+
+            let {reservations} = request.body;
+
+            if (reservations == undefined) {
+                response.status(400).json({
+                    error: request.t("errors.missing_data", { returnObjects: true })
+                });
+            } else {
+                await database.cancelReservations(reservations);
+                response.status(200).json({
+                    message: request.t("modal.success.bookings_have_been_cancelled_successfully", { returnObjects: true })
+                });
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
 
 function LoggedInCheck(request) {
     let vissza = false;
@@ -916,8 +941,8 @@ function LoggedInCheck(request) {
 router.get('/helyfoglalas', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            response.status(220).json({
-                message: "Nem vagy bejelentkezve!"
+            response.status(401).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
             });
         }
         else {
@@ -945,7 +970,7 @@ router.get('/helyfoglalas', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -953,8 +978,8 @@ router.get('/helyfoglalas', async (request, response) => {
 router.post('/helyfoglalas', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            response.status(220).json({
-                message: "Nem vagy bejelentkezve!"
+            response.status(401).json({
+                error: request.t("errors.login_needed_post", { returnObjects: true })
             });
         }
         else {
@@ -978,7 +1003,7 @@ router.post('/helyfoglalas', async (request, response) => {
     } catch (error) {
         console.error(error)
         response.status(500).json({
-            error: request.t("server_error")
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });

@@ -64,41 +64,64 @@
     "errors": {
         "bad_http_get_request": "A HTTP-GET lekérdezés nem megfelelő!",
         "bad_url_parameter": "HIBA : Az URL paraméterek közül valamelyik hibás.",
-        "client_error" : "Sajnos hiba történt a kliens oldalon. Kérjük, próbálja meg újra később!",
-        "server_error": "Sajnos, hiba történt a szerverben. Kérjük, próbálja meg újra később!"
+        "client_error": "Sajnos hiba történt a kliens oldalon. Kérjük, próbálja meg újra később!",
+        "server_error": "Sajnos, hiba történt a szerverben. Kérjük, próbálja meg újra később!",
+        "login_needed_get": "Hozzáférés megtagadva. Az adatok megtekintéséhez előbb be kell jelenetkeznie!",
+        "login_needed_post": "Hozzáférés megtagadva. Az adatok módosításához előbb be kell jelenetkeznie!",
+        "missing_data": "A szükséges adatok hiányznak!",
+        "end_point_not_working": "Ez a végpont nem működik!",
+        "no_active_session": "Nincs aktív session!",
+        "missing_url_parameter": "Hiányzó URL paraméter!"
     },
     "modal": {
-        "login": "Bejelentkezés",
-        "registration": "Regisztráció",
-        "email": "E-mail",
-        "password": "Jelszó",
-        "no_account": "Nincs még fiókod? Hozz létre egyet!",
-        "first_name": "Keresztnév",
-        "last_name": "Vezetéknév",
-        "birth_date": "Születési dátum (éééé.hh.nn.)",
-        "login_successful": "Sikeres bejelentkezés!",
-        "logout_successful": "Sikeres kijelentkezés!",
-        "login_unsuccessful": "Sikertelen bejelentkezés!",
-        "logout_unsuccessful": "Sikertelen kijelentkezés!",
-        "missing_email_and_password_fields": "Kérjük, töltse ki az email és jelszó mezőket!",
-        "server_error_during_login": "A bejelentkezéskor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
-        "registration_successful": "Sikeres regisztráció!",
-        "registration_unsuccessful": "Sikertelen regisztráció!",
-        "missing_fields": "Kérjük, töltse ki az összes kötelező mezőt!",
-        "password_char_limit": "A jelszó legalább 6 karakter hosszú kell legyen!",
-        "server_error_during_registration": "A regisztrációkor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
-        "server_error_during_logout": "A kijelentkezéskor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
-        "edit_profile": "Profil szerkesztése",
-        "verify": "Jelszó ellenőrzése",
-        "save": "Módosítások mentése",
-        "missing_password_field": "Kérjük, adja meg a jelszavát!",
-        "password_verified": "Jelszó ellenőrizve! Most már szerkesztheti a profilját.",
-        "wrong_password": "Hibás jelszó!",
-        "server_error_during_password_verification": "A jelszó ellenőrzésekor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
-        "missing_profile_fields": "Kérjük, töltse ki az összes profil mezőt!",
-        "profile_updated_successfully": "A profil sikeresen frissítve!",
-        "profile_update_failed": "A profil frissítése meghiúsult!",
-        "server_error_during_profile_update": "A profil frissítésekor szerverhiba lépett fel. Kérjük próbálkozzon újra később!"
+        "title": {
+            "login": "Bejelentkezés",
+            "registration": "Regisztráció",
+            "edit_profile": "Profil szerkesztése",
+            "verify_password": "Jelszó ellenőrzése",
+            "cancel_bookings": "Foglalások lemondása"
+        },
+        "field": {
+            "email": "E-mail",
+            "password": "Jelszó",
+            "first_name": "Keresztnév",
+            "last_name": "Vezetéknév",
+            "birth_date": "Születési dátum (éééé.hh.nn.)"
+        },
+        "error": {
+            "login_unsuccessful": "Sikertelen bejelentkezés!",
+            "logout_unsuccessful": "Sikertelen kijelentkezés!",
+            "missing_email_and_password_fields": "Kérjük, töltse ki az email és jelszó mezőket!",
+            "server_error_during_login": "A bejelentkezéskor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
+            "registration_unsuccessful": "Sikertelen regisztráció!",
+            "password_char_limit": "A jelszó legalább 6 karakter hosszú kell legyen!",
+            "server_error_during_registration": "A regisztrációkor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
+            "server_error_during_logout": "A kijelentkezéskor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
+            "missing_password_field": "Kérjük, adja meg a jelszavát!",
+            "wrong_password": "Hibás jelszó!",
+            "server_error_during_password_verification": "A jelszó ellenőrzésekor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
+            "missing_fields": "Kérjük, töltse ki az összes beviteli mezőt!",
+            "profile_update_failed": "A profiladatok frissítése meghiúsult!",
+            "server_error_during_profile_update": "A profiladatok frissítésekor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
+            "wrong_email_or_password": "Rossz email vagy jelszó!"
+        },
+        "success": {
+            "login_successful": "Sikeres bejelentkezés!",
+            "logout_successful": "Sikeres kijelentkezés!",
+            "registration_successful": "Sikeres regisztráció!",
+            "password_verified_for_profile_edit": "Jelszó ellenőrizve! Most már szerkesztheti a profilját.",
+            "profile_updated_successfully": "A profiladatok sikeresen frissítve!",
+            "password_verified": "Jelszó ellenőrizve!",
+            "bookings_have_been_cancelled_successfully" : "A kijelölt foglalások törlése sikeres!"
+        },
+        "button": {
+            "save": "Módosítások mentése",
+            "verification": "Ellenőrzés"
+        },
+        "caption": {
+            "no_account": "Nincs még fiókod? Hozz létre egyet!",
+            "cancel_selected_reservations": "Az alábbi foglalások törlésre kerülnek:"
+        }
     },
     "map": {
         "title": "Tervezés",
@@ -153,34 +176,24 @@
         "flights_tabel": {
             "seat_column": "Hely",
             "fare_class_column": "Osztály",
-            "passenger_column" : "Utas",
-            "i_cancel_column" : "Lemondás",
-            "adult" : "felnőtt",
-            "child" : "gyermek"
+            "passenger_column": "Utas",
+            "i_cancel_column": "Lemondás",
+            "adult": "felnőtt",
+            "child": "gyermek"
         },
-        "bookings" : "Foglalások",
-        "active_bookings" : "Aktív foglalások",
-        "previous_bookings" : "Korábbi foglalások",
+        "bookings": "Foglalások",
+        "active_bookings": "Aktív foglalások",
+        "previous_bookings": "Korábbi foglalások",
         "choose_flight": "Válasszon járatot!",
-        "no_active_bookings" : "Úgy tűnik nincs egy aktív foglalásod sem.",
-        "no_previous_bookings" : "Úgy tűnik nincsenek korábbi foglalásaid.",
-        "no_bookings" : "Úgy tűnik még nem utaztál velünk.",
-        "select_all_for_cancellation" : "Összes kijelölése lemondásra",
-        "cancel_selected" : "Kijelöltek lemondása"
+        "no_active_bookings": "Úgy tűnik nincs egy aktív foglalásod sem.",
+        "no_previous_bookings": "Úgy tűnik nincsenek korábbi foglalásaid.",
+        "no_bookings": "Úgy tűnik még nem utaztál velünk.",
+        "select_all_for_cancellation": "Összes kijelölése lemondásra",
+        "cancel_selected": "Kijelöltek lemondása",
+        "error": {
+            "user_not_found": "A felhasználható nem található meg ay adatbázisban!"
+        }
     },
-    "login_needed": "Hozzáférés megtagadva. Az adatok megtekintéséhez előbb be kell jelenetkeznie!",
-    "missing_data": "Hiányzó adat!",
-    "wrong_email_or_password": "Rossz email vagy jelszó",
-    "login_successful": "Sikeres bejelentkezés!",
-    "missing_data_by_user": "A felhasználó nem adta meg valamelyik adatot!",
-    "end_point_not_working": "Ez a végpont nem működik!",
-    "registration_successful": "Sikeres regisztráció!",
-    "registration_unsuccessful": "Sikertelen regisztráció!",
-    "logout_unsuccessful": "Sikertelen kijelentkezés!",
-    "logout_successful": "Sikeres kijelentkezés!",
-    "no_active_session": "Nincs aktív session!",
-    "server_error" : "Sajnos, hiba történt a szerverben. Kérjük, próbálja meg újra később!",
-    "missing_url_parameter" : "Hiányzó URL paraméter!",
     "loyalty_program": {
         "title": "Hűségprogram",
         "num_of_my_flights": "Repüléseim száma",
