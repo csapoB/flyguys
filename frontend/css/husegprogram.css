@@ -69,16 +69,36 @@ main.flex-grow-1 > .container-fluid {
   height: 100%;
 }
 
+footer {
+  position: relative;
+  margin-top: auto;
+}
+
 @media only screen and (max-width: 768px) {
   .card {
     height: auto !important;
     max-height: 70vh;
     overflow-y: auto;
   }
-  main{
-    max-height: calc(100vh - 600px);
+  main.flex-grow-1 {
+    overflow-y: visible !important;
+    max-height: none !important;
+    flex: 1 1 auto !important;
+  }
+  main.flex-grow-1 > .container-fluid {
+    flex: none !important;
+    min-height: auto !important;
+  }
+  #row1 {
+    min-height: auto !important;
+  }
+  #row2 {
+    min-height: auto !important;
+    flex: none !important;
   }
   .bg {
-    max-height: calc(100vh - 700px);
+    overflow-y: visible !important;
+    max-height: none !important;
+    padding-bottom: 0 !important;
   }
 }
