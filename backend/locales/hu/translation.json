@@ -110,7 +110,7 @@
             "logout_successful": "Sikeres kijelentkezés!",
             "registration_successful": "Sikeres regisztráció!",
             "password_verified_for_profile_edit": "Jelszó ellenőrizve! Most már szerkesztheti a profilját.",
-            "profile_updated_successfully": "A profiladatok sikeresen frissítve!",
+            "profile_updated_successfully": "Profiladatok sikeresen frissítve!",
             "password_verified": "Jelszó ellenőrizve!",
             "bookings_have_been_cancelled_successfully" : "A kijelölt foglalások törlése sikeres!"
         },
@@ -181,6 +181,20 @@
             "adult": "felnőtt",
             "child": "gyermek"
         },
+        "profile_data" : {
+            "name": "Név",
+            "rank": {
+                "title": "Rang",
+                "no_rank" : "Nincs rang",
+                "bronze": "Bronz",
+                "silver" : "Ezüst",
+                "gold": "Arany",
+                "platinum" : "Platina",
+                "diamond": "Gyémánt"
+            },
+            "email": "Email cím",
+            "birth_date": "Születési dátum"
+        },
         "bookings": "Foglalások",
         "active_bookings": "Aktív foglalások",
         "previous_bookings": "Korábbi foglalások",
@@ -190,6 +204,8 @@
         "no_bookings": "Úgy tűnik még nem utaztál velünk.",
         "select_all_for_cancellation": "Összes kijelölése lemondásra",
         "cancel_selected": "Kijelöltek lemondása",
+        "edit_profile" : "Profiladatok szerkesztése",
+        "save_changes": "Változások mentése",
         "error": {
             "user_not_found": "A felhasználható nem található meg ay adatbázisban!"
         }

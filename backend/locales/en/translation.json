@@ -181,6 +181,20 @@
             "adult": "adult",
             "child": "child"
         },
+        "profile_data": {
+            "name": "Name",
+            "rank": {
+                "title": "Rank",
+                "no_rank" : "No rank",
+                "bronze": "Bronze",
+                "silver": "Silver",
+                "gold": "Gold",
+                "platinum": "Platinum",
+                "diamond": "Diamond"
+            },
+            "email": "Email",
+            "birth_date": "Birth date"
+        },
         "bookings": "Bookings",
         "active_bookings": "Active bookings",
         "previous_bookings": "Previous bookings",
@@ -190,6 +204,8 @@
         "no_bookings": "It seems like you have not travelled with us.",
         "select_all_for_cancellation": "Select all for cancellation",
         "cancel_selected": "Cancel selected",
+        "edit_profile": "Edit profile",
+        "save_changes": "Save Changes",
         "error": {
             "user_not_found": "User not found in the database!"
         }
