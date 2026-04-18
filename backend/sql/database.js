@@ -195,7 +195,7 @@ async function SeatReservation(PassengerID, flightID, rowID, columnID, adult){
 
 // Profil
 async function Profil(id){
-    const query = 'SELECT UserName, UserEmail, LoyaltyStatusName From useraccount LEFT JOIN Loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.loyaltyStatusID INNER JOIN number_of_flights_of_users ON useraccount.UserID = number_of_flights_of_users.UserID WHERE useraccount.UserId = ?';
+    const query = 'SELECT UserName, UserEmail, LoyaltyStatusName, UserBirthDate From useraccount LEFT JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserId = ?';
     const [rows] = await pool.execute(query, [id]);
     return rows;
 }
@@ -207,14 +207,14 @@ async function selectActiveReservationsByUserIdAndFlightId(userId, flightId){
 }
 
 async function selectPreviousReservationsByUserIdAndFlightId(userId, flightId){
-    const query = 'SELECT not_cancelled_reservations.RowID, not_cancelled_reservations.ColumnID, fareclass.FareClassName, not_cancelled_reservations.IsAdult FROM not_cancelled_reservations INNER JOIN flight ON not_cancelled_reservations.FlightID = flight.FlightID INNER JOIN fareclass ON fareclass.FareClassID = not_cancelled_reservations.FareClassID WHERE not_cancelled_reservations.IsCancelled = 0 AND flight.DepartureDateTime < NOW() AND not_cancelled_reservations.PassengerID = ? AND not_cancelled_reservations.FlightID = ? ORDER BY not_cancelled_reservations.RowID ASC, not_cancelled_reservations.ColumnID;';
+    const query = 'SELECT not_cancelled_reservations.RowID, not_cancelled_reservations.ColumnID, fareclass.FareClassName, not_cancelled_reservations.IsAdult FROM not_cancelled_reservations INNER JOIN flight ON not_cancelled_reservations.FlightID = flight.FlightID INNER JOIN fareclass ON fareclass.FareClassID = not_cancelled_reservations.FareClassID WHERE flight.DepartureDateTime < NOW() AND not_cancelled_reservations.PassengerID = ? AND not_cancelled_reservations.FlightID = ? ORDER BY not_cancelled_reservations.RowID ASC, not_cancelled_reservations.ColumnID;';
     const [rows] = await pool.execute(query, [userId, flightId]);
     return rows;
 }
 
-async function updateUserProfile(userId, userName, email){
-    const query = 'UPDATE useraccount SET UserName = ?, UserEmail = ? WHERE UserID = ?;';
-    const [result] = await pool.execute(query, [userName, email, userId]);
+async function updateUserProfile(userId, userName, email, password, birthDate){
+    const query = 'UPDATE useraccount SET UserName = ?, UserEmail = ?, UserPassword = ?, UserBirthDate = ? WHERE UserID = ?;';
+    const [result] = await pool.execute(query, [userName, email, password, birthDate, userId]);
     return result;
 }
 
