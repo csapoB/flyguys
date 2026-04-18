@@ -832,7 +832,7 @@ router.post('/verifypassword', async (request, response) => {
                 error: request.t("modal.error.wrong_password", { returnObjects: true }),
                 verified: false
             });
-            
+
         } else {
             response.status(200).json({
                 message: request.t("modal.success.password_verified", { returnObjects: true }),
@@ -850,40 +850,34 @@ router.post('/verifypassword', async (request, response) => {
 router.put('/updateprofile', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            return response.status(401).json({
+            response.status(401).json({
                 error: request.t("errors.login_needed_post", { returnObjects: true })
             });
+        } else {
+            const { nev, email, jelszo, szuldatum } = request.body;
+
+            if (!nev || !email || !jelszo || !szuldatum) {
+                response.status(400).json({
+                    error: request.t("errors.missing_data", { returnObjects: true })
+                });
+            } else {
+                const user = await database.getUserById(request.session.user.id);
+
+                if (!user) {
+                    response.status(400).json({
+                        error: request.t("profile.error.user_not_found", { returnObjects: true })
+                    });
+                } else {
+                    const saltRounds = 10;
+                    const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
+                    await database.updateUserProfile(request.session.user.id, nev, email, hashedPassword, szuldatum);
+
+                    response.status(200).json({
+                        message: request.t("modal.success.profile_updated_successfully", { returnObjects: true })
+                    });
+                }
+            }
         }
-
-        const { userName, email, password } = request.body;
-
-        if (!userName || !email || !password) {
-            return response.status(400).json({
-                error: request.t("errors.missing_data", { returnObjects: true })
-            });
-        }
-
-        const user = await database.getUserById(request.session.user.id);
-
-        if (!user) {
-            return response.status(400).json({
-                error: request.t("profile.error.user_not_found", { returnObjects: true })
-            });
-        }
-
-        // Verify password first
-        if (!(await bcrypt.compare(password, user[0].UserPassword))) {
-            return response.status(400).json({
-                error: request.t("modal.error.wrong_password", { returnObjects: true })
-            });
-        }
-
-        // Update profile
-        await database.updateUserProfile(request.session.user.id, userName, email);
-
-        response.status(200).json({
-            message: request.t("modal.success.profile_updated_successfully", { returnObjects: true })
-        });
 
     } catch (error) {
         console.log(error);
@@ -901,7 +895,7 @@ router.put('/cancelreservations', async (request, response) => {
             });
         } else {
 
-            let {reservations} = request.body;
+            let { reservations } = request.body;
 
             if (reservations == undefined) {
                 response.status(400).json({

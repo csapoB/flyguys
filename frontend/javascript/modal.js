@@ -1,5 +1,5 @@
 import { getFlights, getIndex, getLoyaltyProgram, getModal, getProfile } from "./locale.js";
-import { dateFormatter, generateToast, initCheapestFlights, initFlights, initHusegprogram, initProfile } from "./toolbox.js";
+import { dateDeFormatter, dateFormatter, generateToast, initCheapestFlights, initFlights, initHusegprogram, initProfile, nameDeFormatter } from "./toolbox.js";
 
 export async function modalInit(current_language, end_point) {
 
@@ -78,8 +78,8 @@ export async function modalInit(current_language, end_point) {
                 generateToast(getmodal.success.login_successful, "success");
 
             } else {
-                generateToast(getmodal.error.login_unsuccessful + " " + data.message, "danger");
-                console.error(data.message);
+                generateToast(getmodal.error.login_unsuccessful + " " + data.error, "danger");
+                console.error(data.error);
             }
         } catch (error) {
             generateToast(getmodal.error.server_error_during_login, "danger")
@@ -89,7 +89,7 @@ export async function modalInit(current_language, end_point) {
     $(document).on("click", ".submit-register", async function (event) {
         event.preventDefault();
 
-        const userName = $("#first_name").val().trim() + " " + $("#last_name").val().trim();
+        const userName = $("#first_name").val().trim() + "&" + $("#last_name").val().trim();
         const email = $("#new_usr_email").val().trim();
         const password = $("#new_usr_passw").val().trim();
 
@@ -113,7 +113,7 @@ export async function modalInit(current_language, end_point) {
             return;
         }
         try {
-            
+
             const response = await fetch('/api/register', {
                 method: 'POST',
                 headers: {
@@ -146,8 +146,8 @@ export async function modalInit(current_language, end_point) {
 
             } else {
 
-                console.error(data.message);
-                generateToast(getmodal.error.registration_unsuccessful + " " + data.message, "danger");
+                console.error(data.error);
+                generateToast(getmodal.error.registration_unsuccessful + " " + data.error, "danger");
 
             }
         } catch (error) {
@@ -192,8 +192,8 @@ export async function modalInit(current_language, end_point) {
                 generateToast(getmodal.success.logout_successful, "success");
 
             } else {
-                console.error(data.message);
-                generateToast(getmodal.error.logout_unsuccessful + " " + data.message, "danger");
+                console.error(data.error);
+                generateToast(getmodal.error.logout_unsuccessful + " " + data.error, "danger");
             }
 
         } catch (error) {
@@ -507,7 +507,7 @@ export async function initReservationCancellationModal(current_language, i18n_va
 
 
     let $title = $("<h1>", {
-        "id": "modalChildLabel",
+        "id": "modalChildLabe2",
         "class": "text-danger modal-title fs-2",
         "text": `${getmodal.title.cancel_bookings}`
     });
@@ -545,13 +545,13 @@ export async function initReservationCancellationModal(current_language, i18n_va
                         if ($row.prop("checked")) {
                             array.push($row.parent().parent().data("reservation_id"));
                         }
-                        
+
                     }
                     return array;
                 }
                 let reservations = reservationSelector();
-                
-                let response = await fetch("/api/cancelreservations", { method: "PUT", headers: { "Content-Type": "application/json", "Accept-Language": current_language }, body: JSON.stringify({ reservations})});
+
+                let response = await fetch("/api/cancelreservations", { method: "PUT", headers: { "Content-Type": "application/json", "Accept-Language": current_language }, body: JSON.stringify({ reservations }) });
 
                 switch (response.status) {
                     case 200:
@@ -584,6 +584,184 @@ export async function initReservationCancellationModal(current_language, i18n_va
     $modal_body.append($frame_for_tabel);
 
     $modal_footer.append($cancel_reservations_button);
+
+}
+
+export async function initEditProfileModal(profile_data, current_language, i18n_values) {
+
+    let getmodal = await getModal(current_language);
+
+    initPasswordVerificationModalForEditProfile(profile_data, current_language, getmodal);
+
+    init_child_modal("childModal3", "childModal3_content", "modal_frame3");
+    init_modal_content_template("childModal3_content", "child3");
+
+    let $modal_header = $("#child3Modal_header");
+    let $modal_body = $("#child3Modal_body");
+    let $modal_footer = $("#child3Modal_footer");
+
+
+    let $title = $("<h1>", {
+        "id": "modalChildLabel",
+        "class": "text-danger modal-title fs-2",
+        "text": `${getmodal.title.edit_profile}`
+    });
+
+    let $close_button = $("<button>", {
+        "class": "btn-close",
+        "type": "button",
+        "aria-label": "Close",
+        "data-bs-dismiss": "modal"
+    });
+
+    let $input_group_for_name = $("<div>", {
+        "class": "input-group w-75 mb-4 mt-2"
+    });
+
+    let $first_name = $("<input/>", {
+        "id": "edit_first_name",
+        "class": "modal_input form-control",
+        "type": "text",
+        "placeholder": `${getmodal.field.first_name}`
+    });
+
+    let $last_name = $("<input/>", {
+        "id": "edit_last_name",
+        "class": "modal_input form-control",
+        "type": "text",
+        "placeholder": `${getmodal.field.last_name}`
+    });
+
+    $input_group_for_name.append($last_name);
+    $input_group_for_name.append($first_name);
+
+    let $birth_date = $("<input/>", {
+        "id": "edit_birth_date",
+        "class": "form-control modal_input mb-4 w-75",
+        "type": "text",
+        "placeholder": `${getmodal.field.birth_date}`
+    });
+    $birth_date.datepicker();
+
+    let $e_mail = $("<input/>", {
+        "id": "edit_usr_email",
+        "class": "form-control modal_input w-75 mb-4",
+        "type": "email",
+        "placeholder": `${getmodal.field.email}`,
+    });
+
+    let $input_group_for_passw = $("<div>", {
+        "class": "input-group w-75 mb-4"
+    });
+
+    let $passw = $("<input/>", {
+        "id": "edit_usr_passw",
+        "class": "form-control modal_input",
+        "type": "password",
+        "placeholder": `${getmodal.field.password}`
+    });
+
+    let $see_passw_button = $("<button>", {
+        "id": "passw_button",
+        "class": "btn btn-outline-secondary",
+        "html": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-eye-fill\" viewBox=\"0 0 16 16\"> <path d=\"M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0\"/><path d=\"M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7\"/></svg>",
+        on: {
+            "click": seePassw
+        }
+    });
+
+    $input_group_for_passw.append($passw);
+    $input_group_for_passw.append($see_passw_button);
+
+    let $save_changes_button = $("<button>", {
+        "id": "confirm_edit_button",
+        "class": "btn btn-danger w-75 mb-2 mt-2",
+        "type": "submit",
+        "text": `${i18n_values.save_changes}`,
+        on: {
+            "click": async function (event) {
+                event.preventDefault();
+
+                const userName = $("#edit_first_name").val().trim() + "&" + $("#edit_last_name").val().trim();
+                const email = $("#edit_usr_email").val().trim();
+                const password = $("#edit_usr_passw").val().trim();
+
+                // Születési dátum konvertálása mm/dd/yyyy formátumból YYYY-MM-DD formátumba
+                const birthDateInput = $("#edit_birth_date").val().trim();
+
+                let birthDate = null;
+
+                if (birthDateInput) {
+
+                    birthDate = dateFormatter(birthDateInput, current_language)
+                }
+
+                if (!userName.trim() || !email || !password) {
+                    generateToast(getmodal.error.missing_fields, "danger");
+                    return;
+                }
+
+                if (password.length < 6) {
+                    generateToast(getmodal.error.password_char_limit, "danger");
+                    return;
+                }
+                try {
+
+                    const response = await fetch('/api/updateprofile', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept-Language': current_language
+                        },
+                        body: JSON.stringify({
+                            nev: userName.trim(),
+                            email: email,
+                            jelszo: password,
+                            szuldatum: birthDate || null
+                        })
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+
+                        // Modal bezárása
+                        const childModal = bootstrap.Modal.getInstance(document.getElementById('childModal3'));
+                        const parentModal = bootstrap.Modal.getInstance(document.getElementById('monadModal3'));
+
+                        if (childModal) {
+                            childModal.hide();
+                        }
+                        if (parentModal) {
+                            parentModal.hide();
+                        }
+
+                        generateToast(getmodal.success.profile_updated_successfully, "success");
+                        await initProfile(current_language, i18n_values);
+
+                    } else {
+
+                        console.error(data.error);
+                        generateToast(getmodal.error.profile_update_failed + "" + data.error, "danger");
+
+                    }
+                } catch (error) {
+                    console.error('ERROR: ', error);
+                    generateToast(getmodal.error.server_error_during_profile_update, "danger");
+                }
+            }
+        }
+    });
+
+    $modal_header.append($title);
+    $modal_header.append($close_button);
+
+
+    $modal_body.append($input_group_for_name);
+    $modal_body.append($birth_date);
+    $modal_body.append($e_mail);
+    $modal_body.append($input_group_for_passw);
+
+    $modal_footer.append($save_changes_button);
 
 }
 
@@ -634,7 +812,7 @@ function initPasswordVerificationModalForReservationCancellation(language, i18n_
     $input_group_for_passw.append($see_passw_button);
 
     let $verification_button = $("<button>", {
-        "id" : "verification_button",
+        "id": "verification_button",
         "class": "btn btn-danger w-75 mb-2",
         "type": "submit",
         "text": `${i18n_values.button.verification}`,
@@ -653,18 +831,18 @@ function initPasswordVerificationModalForReservationCancellation(language, i18n_
                         let $active_reservations_clone = $("#active_reservations").clone();
                         $active_reservations_clone.removeClass("table-hover");
                         let $inputs = $active_reservations_clone.find("tbody tr td input.cancel_active_reservation");
-                        
+
                         for (let i = 0; i < $inputs.length; i++) {
                             if (!$inputs.eq(i).prop("checked")) {
                                 $inputs.eq(i).parent().parent().remove()
-                            }                          
+                            }
                         }
-                        
+
 
                         $active_reservations_clone.find("#i_cancel_column_th").remove();
                         $active_reservations_clone.find(".i_cancel_column_td").remove();
 
-                        let $last_td_s =  $active_reservations_clone.find("tbody tr").last().find("td");
+                        let $last_td_s = $active_reservations_clone.find("tbody tr").last().find("td");
                         $last_td_s.first().addClass("rounded-bottom border-bottom-0");
                         $last_td_s.last().addClass("rounded-bottom border-bottom-0");
 
@@ -690,24 +868,21 @@ function initPasswordVerificationModalForReservationCancellation(language, i18n_
 
     $modal_footer.append($verification_button);
 }
-/*
-export async function editProfileModal(current_language, userData) {
 
-    let getmodal = await getModal(current_language);
-
-    if ($("#monadModal").next().length != 0) {
-        $("#modal_frame").children().last().remove();
+function initPasswordVerificationModalForEditProfile(profile_data, language, i18n_values) {
+    if ($("#monadModal3").next().length != 0) {
+        $("#modal_frame3").children().last().remove();
     }
-    init_modal_content_template("monadModal_content", "monad");
+    init_modal_content_template("monadModal3_content", "monad3");
 
-    let $modal_header = $("#monadModal_header");
-    let $modal_body = $("#monadModal_body");
-    let $modal_footer = $("#monadModal_footer");
+    let $modal_header = $("#monad3Modal_header");
+    let $modal_body = $("#monad3Modal_body");
+    let $modal_footer = $("#monad3Modal_footer");
 
     let $title = $("<h1>", {
-        "id": "modalMonadLabel",
+        "id": "modalMonadLabel3",
         "class": "text-danger modal-title fs-2",
-        "text": `${getmodal.edit_profile}`
+        "text": `${i18n_values.title.verify_password}`
     });
 
     let $close_button = $("<button>", {
@@ -717,95 +892,15 @@ export async function editProfileModal(current_language, userData) {
         "data-bs-dismiss": "modal"
     });
 
-    // Password verification stage
     let $input_group_for_passw = $("<div>", {
-        "class": "input-group w-75 mb-4",
-        "id": "password_verification_group"
+        "class": "input-group w-75"
     });
 
-    let $passw = $("<input/>", {
-        "id": "edit_profile_passw",
+    let $passw = $("<input>", {
+        "id": "usr_passw",
         "class": "form-control modal_input",
         "type": "password",
-        "placeholder": `${getmodal.password}`
-    });
-
-    let $see_passw_button = $("<button>", {
-        "id": "edit_profile_passw_button",
-        "class": "btn btn-outline-secondary",
-        "html": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-eye-fill\" viewBox=\"0 0 16 16\"> <path d=\"M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0\"/><path d=\"M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7\"/></svg>",
-        on: {
-            "click": seePassw
-        }
-    });
-
-    $input_group_for_passw.append($passw);
-    $input_group_for_passw.append($see_passw_button);
-
-    // Editable profile fields (initially hidden)
-    let $modal_header = $("#childModal_header");
-    let $modal_body = $("#childModal_body");
-    let $modal_footer = $("#childModal_footer");
-
-
-    let $title = $("<h1>", {
-        "id": "modalChildLabel",
-        "class": "text-danger modal-title fs-2",
-        "text": `${i18next_values.registration}`
-    });
-
-    let $close_button = $("<button>", {
-        "class": "btn-close",
-        "type": "button",
-        "aria-label": "Close",
-        "data-bs-dismiss": "modal"
-    });
-
-    let $input_group_for_name = $("<div>", {
-        "class": "input-group w-75 mb-4 mt-2"
-    });
-
-    let $first_name = $("<input/>", {
-        "id": "first_name",
-        "class": "modal_input form-control",
-        "type": "text",
-        "placeholder": `${i18next_values.first_name}`
-    });
-
-    let $last_name = $("<input/>", {
-        "id": "last_name",
-        "class": "modal_input form-control",
-        "type": "text",
-        "placeholder": `${i18next_values.last_name}`
-    });
-
-    $input_group_for_name.append($last_name);
-    $input_group_for_name.append($first_name);
-
-    let $birth_date = $("<input/>", {
-        "id": "birth_date",
-        "class": "form-control modal_input mb-4 w-75",
-        "type": "text",
-        "placeholder": `${i18next_values.birth_date}`
-    });
-    $birth_date.datepicker();
-
-    let $e_mail = $("<input/>", {
-        "id": "new_usr_email",
-        "class": "form-control modal_input w-75 mb-4",
-        "type": "email",
-        "placeholder": `${i18next_values.email}`,
-    });
-
-    let $input_group_for_passw = $("<div>", {
-        "class": "input-group w-75 mb-4"
-    });
-
-    let $passw = $("<input/>", {
-        "id": "new_usr_passw",
-        "class": "form-control modal_input",
-        "type": "password",
-        "placeholder": `${i18next_values.password}`
+        "placeholder": `${i18n_values.field.password}`
     });
 
     let $see_passw_button = $("<button>", {
@@ -820,123 +915,50 @@ export async function editProfileModal(current_language, userData) {
     $input_group_for_passw.append($passw);
     $input_group_for_passw.append($see_passw_button);
 
+    let $verification_button = $("<button>", {
+        "id": "verification_button",
+        "class": "btn btn-danger w-75 mb-2",
+        "type": "submit",
+        "text": `${i18n_values.button.verification}`,
+        on: {
+            "click": async function (event) {
+                event.preventDefault();
+                let password = $passw.val().trim();
+                let response = await fetch("/api/verifypassword", { method: "POST", headers: { "Content-Type": "application/json", "Accept-Language": language }, body: JSON.stringify({ password }) });
+                switch (response.status) {
+                    case 200:
+                        generateToast((await response.json()).message, "success");
+
+                        let name_obj = nameDeFormatter(profile_data.UserName, language);
+
+                        if (language == "en") {
+                            $("#edit_first_name").val(name_obj.last_name);
+                            $("#edit_last_name").val(name_obj.first_name);
+                        } else {
+                            $("#edit_first_name").val(name_obj.first_name);
+                            $("#edit_last_name").val(name_obj.last_name);
+                        }
+                        $("#edit_birth_date").val(dateDeFormatter(profile_data.UserBirthDate, language));
+                        $("#edit_usr_email").val(profile_data.UserEmail);
+                        $("#edit_usr_passw").val(password);
+
+                        bootstrap.Modal.getOrCreateInstance($("#monadModal3")).hide();
+                        bootstrap.Modal.getOrCreateInstance($("#childModal3")).show();
+                        break;
+
+                    default:
+                        generateToast((await response.json()).error, "danger");
+                        break;
+                }
+
+            }
+        }
+    });
+
     $modal_header.append($title);
     $modal_header.append($close_button);
 
-    $modal_body.append($input_group_for_name);
-    $modal_body.append($birth_date);
-    $modal_body.append($e_mail);
     $modal_body.append($input_group_for_passw);
 
-
-
-
-    let $verify_button = $("<button>", {
-        "class": "btn btn-danger w-75 mb-2 submit-edit-profile-verify",
-        "type": "button",
-        "text": `${getmodal.verify}`,
-        "id": "verify_password_btn"
-    });
-
-    let $save_button = $("<button>", {
-        "class": "btn btn-success w-75 mb-2 submit-edit-profile-save",
-        "type": "button",
-        "text": `${getmodal.save}`,
-        "id": "save_profile_btn",
-        "style": "display: none;"
-    });
-
-    $modal_footer.append($verify_button);
-    $modal_footer.append($save_button);
-
-    // Show the modal
-    const modal = new bootstrap.Modal(document.getElementById('monadModal'));
-    modal.show();
-
-    // Handle password verification
-    $(document).on("click", ".submit-edit-profile-verify", async function () {
-        const password = $("#edit_profile_passw").val().trim();
-
-        if (!password) {
-            generateToast(getmodal.missing_password_field, "danger");
-            return;
-        }
-
-        try {
-            const response = await fetch('/api/verifypassword', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept-Language': current_language
-                },
-                body: JSON.stringify({ password })
-            });
-
-            const data = await response.json();
-
-            if (response.ok && data.verified) {
-                // Password is correct, show edit fields
-                $("#password_verification_group").hide();
-                $("#name_input_group").show();
-                $("#email_input_group").show();
-                $("#verify_password_btn").hide();
-                $("#save_profile_btn").show();
-                generateToast(getmodal.password_verified, "success");
-            } else {
-                generateToast(getmodal.wrong_password, "danger");
-            }
-        } catch (error) {
-            generateToast(getmodal.server_error_during_password_verification, "danger");
-            console.error("ERROR: ", error);
-        }
-    });
-
-    // Handle profile save
-    $(document).on("click", ".submit-edit-profile-save", async function () {
-        const userName = $("#edit_profile_name").val().trim();
-        const email = $("#edit_profile_email").val().trim();
-        const password = $("#edit_profile_passw").val().trim();
-
-        if (!userName || !email) {
-            generateToast(getmodal.missing_profile_fields, "danger");
-            return;
-        }
-
-        try {
-            const response = await fetch('/api/updateprofile', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept-Language': current_language
-                },
-                body: JSON.stringify({ userName, email, password })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('monadModal'));
-                if (modal) {
-                    modal.hide();
-                }
-                generateToast(getmodal.profile_updated_successfully, "success");
-                // Reload the page to show updated profile
-                setTimeout(() => {
-                    location.reload();
-                }, 1500);
-            } else {
-                generateToast(getmodal.profile_update_failed + " " + data.message, "danger");
-            }
-        } catch (error) {
-            generateToast(getmodal.server_error_during_profile_update, "danger");
-            console.error("ERROR: ", error);
-        }
-    });
-
+    $modal_footer.append($verification_button);
 }
-*/
-// LOGIN
-
-
-// REGISTRATION HANDLER
-
