@@ -49,13 +49,20 @@ a:hover{
 #hatterkep .col-lg-3,
 #hatterkep .col-md-4,
 #hatterkep .col-sm-4,
-#hatterkep .col-6 {
+#hatterkep .col-12 {
     background: rgba(255, 255, 255, 0.55);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     border-radius: 10px;
     padding: 1rem 1.2rem;
     margin: 0.4rem;
+}
+
+@media (min-width: 576px) and (max-width: 999px) {
+    #hatterkep .col-12 {
+        flex: 1 1 0%;
+        width: auto;
+    }
 }
 
 #hatterkep h4 {
