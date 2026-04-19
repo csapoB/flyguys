@@ -17,6 +17,9 @@ export async function plannerInit(current_language) {
     let destination = await popoverInit("destination_input", "destination_popover");
     // Datepickerek
     let $departure = $("#departure_input");
+    $departure.on("click", function () {
+        $("body").append($("#ui-datepicker-div"));
+    });
     let available_departure_dates = (await (await fetch("/api/availabledeparturedatesfiltered", { method: "GET" })).json()).departuredates
     $departure.datepicker({
         beforeShowDay: function (d) {
@@ -79,6 +82,9 @@ export async function plannerInit(current_language) {
     });
 
     let $return = $("#return_input");
+    $return.on("click", function () {
+        $("body").append($("#ui-datepicker-div"));
+    });
     let available_return_dates = [];
     let $return_datepicker = $return.datepicker({
         beforeShowDay: function (d) {

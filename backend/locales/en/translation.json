@@ -67,7 +67,8 @@
         "client_error": "Unfortunately, an error occured in the client site. Please, try again later!",
         "server_error": "Unfortunately, an error occured in the server. Please, try again later!",
         "login_needed_get": "Access denied. You need to log in to access data!",
-        "login_needed_post": "Access denied. You need to log in to modify data!",
+        "login_needed_post": "Action denied. You need to log in to modify data!",
+        "login_needed_delete": "Action denied. You need to log in to delete data!",
         "missing_data": "Required data are missing!",
         "end_point_not_working": "This end point doesn't work!",
         "no_active_session": "No active session!",
@@ -78,6 +79,7 @@
             "login": "Login",
             "registration": "Registration",
             "edit_profile": "Edit Profile",
+            "delete_profile": "Delete Profile",
             "verify_password": "Verify Password",
             "cancel_bookings": "Cancel Bookings"
         },
@@ -102,8 +104,10 @@
             "server_error_during_password_verification": "A server error occured during password verification. Please, try again later!",
             "missing_fields": "Please, fill out all fields!",
             "profile_update_failed": "Profile update failed!",
+            "profile_deletion_failed": "Profile deletion failed!",
             "server_error_during_profile_update": "A server error occured during profile update. Please, try again later!",
-            "wrong_email_or_password": "Wrong email or password!"
+            "wrong_email_or_password": "Wrong email or password!",
+            "cancel_bookings_no_adults": "When cancelling bookings, there has to be at least 1 adult remaining beside children!"
         },
         "success": {
             "login_successful": "Login successful!",
@@ -111,16 +115,20 @@
             "registration_successful": "Registration successful!",
             "password_verified_for_profile_edit": "Password verified! You can now edit your profile.",
             "profile_updated_successfully": "Profile updated successfully!",
+            "profile_deleted_successfully": "Profile deleted successfully! You will be redirected in 5 seconds.",
             "password_verified": "Password verified!",
             "bookings_have_been_cancelled_successfully": "Selected bookings have been cancelled successfully!"
         },
         "button": {
             "save": "Save Changes",
-            "verification": "Verification"
+            "verification": "Verification",
+            "yes": "Yes",
+            "no": "No"
         },
         "caption": {
             "no_account": "Don't have an account? Sign up here:",
-            "cancel_selected_reservations": "The bookings below will be cancelled:"
+            "cancel_selected_reservations": "The bookings below will be cancelled:",
+            "delete_profile": "Are you sure you want to delete your profile?"
         }
     },
     "map": {
@@ -167,9 +175,11 @@
         "booking": "Booking",
         "selected_seats": "Selected seats",
         "no_seats_selected": "No seats have been selected!",
-        "errors": {
+        "reservation_successful": "Reservation successful! You will be redirected in 5 seconds.",
+        "error": {
             "not_logged_in": "You have to be logged in to book a flight.",
-            "no_adults": "When booking, there has to be at least 1 adult."
+            "no_adults": "When booking, there has to be at least 1 adult.",
+            "already_booked_seat": "Booking failed! The seat is already booked."
         }
     },
     "profile": {
@@ -185,7 +195,7 @@
             "name": "Name",
             "rank": {
                 "title": "Rank",
-                "no_rank" : "No rank",
+                "no_rank": "No rank",
                 "bronze": "Bronze",
                 "silver": "Silver",
                 "gold": "Gold",
@@ -195,6 +205,7 @@
             "email": "Email",
             "birth_date": "Birth date"
         },
+        "title": "Profile",
         "bookings": "Bookings",
         "active_bookings": "Active bookings",
         "previous_bookings": "Previous bookings",
@@ -205,6 +216,7 @@
         "select_all_for_cancellation": "Select all for cancellation",
         "cancel_selected": "Cancel selected",
         "edit_profile": "Edit profile",
+        "delete_profile": "Delete profile",
         "save_changes": "Save Changes",
         "error": {
             "user_not_found": "User not found in the database!"

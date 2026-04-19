@@ -67,7 +67,8 @@
         "client_error": "Sajnos hiba történt a kliens oldalon. Kérjük, próbálja meg újra később!",
         "server_error": "Sajnos, hiba történt a szerverben. Kérjük, próbálja meg újra később!",
         "login_needed_get": "Hozzáférés megtagadva. Az adatok megtekintéséhez előbb be kell jelenetkeznie!",
-        "login_needed_post": "Hozzáférés megtagadva. Az adatok módosításához előbb be kell jelenetkeznie!",
+        "login_needed_post": "Parancs megtagadva. Az adatok módosításához előbb be kell jelenetkeznie!",
+        "login_needed_delete" : "Parancs megtagadva. Az adatok törléséhez előbb be kell jelenetkeznie!",
         "missing_data": "A szükséges adatok hiányznak!",
         "end_point_not_working": "Ez a végpont nem működik!",
         "no_active_session": "Nincs aktív session!",
@@ -78,6 +79,7 @@
             "login": "Bejelentkezés",
             "registration": "Regisztráció",
             "edit_profile": "Profil szerkesztése",
+            "delete_profile" : "Profil törlése",
             "verify_password": "Jelszó ellenőrzése",
             "cancel_bookings": "Foglalások lemondása"
         },
@@ -103,7 +105,8 @@
             "missing_fields": "Kérjük, töltse ki az összes beviteli mezőt!",
             "profile_update_failed": "A profiladatok frissítése meghiúsult!",
             "server_error_during_profile_update": "A profiladatok frissítésekor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
-            "wrong_email_or_password": "Rossz email vagy jelszó!"
+            "wrong_email_or_password": "Rossz email vagy jelszó!",
+            "cancel_bookings_no_adults": "A foglalások lemondásánál, 1 felnőttnek maradnia kell a gyerekek mellett!"
         },
         "success": {
             "login_successful": "Sikeres bejelentkezés!",
@@ -111,16 +114,20 @@
             "registration_successful": "Sikeres regisztráció!",
             "password_verified_for_profile_edit": "Jelszó ellenőrizve! Most már szerkesztheti a profilját.",
             "profile_updated_successfully": "Profiladatok sikeresen frissítve!",
+            "profile_deleted_successfully": "A profil törlése sikeres! 5 másodperc múlva átirányítunk.",
             "password_verified": "Jelszó ellenőrizve!",
             "bookings_have_been_cancelled_successfully" : "A kijelölt foglalások törlése sikeres!"
         },
         "button": {
             "save": "Módosítások mentése",
-            "verification": "Ellenőrzés"
+            "verification": "Ellenőrzés",
+            "yes": "Igen",
+            "no": "Nem"
         },
         "caption": {
             "no_account": "Nincs még fiókod? Hozz létre egyet!",
-            "cancel_selected_reservations": "Az alábbi foglalások törlésre kerülnek:"
+            "cancel_selected_reservations": "Az alábbi foglalások törlésre kerülnek:",
+            "delete_profile": "Biztosan törölni szeretnéd a profilodat?"
         }
     },
     "map": {
@@ -167,9 +174,11 @@
         "booking": "Lefoglalás",
         "selected_seats": "Kiválasztott helyek",
         "no_seats_selected": "Nincs kiválasztott hely!",
-        "errors": {
+        "reservation_successful": "Sikeres foglalás! 5 másodperc múlva átirányítunk.",
+        "error": {
             "not_logged_in": "A foglaláshoz be kell jelentkeznie.",
-            "no_adults": "A foglalásnál legalább 1 felnőtt utasnak lennie kell."
+            "no_adults": "A foglalásnál legalább 1 felnőtt utasnak lennie kell.",
+            "already_booked_seat": "A foglalás meghiusult! Az ülőhelyet már korábban lefoglalták."
         }
     },
     "profile": {
@@ -195,6 +204,7 @@
             "email": "Email cím",
             "birth_date": "Születési dátum"
         },
+        "title": "Profil",
         "bookings": "Foglalások",
         "active_bookings": "Aktív foglalások",
         "previous_bookings": "Korábbi foglalások",
@@ -204,8 +214,8 @@
         "no_bookings": "Úgy tűnik még nem utaztál velünk.",
         "select_all_for_cancellation": "Összes kijelölése lemondásra",
         "cancel_selected": "Kijelöltek lemondása",
-        "edit_profile" : "Profiladatok szerkesztése",
-        "save_changes": "Változások mentése",
+        "edit_profile" : "Profil szerkesztése",
+        "delete_profile" : "Profil törlése",
         "error": {
             "user_not_found": "A felhasználható nem található meg ay adatbázisban!"
         }

@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS useraccount (
     UserID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     UserName VARCHAR(255) NOT NULL,
     UserEmail VARCHAR(255),
-    UserPassword VARCHAR(100) NOT NULL,
+    UserPassword VARCHAR(100),
     UserBirthDate DATE,
     LoyaltyStatusID INT DEFAULT 1,
     AdminStatus BOOLEAN DEFAULT 0,
@@ -154,7 +154,7 @@ CREATE VIEW IF NOT EXISTS not_cancelled_reservations AS
 	SELECT reservations_with_prices.ReservationID, reservations_with_prices.PassengerID, reservations_with_prices.FlightID, reservations_with_prices.RowID, reservations_with_prices.ColumnID, reservations_with_prices.FareClassID, reservations_with_prices.IsAdult FROM reservations_with_prices WHERE !reservations_with_prices.IsCancelled;
 
 CREATE VIEW IF NOT EXISTS number_of_flights_of_users AS
-	SELECT useraccount.UserID, COUNT(DISTINCT not_cancelled_reservations.FlightID) AS "NumberOfFlights" FROM useraccount LEFT JOIN not_cancelled_reservations ON useraccount.UserID = not_cancelled_reservations.PassengerID GROUP BY useraccount.UserID;
+	SELECT useraccount.UserID, COUNT(DISTINCT not_cancelled_reservations.FlightID) AS "NumberOfFlights" FROM useraccount LEFT JOIN not_cancelled_reservations ON useraccount.UserID = not_cancelled_reservations.PassengerID  INNER JOIN flight ON not_cancelled_reservations.FlightID = flight.FlightID WHERE flight.DepartureDateTime < NOW() GROUP BY useraccount.UserID;
 
 INSERT INTO loyaltystatus (loyaltystatus.LoyaltyStatusName, loyaltystatus.DiscountInPercentage, loyaltystatus.NumberOfFlightsRequired) VALUES 
 ("Bronze", 0, 0),
@@ -601,7 +601,7 @@ INSERT INTO flight (flight.DepartureAirport, flight.ArrivalAirport, flight.Depar
 ("LHR", "ATH", DATE_ADD(CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-10 07:40:00"), INTERVAL 1 MONTH), DATE_ADD(CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-10 13:20:00"), INTERVAL 1 MONTH), 5, 40000),
 ("CPH", "MUC", DATE_ADD(CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-13 14:05:00"), INTERVAL 1 MONTH), DATE_ADD(CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-13 15:40:00"), INTERVAL 1 MONTH), 7, 22000),
 ("BUD", "ZRH", DATE_ADD(CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-14 4:00:00"), INTERVAL 1 MONTH), DATE_ADD(CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-14 5:40:00"), INTERVAL 1 MONTH), 6, 18000),
-("ZRH", "BUD", DATE_ADD(CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-17 16:30:00"), INTERVAL 1 MONTH), DATE_ADD(CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-14 18:10:00"), INTERVAL 1 MONTH), 6, 26700);
+("ZRH", "BUD", DATE_ADD(CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-14 16:30:00"), INTERVAL 1 MONTH), DATE_ADD(CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-14 18:10:00"), INTERVAL 1 MONTH), 6, 26700);
 
 
 

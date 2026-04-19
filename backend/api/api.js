@@ -41,7 +41,7 @@ router.get('/airports', async (request, response) => {
 router.get('/LoginCheck', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            return response.status(401).json({
+            response.status(401).json({
                 allapot: false
             })
         }
@@ -62,7 +62,7 @@ router.get('/LoginCheck', async (request, response) => {
 router.get('/AdminCheck', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            return response.status(401).json({
+            response.status(401).json({
                 admin: false
             })
         }
@@ -141,7 +141,7 @@ router.get('/availablearrivalairportsfiltered', async (request, response) => {
 router.get('/flightsofuser', async (request, response) => {
     try {
 
-        if (request.session && request.session.user && request.session.user.id) {
+        if (LoggedInCheck(request)) {
             let active_flights;
             let previous_flights;
             if (request.get("Accept-Language") == "hu") {
@@ -288,6 +288,7 @@ router.get('/hu/flights', async (request, response) => {
 
             let data;
             if (LoggedInCheck(request)) {
+                await database.updateLoyaltyStatus(request.session.user.id);
                 data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), request.session.user.id);
             } else {
                 data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL");
@@ -325,6 +326,7 @@ router.get('/en/flights', async (request, response) => {
                 current_eur_exch_rate = 0.00259;
             }
             if (LoggedInCheck(request)) {
+                await database.updateLoyaltyStatus(request.session.user.id);
                 data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), request.session.user.id);
             } else {
                 data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL");
@@ -367,6 +369,7 @@ router.get('/cheapestflights', async (request, response) => {
             }
 
             if (LoggedInCheck(request)) {
+                await database.updateLoyaltyStatus(request.session.user.id);
                 one_way = await database.selectTop4CheapestOneWayFlightsEn(request.session.user.id);
             } else {
                 one_way = await database.selectTop4CheapestOneWayFlightsEn("NULL");
@@ -391,7 +394,7 @@ router.get('/cheapestflights', async (request, response) => {
 router.get('/activereservations', async (request, response) => {
     try {
 
-        if (request.session && request.session.user && request.session.user.id) {
+        if (LoggedInCheck(request)) {
 
             if (request.query.flight_id == undefined) {
 
@@ -426,8 +429,7 @@ router.get('/activereservations', async (request, response) => {
 router.get('/previousreservations', async (request, response) => {
     try {
 
-        if (request.session && request.session.user && request.session.user.id) {
-
+        if (LoggedInCheck(request)) {
             if (request.query.flight_id == undefined) {
 
                 response.status(400).json({
@@ -673,7 +675,7 @@ router.post('/login', async (request, response) => {
         if (email && password) {
             const login = await database.Login(email);
             if (!login) {
-                return response.status(400).json({
+                response.status(400).json({
                     error: request.t("modal.error.wrong_email_or_password", { returnObjects: true })
                 });
             }
@@ -686,15 +688,18 @@ router.post('/login', async (request, response) => {
                     }
                     console.log(request.session.user)
                     if (request.session.user.role === 1) {
-                        response.status(201).json({
+                        response.status(200).json({
                             message: request.t("modal.success.login_successful", { returnObjects: true }),
                             admin: true
                         });
+                    } else {
+                        await database.updateLoyaltyStatus(request.session.user.id);
+                        response.status(200).json({
+                            message: request.t("modal.success.login_successful", { returnObjects: true }),
+                            admin: false
+                        });
                     }
-                    response.status(201).json({
-                        message: request.t("modal.success.login_successful", { returnObjects: true }),
-                        admin: false
-                    });
+
                 }
                 else {
                     response.status(400).json({
@@ -751,20 +756,24 @@ router.post('/register', async (request, response) => {
 router.post('/logout', async (request, response) => {
     try {
         if (!request.session) {
-            return response.status(400).json({
+            response.status(400).json({
                 message: request.t("errors.no_active_session", { returnObjects: true })
             });
-        }
-        request.session.destroy(err => {
-            if (err) {
-                console.error('Session destroy error:', err);
-                return response.status(500).json({ error: request.t("modal.error.logout_unsuccessful", { returnObjects: true }) })
-            }
-            response.clearCookie('connect.sid');
-            return response.status(200).json({
-                message: request.t("modal.success.logout_successful", { returnObjects: true })
+        } else {
+            request.session.destroy(err => {
+                if (err) {
+                    console.error('Session destroy error:', err);
+                    response.status(500).json({ error: request.t("modal.error.logout_unsuccessful", { returnObjects: true }) })
+                } else {
+                    response.clearCookie('connect.sid');
+                    response.status(200).json({
+                        message: request.t("modal.success.logout_successful", { returnObjects: true })
+                    });
+                }
+
             })
-        })
+        }
+
     } catch (error) {
         console.error(error)
         response.status(500).json({
@@ -776,11 +785,12 @@ router.post('/logout', async (request, response) => {
 router.get('/husegprogram', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            return response.status(401).json({
+            response.status(401).json({
                 error: request.t("errors.login_needed_get", { returnObjects: true })
             })
         }
         else {
+            await database.updateLoyaltyStatus(request.session.user.id);
             const user = await database.Husegprogram(request.session.user.id);
             response.status(200).json({
                 result: user
@@ -796,10 +806,16 @@ router.get('/husegprogram', async (request, response) => {
 
 router.get('/profil', async (request, response) => {
     try {
-        const user = await database.Profil(request.session.user.id);
-        response.status(200).json({
-            result: user
-        })
+        if (LoggedInCheck(request)) {
+            const user = await database.Profil(request.session.user.id);
+            response.status(200).json({
+                result: user
+            });
+        } else {
+            response.status(401).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        }
 
     } catch (error) {
         console.error(error)
@@ -812,33 +828,37 @@ router.get('/profil', async (request, response) => {
 router.post('/verifypassword', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            return response.status(401).json({
+            response.status(401).json({
                 error: request.t("errors.login_needed_post", { returnObjects: true })
             });
-        }
-
-        const { password } = request.body;
-
-        const user = await database.getUserById(request.session.user.id);
-
-        if (!user) {
-            return response.status(400).json({
-                message: request.t("profile.error.user_not_found", { returnObjects: true })
-            });
-        }
-
-        if (!(await bcrypt.compare(password, user[0].UserPassword)) || !password) {
-            response.status(400).json({
-                error: request.t("modal.error.wrong_password", { returnObjects: true }),
-                verified: false
-            });
-
         } else {
-            response.status(200).json({
-                message: request.t("modal.success.password_verified", { returnObjects: true }),
-                verified: true
-            });
+
+            const { password } = request.body;
+
+            const user = await database.getUserById(request.session.user.id);
+
+            if (!user) {
+                response.status(400).json({
+                    message: request.t("profile.error.user_not_found", { returnObjects: true })
+                });
+            } else {
+
+                if (!(await bcrypt.compare(password, user[0].UserPassword)) || !password) {
+                    response.status(400).json({
+                        error: request.t("modal.error.wrong_password", { returnObjects: true }),
+                        verified: false
+                    });
+
+                } else {
+
+                    response.status(200).json({
+                        message: request.t("modal.success.password_verified", { returnObjects: true }),
+                        verified: true
+                    });
+                }
+            }
         }
+
     } catch (error) {
         console.log(error);
         response.status(500).json({
@@ -887,6 +907,48 @@ router.put('/updateprofile', async (request, response) => {
     }
 });
 
+router.put('/deleteprofile', async (request, response) => {
+    try {
+        if (!LoggedInCheck(request)) {
+            response.status(401).json({
+                error: request.t("errors.login_needed_delete", { returnObjects: true })
+            });
+        } else {
+
+            const user = await database.getUserById(request.session.user.id);
+
+            if (!user) {
+                response.status(400).json({
+                    error: request.t("profile.error.user_not_found", { returnObjects: true })
+                });
+            } else {
+                await database.deleteUserProfile(request.session.user.id);
+                await database.cancelAllReservationsOfUser(request.session.user.id);
+                request.session.destroy(err => {
+                    if (err) {
+                        console.error('Session destroy error:', err);
+                        response.status(500).json({ error: request.t("modal.error.logout_unsuccessful", { returnObjects: true }) })
+                    } else {
+                        response.clearCookie('connect.sid');
+                        response.status(200).json({
+                            message: request.t("modal.success.profile_deleted_successfully", { returnObjects: true })
+                        });
+                    }
+
+                })
+            }
+
+
+        }
+
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
 router.put('/cancelreservations', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
@@ -902,10 +964,18 @@ router.put('/cancelreservations', async (request, response) => {
                     error: request.t("errors.missing_data", { returnObjects: true })
                 });
             } else {
-                await database.cancelReservations(reservations);
-                response.status(200).json({
-                    message: request.t("modal.success.bookings_have_been_cancelled_successfully", { returnObjects: true })
-                });
+
+                if (await database.cancelReservationCheckForRemainingOnlyChildren(reservations, request.session.user.id)) {
+                    response.status(400).json({
+                        error: request.t("modal.error.cancel_bookings_no_adults", { returnObjects: true })
+                    });
+                } else {
+                    await database.cancelReservations(reservations, request.session.user.id);
+                    response.status(200).json({
+                        message: request.t("modal.success.bookings_have_been_cancelled_successfully", { returnObjects: true })
+                    });
+                }
+
             }
         }
 
@@ -944,6 +1014,7 @@ router.get('/helyfoglalas', async (request, response) => {
             if (!id) {
                 throw new Error("Nincs járat id")
             }
+            await database.updateLoyaltyStatus(request.session.user.id);
             const helyek = await database.selectAvailableSeatsOnFlight(id, request.session.user.id);
 
             if (request.get("Accept-Language") == "en") {
@@ -980,19 +1051,30 @@ router.post('/helyfoglalas', async (request, response) => {
             const { flightID, rowID, columnID, isAdult } = request.body;
             const parsedIsAdult = Number(isAdult);
             if (!Number.isInteger(parsedIsAdult) || (parsedIsAdult !== 0 && parsedIsAdult !== 1)) {
-                throw new Error("Hibás az isAdult")
+                response.status(400).json({
+                    error: request.t("seat_chooser.error.no_adults", { returnObjects: true })
+                });
             }
 
             if (!flightID || !rowID || !columnID) {
-                throw new Error(request.t("missing_data"))
+                response.status(400).json({
+                    error: request.t("errors.missing_data", { returnObjects: true })
+                });
+
+            } else {
+                const siker = await database.SeatReservation(request.session.user.id, flightID, rowID, columnID, parsedIsAdult);
+                if (!siker) {
+                    response.status(400).json({
+                        error: request.t("seat_chooser.error.already_booked_seat", { returnObjects: true })
+                    });
+                } else {
+                    response.status(200).json({
+                        siker: siker
+                    });
+                }
             }
-            const siker = await database.SeatReservation(request.session.user.id, flightID, rowID, columnID, parsedIsAdult);
-            if (!siker) {
-                throw new Error("Ez a hely már foglalva van")
-            }
-            response.status(200).json({
-                siker: siker
-            })
+
+
         }
     } catch (error) {
         console.error(error)

@@ -1,5 +1,5 @@
 ﻿import { getSeatChooser } from "./locale.js";
-import { infoPageGenerator, errorPageGenerator, showLogin, initI18n } from "./toolbox.js";
+import { infoPageGenerator, errorPageGenerator, showLogin, initI18n, generateToast } from "./toolbox.js";
 
 let kivalaszottUlesekOda = [];
 let kivalaszottUlesekVissza = [];
@@ -104,7 +104,7 @@ $(document).ready(async function () {
                 let osszesen = 0;
                 kivalaszottUlesekOda.forEach(u => osszesen += u.ar);
                 kivalaszottUlesekVissza.forEach(u => osszesen += u.ar);
-                alert("Sikeres foglalás! 5 másodperc múlva átirányítunk.");
+                generateToast(getseatchooser.reservation_successful, "success");
                 setTimeout(function () {
                     window.location.replace(`/${language}`);
                 }, 5000);
@@ -125,9 +125,8 @@ $(document).ready(async function () {
             "class": "container min-vh-100 d-flex flex-column justify-content-evenly"
         });
 
-        infoPageGenerator($error_div, getseatchooser.errors.not_logged_in);
+        infoPageGenerator($error_div, getseatchooser.error.not_logged_in);
         $frame.append($error_div);
-
 
         showLogin(language);
 
