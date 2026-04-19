@@ -673,39 +673,22 @@ router.post('/login', async (request, response) => {
     try {
         const { email, password } = request.body
         if (email && password) {
-            const login = await database.Login(email);
+            const login = await database.Login(email, password);
             if (!login) {
                 response.status(400).json({
                     error: request.t("modal.error.wrong_email_or_password", { returnObjects: true })
                 });
             }
             else {
-                if (await bcrypt.compare(password, login.UserPassword)) {
-                    request.session.user = {
-                        id: login.UserID,
-                        role: login.AdminStatus,
-                        timestamp: Date.now()
-                    }
-                    console.log(request.session.user)
-                    if (request.session.user.role === 1) {
-                        response.status(200).json({
-                            message: request.t("modal.success.login_successful", { returnObjects: true }),
-                            admin: true
-                        });
-                    } else {
-                        await database.updateLoyaltyStatus(request.session.user.id);
-                        response.status(200).json({
-                            message: request.t("modal.success.login_successful", { returnObjects: true }),
-                            admin: false
-                        });
-                    }
-
-                }
-                else {
-                    response.status(400).json({
-                        error: request.t("modal.error.wrong_password", { returnObjects: true })
-                    });
-                }
+                request.session.user = {
+                    id: login.UserID,
+                    role: login.AdminStatus,
+                    timestamp: Date.now()
+                };
+                response.status(201).json({
+                    message: request.t("modal.success.login_successful", { returnObjects: true }),
+                    admin: login.AdminStatus === 1
+                });
             }
         }
         else {
@@ -1001,6 +984,19 @@ function LoggedInCheck(request) {
     return vissza;
 }
 
+function EnsureAdminSession(request) {
+    let vissza = true;
+    if (!LoggedInCheck(request) || request.session.user.role != 1) {
+        vissza = false;
+    }
+    return vissza;
+}
+
+function ToSqlDateTime(dateObject) {
+    const pad = (value) => `${value}`.padStart(2, '0');
+    return `${dateObject.getFullYear()}-${pad(dateObject.getMonth() + 1)}-${pad(dateObject.getDate())} ${pad(dateObject.getHours())}:${pad(dateObject.getMinutes())}:${pad(dateObject.getSeconds())}`;
+}
+
 
 router.get('/helyfoglalas', async (request, response) => {
     try {
@@ -1084,6 +1080,315 @@ router.post('/helyfoglalas', async (request, response) => {
     }
 });
 
+router.get('/AdminGetUsers', async (request, response) => {
+    try {
+        if (!EnsureAdminSession(request)) {
+            throw new Error("Nem vagy bejelentkezve!")
+        }
 
+        const adatvissza = await database.AdminGetUsers();
+        response.status(200).json({
+            adat: adatvissza
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            message: error.message
+        });
+    }
+});
+
+router.get('/AdminSearchUsers', async (request, response) => {
+    try {
+        if (!EnsureAdminSession(request)) {
+            throw new Error("Nem vagy bejelentkezve!")
+        }
+
+        if (typeof request.query.email !== 'string') {
+            throw new Error("Hibás email")
+        }
+
+        const email = request.query.email.trim();
+        const adatvissza = await database.AdminSearchUsers(email);
+        response.status(200).json({
+            adat: adatvissza
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            message: error.message
+        });
+    }
+});
+
+router.get('/AdminGetUserReservations', async (request, response) => {
+    try {
+        if (!EnsureAdminSession(request)) {
+            throw new Error("Nem vagy bejelentkezve!")
+        }
+
+        const rawUserID = request.query.userID ?? request.query.userId;
+        const userID = Number.parseInt(rawUserID, 10);
+        if (!Number.isInteger(userID) || userID <= 0) {
+            throw new Error("Hibás userID")
+        }
+
+        const adatvissza = await database.AdminGetUserReservations(userID);
+        response.status(200).json({
+            adat: adatvissza
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            message: error.message
+        });
+    }
+});
+
+router.get('/AdminGetUserFlights', async (request, response) => {
+    try {
+        if (!EnsureAdminSession(request)) {
+            throw new Error("Nem vagy bejelentkezve!");
+        }
+
+        const rawUserID = request.query.userID ?? request.query.userId;
+        const userID = Number.parseInt(rawUserID, 10);
+        if (!Number.isInteger(userID) || userID <= 0) {
+            throw new Error("Hibás userID")
+        }
+
+        const adatvissza = await database.AdminGetUserFlights(userID);
+        response.status(200).json({
+            adat: adatvissza
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            message: error.message
+        });
+    }
+});
+
+router.get('/AdminGetUserFlightSeats', async (request, response) => {
+    try {
+        if (!EnsureAdminSession(request)) {
+            throw new Error("Nem vagy bejelentkezve!");
+        }
+
+        const rawUserID = request.query.userID ?? request.query.userId;
+        const rawFlightID = request.query.flightID ?? request.query.flightId;
+
+        const userID = Number.parseInt(rawUserID, 10);
+        const flightID = Number.parseInt(rawFlightID, 10);
+
+        if (!Number.isInteger(userID) || userID <= 0) {
+            throw new Error("Hibás userID")
+        }
+
+        if (!Number.isInteger(flightID) || flightID <= 0) {
+            throw new Error("Hibás flightID")
+        }
+
+        const adatvissza = await database.AdminGetUserFlightSeats(userID, flightID);
+        response.status(200).json({
+            adat: adatvissza
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            message: error.message
+        });
+    }
+});
+
+router.get('/AdminGetFlights', async (request, response) => {
+    try {
+        if (!EnsureAdminSession(request)) {
+            throw new Error("nem vagy bejelentkezve");
+        }
+
+        const adatvissza = await database.AdminGetFlights();
+        response.status(200).json({
+            adat: adatvissza
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            message: error.message
+        });
+    }
+});
+
+router.post('/AdminCancelFlight', async (request, response) => {
+    try {
+        if (!EnsureAdminSession(request)) {
+            throw new Error("nem vagy bejelentkezve");
+        }
+
+        const rawFlightID = request.body.flightID ?? request.body.flightId;
+        const flightID = Number.parseInt(rawFlightID, 10);
+
+        if (!Number.isInteger(flightID) || flightID <= 0) {
+            throw new Error("Hibás flightID");
+        }
+
+        const existingFlight = await database.AdminGetFlightById(flightID);
+        if (!existingFlight) {
+            throw new Error("Nem létező járat");
+        }
+
+        let message = "A járat törölve lett";
+        if (existingFlight.IsCancelled === 1 || existingFlight.IsCancelled === true) {
+            message = 'A járat már törölve van';
+        }
+        else {
+            await database.AdminCancelFlight(flightID);
+        }
+        response.status(200).json({
+            message
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            message: error.message
+        });
+    }
+});
+
+router.get('/AdminGetFlightCreateContext', async (request, response) => {
+    try {
+        if (!EnsureAdminSession(request, response)) {
+            throw new Error("nem vagy bejelentkezve");
+        }
+
+        const adatvissza = await database.AdminGetFlightCreateContext();
+        response.status(200).json({
+            adat: adatvissza
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            message: error.message
+        });
+    }
+});
+
+router.post('/AdminCreateFlight', async (request, response) => {
+    try {
+        if (!EnsureAdminSession(request, response)) {
+            throw new Error("nem vagy bejelentkezve");
+        }
+
+        const {
+            departureAirport,
+            arrivalAirport,
+            departureDateTime,
+            arrivalDateTime,
+            aircraftID,
+            basePriceInHUF
+        } = request.body;
+
+        if (!departureAirport || !arrivalAirport || !departureDateTime || !arrivalDateTime || aircraftID === undefined || basePriceInHUF === undefined) {
+            return response.status(400).json({
+                message: 'Hiányzó adatok'
+            });
+        }
+
+        const normalizedDepartureAirport = `${departureAirport}`.trim().toUpperCase();
+        const normalizedArrivalAirport = `${arrivalAirport}`.trim().toUpperCase();
+        const parsedAircraftID = Number.parseInt(aircraftID, 10);
+        const parsedBasePrice = Number.parseInt(basePriceInHUF, 10);
+
+        if (normalizedDepartureAirport.length === 0 || normalizedArrivalAirport.length === 0) {
+            return response.status(400).json({
+                message: 'Hibás reptér kód'
+            });
+        }
+
+        if (normalizedDepartureAirport === normalizedArrivalAirport) {
+            return response.status(400).json({
+                message: 'Az induló és érkező reptér nem lehet ugyanaz'
+            });
+        }
+
+        if (!Number.isInteger(parsedAircraftID) || parsedAircraftID <= 0) {
+            return response.status(400).json({
+                message: 'Hibás aircraftID'
+            });
+        }
+
+        if (!Number.isInteger(parsedBasePrice) || parsedBasePrice <= 0) {
+            return response.status(400).json({
+                message: 'Hibás alapár'
+            });
+        }
+
+        const parsedDepartureDate = new Date(departureDateTime);
+        const parsedArrivalDate = new Date(arrivalDateTime);
+
+        if (Number.isNaN(parsedDepartureDate.getTime()) || Number.isNaN(parsedArrivalDate.getTime())) {
+            return response.status(400).json({
+                message: 'Hibás dátum formátum'
+            });
+        }
+
+        if (parsedArrivalDate <= parsedDepartureDate) {
+            return response.status(400).json({
+                message: 'Az érkezés időpontja később kell legyen, mint az indulás'
+            });
+        }
+
+        const latestKnownLeg = await database.AdminGetLatestKnownAircraftLeg(parsedAircraftID);
+        if (!latestKnownLeg) {
+            return response.status(400).json({
+                message: 'Nem létező repülő'
+            });
+        }
+
+        if (latestKnownLeg.LastArrivalAirport) {
+            if (`${latestKnownLeg.LastArrivalAirport}`.toUpperCase() !== normalizedDepartureAirport) {
+                return response.status(400).json({
+                    message: `A repülő csak innen indulhat: ${latestKnownLeg.LastArrivalAirport}`
+                });
+            }
+
+            const latestArrivalDate = new Date(latestKnownLeg.LastArrivalDateTime);
+            if (!Number.isNaN(latestArrivalDate.getTime()) && parsedDepartureDate <= latestArrivalDate) {
+                return response.status(400).json({
+                    message: 'Az indulásnak későbbinek kell lennie, mint az utolsó érkezés'
+                });
+            }
+        }
+
+        const sqlDepartureDateTime = ToSqlDateTime(parsedDepartureDate);
+        const sqlArrivalDateTime = ToSqlDateTime(parsedArrivalDate);
+        const hasOverlap = await database.AdminHasFlightOverlap(parsedAircraftID, sqlDepartureDateTime, sqlArrivalDateTime);
+
+        if (hasOverlap) {
+            return response.status(400).json({
+                message: 'A repülő időben ütköző járattal mar foglalt'
+            });
+        }
+
+        const eredmeny = await database.AdminCreateFlight(
+            normalizedDepartureAirport,
+            normalizedArrivalAirport,
+            sqlDepartureDateTime,
+            sqlArrivalDateTime,
+            parsedAircraftID,
+            parsedBasePrice
+        );
+
+        response.status(201).json({
+            message: 'A járat sikeresen létrehozva',
+            flightID: eredmeny.insertId
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            message: error.message
+        });
+    }
+});
 
 module.exports = router;

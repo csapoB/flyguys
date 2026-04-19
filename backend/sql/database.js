@@ -1,4 +1,5 @@
 const mysql = require('mysql2/promise');
+const bcrypt = require('bcryptjs');
 
 const pool = mysql.createPool({
     host: '127.0.0.1',
@@ -166,10 +167,11 @@ async function Register(userName, userEmail, hashedPassword, userBirthDate) {
 }
 
 //LOGIN
-async function Login(email) {
+async function Login(email, password){
     const query = 'SELECT UserID, AdminStatus, UserPassword FROM useraccount WHERE UserEmail = ?';
     const [rows] = await pool.execute(query, [email]);
-    return rows[0] || null;
+    const siker = rows.length > 0 && await bcrypt.compare(password, rows[0].UserPassword);
+    return siker ? { UserID: rows[0].UserID, AdminStatus: rows[0].AdminStatus } : null;
 }
 
 //Hűségprogram
@@ -230,6 +232,343 @@ async function cancelReservations(reservation_ids, userId) {
     const [result] = await pool.query(query, [formatted_reservation_ids, userId]);
     return result;
 }
+async function AdminGetUsers(){
+    const query = `
+        SELECT
+            useraccount.UserID,
+            useraccount.UserName,
+            useraccount.UserEmail,
+            useraccount.UserBirthDate,
+            COALESCE(user_flights.NumberOfFlights, 0) AS "NumberOfFlights",
+            loyaltystatus.LoyaltyStatusName,
+            useraccount.CreatedAt
+        FROM useraccount
+        INNER JOIN loyaltystatus ON loyaltystatus.LoyaltyStatusID = useraccount.LoyaltyStatusID
+        LEFT JOIN (
+            SELECT
+                reservation.PassengerID AS "UserID",
+                COUNT(DISTINCT reservation.FlightID) AS "NumberOfFlights"
+            FROM reservation
+            INNER JOIN flight ON flight.FlightID = reservation.FlightID
+            WHERE reservation.IsCancelled = 0
+                AND flight.IsCancelled = 0
+            GROUP BY reservation.PassengerID
+        ) user_flights ON user_flights.UserID = useraccount.UserID
+        WHERE NOT useraccount.AdminStatus
+        ORDER BY useraccount.CreatedAt DESC;
+    `;
+    const [rows] = await pool.execute(query);
+    return rows;
+}
+
+async function AdminSearchUsers(email){
+    const query = `
+        SELECT
+            useraccount.UserID,
+            useraccount.UserName,
+            useraccount.UserEmail,
+            useraccount.UserBirthDate,
+            COALESCE(user_flights.NumberOfFlights, 0) AS "NumberOfFlights",
+            loyaltystatus.LoyaltyStatusName,
+            useraccount.CreatedAt
+        FROM useraccount
+        INNER JOIN loyaltystatus ON loyaltystatus.LoyaltyStatusID = useraccount.LoyaltyStatusID
+        LEFT JOIN (
+            SELECT
+                reservation.PassengerID AS "UserID",
+                COUNT(DISTINCT reservation.FlightID) AS "NumberOfFlights"
+            FROM reservation
+            INNER JOIN flight ON flight.FlightID = reservation.FlightID
+            WHERE reservation.IsCancelled = 0
+                AND flight.IsCancelled = 0
+            GROUP BY reservation.PassengerID
+        ) user_flights ON user_flights.UserID = useraccount.UserID
+        WHERE NOT useraccount.AdminStatus
+            AND useraccount.UserEmail LIKE ?
+        ORDER BY useraccount.CreatedAt DESC;
+    `;
+    const filter = `%${email}%`;
+    const [rows] = await pool.execute(query, [filter]);
+    return rows;
+}
+
+async function AdminGetUserReservations(userId){
+    const query = `
+        SELECT
+            reservation.ReservationID,
+            reservation.PassengerID AS "UserID",
+            reservation.FlightID,
+            flight.DepartureAirport,
+            departure_city.Hungarian AS "DepartureCity",
+            flight.ArrivalAirport,
+            arrival_city.Hungarian AS "ArrivalCity",
+            flight.DepartureDateTime,
+            flight.ArrivalDateTime,
+            reservation.RowID,
+            reservation.ColumnID,
+            reservation.IsAdult,
+            reservation.IsCancelled,
+            fareclass.FareClassName,
+            ROUND((flight.BasePriceInHUF * fareclass.Multiplier) * ((100 - loyaltystatus.DiscountInPercentage) / 100)) AS "Price"
+        FROM reservation
+        INNER JOIN flight ON reservation.FlightID = flight.FlightID
+        INNER JOIN aircraft ON flight.AircraftID = aircraft.AircraftID
+        INNER JOIN seat ON reservation.RowID = seat.RowID
+            AND reservation.ColumnID = seat.ColumnID
+            AND aircraft.AircraftModelID = seat.AircraftModelID
+        INNER JOIN fareclass ON seat.FareClassID = fareclass.FareClassID
+        INNER JOIN useraccount ON reservation.PassengerID = useraccount.UserID
+        INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID
+        INNER JOIN airport departure_airport ON flight.DepartureAirport = departure_airport.AirportCode
+        INNER JOIN city departure_city ON departure_airport.CityID = departure_city.CityID
+        INNER JOIN airport arrival_airport ON flight.ArrivalAirport = arrival_airport.AirportCode
+        INNER JOIN city arrival_city ON arrival_airport.CityID = arrival_city.CityID
+        WHERE reservation.PassengerID = ?
+        ORDER BY flight.DepartureDateTime DESC, reservation.ReservationID DESC;
+    `;
+    const [rows] = await pool.execute(query, [userId]);
+    return rows;
+}
+
+async function AdminGetUserFlights(userId){
+    const query = `
+        SELECT
+            flight.FlightID,
+            flight.DepartureAirport,
+            departure_city.Hungarian AS "DepartureCity",
+            flight.ArrivalAirport,
+            arrival_city.Hungarian AS "ArrivalCity",
+            flight.DepartureDateTime,
+            flight.ArrivalDateTime,
+            flight.IsCancelled AS "FlightIsCancelled",
+            COUNT(reservation.ReservationID) AS "ReservationCount",
+            SUM(CASE WHEN reservation.IsCancelled = 1 THEN 1 ELSE 0 END) AS "CancelledReservationCount",
+            SUM(CASE WHEN reservation.IsCancelled = 0 THEN 1 ELSE 0 END) AS "ActiveReservationCount",
+            SUM(ROUND((flight.BasePriceInHUF * fareclass.Multiplier) * ((100 - loyaltystatus.DiscountInPercentage) / 100))) AS "TotalPrice",
+            CASE
+                WHEN SUM(CASE WHEN reservation.IsCancelled = 0 THEN 1 ELSE 0 END) = 0 THEN 'Törölt'
+                WHEN SUM(CASE WHEN reservation.IsCancelled = 1 THEN 1 ELSE 0 END) = 0 THEN 'Aktív'
+                ELSE 'Vegyes'
+            END AS "GroupStatus"
+        FROM reservation
+        INNER JOIN flight ON reservation.FlightID = flight.FlightID
+        INNER JOIN aircraft ON flight.AircraftID = aircraft.AircraftID
+        INNER JOIN seat ON reservation.RowID = seat.RowID
+            AND reservation.ColumnID = seat.ColumnID
+            AND aircraft.AircraftModelID = seat.AircraftModelID
+        INNER JOIN fareclass ON seat.FareClassID = fareclass.FareClassID
+        INNER JOIN useraccount ON reservation.PassengerID = useraccount.UserID
+        INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID
+        INNER JOIN airport departure_airport ON flight.DepartureAirport = departure_airport.AirportCode
+        INNER JOIN city departure_city ON departure_airport.CityID = departure_city.CityID
+        INNER JOIN airport arrival_airport ON flight.ArrivalAirport = arrival_airport.AirportCode
+        INNER JOIN city arrival_city ON arrival_airport.CityID = arrival_city.CityID
+        WHERE reservation.PassengerID = ?
+        GROUP BY
+            flight.FlightID,
+            flight.DepartureAirport,
+            departure_city.Hungarian,
+            flight.ArrivalAirport,
+            arrival_city.Hungarian,
+            flight.DepartureDateTime,
+            flight.ArrivalDateTime,
+            flight.IsCancelled
+        ORDER BY flight.DepartureDateTime DESC, flight.FlightID DESC;
+    `;
+    const [rows] = await pool.execute(query, [userId]);
+    return rows;
+}
+
+async function AdminGetUserFlightSeats(userId, flightId){
+    const query = `
+        SELECT
+            reservation.ReservationID,
+            reservation.PassengerID AS "UserID",
+            reservation.FlightID,
+            flight.DepartureAirport,
+            departure_city.Hungarian AS "DepartureCity",
+            flight.ArrivalAirport,
+            arrival_city.Hungarian AS "ArrivalCity",
+            flight.DepartureDateTime,
+            flight.ArrivalDateTime,
+            flight.IsCancelled AS "FlightIsCancelled",
+            reservation.RowID,
+            reservation.ColumnID,
+            reservation.IsAdult,
+            reservation.IsCancelled,
+            fareclass.FareClassName,
+            ROUND((flight.BasePriceInHUF * fareclass.Multiplier) * ((100 - loyaltystatus.DiscountInPercentage) / 100)) AS "Price"
+        FROM reservation
+        INNER JOIN flight ON reservation.FlightID = flight.FlightID
+        INNER JOIN aircraft ON flight.AircraftID = aircraft.AircraftID
+        INNER JOIN seat ON reservation.RowID = seat.RowID
+            AND reservation.ColumnID = seat.ColumnID
+            AND aircraft.AircraftModelID = seat.AircraftModelID
+        INNER JOIN fareclass ON seat.FareClassID = fareclass.FareClassID
+        INNER JOIN useraccount ON reservation.PassengerID = useraccount.UserID
+        INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID
+        INNER JOIN airport departure_airport ON flight.DepartureAirport = departure_airport.AirportCode
+        INNER JOIN city departure_city ON departure_airport.CityID = departure_city.CityID
+        INNER JOIN airport arrival_airport ON flight.ArrivalAirport = arrival_airport.AirportCode
+        INNER JOIN city arrival_city ON arrival_airport.CityID = arrival_city.CityID
+        WHERE reservation.PassengerID = ? AND reservation.FlightID = ?
+        ORDER BY reservation.RowID ASC, reservation.ColumnID ASC, reservation.ReservationID DESC;
+    `;
+    const [rows] = await pool.execute(query, [userId, flightId]);
+    return rows;
+}
+
+async function AdminGetFlights(){
+    const query = `
+        SELECT
+            flight.FlightID,
+            flight.DepartureAirport,
+            departure_city.Hungarian AS "DepartureCity",
+            flight.ArrivalAirport,
+            arrival_city.Hungarian AS "ArrivalCity",
+            flight.DepartureDateTime,
+            flight.ArrivalDateTime,
+            flight.AircraftID,
+            aircraftmodel.AircraftModelName,
+            flight.BasePriceInHUF,
+            flight.IsCancelled,
+            COUNT(reservation.ReservationID) AS "ReservationCount",
+            SUM(CASE WHEN reservation.IsCancelled = 0 THEN 1 ELSE 0 END) AS "ActiveReservationCount"
+        FROM flight
+        INNER JOIN aircraft ON aircraft.AircraftID = flight.AircraftID
+        INNER JOIN aircraftmodel ON aircraftmodel.AircraftModelID = aircraft.AircraftModelID
+        INNER JOIN airport departure_airport ON departure_airport.AirportCode = flight.DepartureAirport
+        INNER JOIN city departure_city ON departure_city.CityID = departure_airport.CityID
+        INNER JOIN airport arrival_airport ON arrival_airport.AirportCode = flight.ArrivalAirport
+        INNER JOIN city arrival_city ON arrival_city.CityID = arrival_airport.CityID
+        LEFT JOIN reservation ON reservation.FlightID = flight.FlightID
+        GROUP BY
+            flight.FlightID,
+            flight.DepartureAirport,
+            departure_city.Hungarian,
+            flight.ArrivalAirport,
+            arrival_city.Hungarian,
+            flight.DepartureDateTime,
+            flight.ArrivalDateTime,
+            flight.AircraftID,
+            aircraftmodel.AircraftModelName,
+            flight.BasePriceInHUF,
+            flight.IsCancelled
+        ORDER BY flight.DepartureDateTime DESC, flight.FlightID DESC;
+    `;
+    const [rows] = await pool.execute(query);
+    return rows;
+}
+
+async function AdminCancelFlight(flightId){
+    const query = 'UPDATE flight SET IsCancelled = 1 WHERE FlightID = ? AND IsCancelled = 0;';
+    const [result] = await pool.execute(query, [flightId]);
+    return result;
+}
+
+async function AdminGetFlightById(flightId){
+    const query = 'SELECT FlightID, IsCancelled FROM flight WHERE FlightID = ?;';
+    const [rows] = await pool.execute(query, [flightId]);
+    return rows[0] || null;
+}
+
+async function AdminGetFlightCreateContext(){
+    const airportQuery = `
+        SELECT
+            airport.AirportCode,
+            city.Hungarian AS "City",
+            country.Hungarian AS "Country"
+        FROM airport
+        INNER JOIN city ON city.CityID = airport.CityID
+        INNER JOIN country ON country.CountryID = airport.CountryID
+        ORDER BY country.Hungarian ASC, city.Hungarian ASC;
+    `;
+
+    const aircraftQuery = `
+        SELECT
+            aircraft.AircraftID,
+            aircraftmodel.AircraftModelName,
+            latest_flight.ArrivalAirport AS "LastArrivalAirport",
+            latest_flight.ArrivalDateTime AS "LastArrivalDateTime"
+        FROM aircraft
+        INNER JOIN aircraftmodel ON aircraftmodel.AircraftModelID = aircraft.AircraftModelID
+        LEFT JOIN flight latest_flight ON latest_flight.FlightID = (
+            SELECT f2.FlightID
+            FROM flight f2
+            WHERE f2.AircraftID = aircraft.AircraftID
+                AND f2.IsCancelled = 0
+            ORDER BY f2.ArrivalDateTime DESC, f2.FlightID DESC
+            LIMIT 1
+        )
+        ORDER BY aircraft.AircraftID ASC;
+    `;
+
+    const [airports] = await pool.execute(airportQuery);
+    const [aircraft] = await pool.execute(aircraftQuery);
+
+    return {
+        airports,
+        aircraft
+    };
+}
+
+async function AdminGetLatestKnownAircraftLeg(aircraftId){
+    const query = `
+        SELECT
+            aircraft.AircraftID,
+            latest_flight.ArrivalAirport AS "LastArrivalAirport",
+            latest_flight.ArrivalDateTime AS "LastArrivalDateTime"
+        FROM aircraft
+        LEFT JOIN flight latest_flight ON latest_flight.FlightID = (
+            SELECT f2.FlightID
+            FROM flight f2
+            WHERE f2.AircraftID = aircraft.AircraftID
+                AND f2.IsCancelled = 0
+            ORDER BY f2.ArrivalDateTime DESC, f2.FlightID DESC
+            LIMIT 1
+        )
+        WHERE aircraft.AircraftID = ?;
+    `;
+    const [rows] = await pool.execute(query, [aircraftId]);
+    return rows[0] || null;
+}
+
+async function AdminHasFlightOverlap(aircraftId, departureDateTime, arrivalDateTime){
+    const query = `
+        SELECT COUNT(*) AS "OverlapCount"
+        FROM flight
+        WHERE AircraftID = ?
+            AND IsCancelled = 0
+            AND NOT (ArrivalDateTime <= ? OR DepartureDateTime >= ?);
+    `;
+    const [rows] = await pool.execute(query, [aircraftId, departureDateTime, arrivalDateTime]);
+    const overlapCount = Number.parseInt(rows[0].OverlapCount, 10);
+    return Number.isInteger(overlapCount) && overlapCount > 0;
+}
+
+async function AdminCreateFlight(departureAirport, arrivalAirport, departureDateTime, arrivalDateTime, aircraftId, basePriceInHUF){
+    const query = `
+        INSERT INTO flight (
+            DepartureAirport,
+            ArrivalAirport,
+            DepartureDateTime,
+            ArrivalDateTime,
+            AircraftID,
+            BasePriceInHUF,
+            IsCancelled
+        ) VALUES (?, ?, ?, ?, ?, ?, 0);
+    `;
+    const [result] = await pool.execute(query, [
+        departureAirport,
+        arrivalAirport,
+        departureDateTime,
+        arrivalDateTime,
+        aircraftId,
+        basePriceInHUF
+    ]);
+    return result;
+}
+
 
 async function cancelAllReservationsOfUser(userId) {
     const query = `UPDATE reservation SET IsCancelled = 1 WHERE ReservationID IN (SELECT ReservationID FROM reservation r1 WHERE r1.PassengerID = ? AND r1.IsCancelled = 0) AND FlightID NOT IN (SELECT flight.FlightID FROM flight WHERE flight.DepartureDateTime < NOW() OR flight.IsCancelled = 1);`;
@@ -303,6 +642,17 @@ module.exports = {
     cancelReservations,
     cancelAllReservationsOfUser,
     updateLoyaltyStatus,
-    cancelReservationCheckForRemainingOnlyChildren
-
+    cancelReservationCheckForRemainingOnlyChildren,
+    AdminSearchUsers,
+    AdminGetUsers,
+    AdminGetUserReservations,
+    AdminGetUserFlights,
+    AdminGetUserFlightSeats,
+    AdminGetFlights,
+    AdminCancelFlight,
+    AdminGetFlightById,
+    AdminGetFlightCreateContext,
+    AdminGetLatestKnownAircraftLeg,
+    AdminHasFlightOverlap,
+    AdminCreateFlight
 };

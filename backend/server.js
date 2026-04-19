@@ -115,6 +115,14 @@ router.get('/admin', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/admin.html'));
 });
 
+router.get('/hu/admin', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/admin.html'));
+});
+
+router.get('/en/admin', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/admin.html'));
+});
+
 router.get('/flights', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/flights.html'));
 });
