@@ -55,13 +55,12 @@ export async function getPlanner(lang) {
 export async function getFooter(lang) {
     let getfooter = (await (await fetch("/api/getfooter", { method: "GET", headers: { "Accept-Language": lang } })).json()).footer;
     $("#title_about_us_footer").text(getfooter.title_about_us);
-    $("#company_infos_footer").text(getfooter.company_infos);
-    $("#magazine_footer").text(getfooter.magazine);
+    $("#company_infos_footer").text(getfooter.company_infos).prop("href", `/${lang}/rolunk`);
+    $("#magazine_footer").text(getfooter.magazine).prop("href", `/magazin`);
     $("#title_services_footer").text(getfooter.title_services);
-    $("#loyalty_program_footer").text(getfooter.loyalty_program);
-    $("#flight_search_footer").text(getfooter.flight_search);
-    $("#my_flights_footer").text(getfooter.my_flights);
-    $("#travel_planner_footer").text(getfooter.travel_planner);
+    $("#loyalty_program_footer").text(getfooter.loyalty_program).prop("href", `/${lang}/husegprogram`);
+$("#my_flights_footer").text(getfooter.my_flights).prop("href", `/${lang}/profil`);
+    $("#travel_planner_footer").text(getfooter.travel_planner).prop("href", `/${lang}/map`);
     $("#title_contact_footer").text(getfooter.title_contact);
     $("#all_rights_reserved_footer").text(getfooter.all_rights_reserved);
 
