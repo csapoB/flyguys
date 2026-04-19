@@ -37,13 +37,15 @@ export async function modalInit(current_language, end_point) {
 
         const data = await response.json();
         switch (response.status) {
-            case 200:
+            case 201:
 
                 if (data.admin) {
                     $("#admin_button").show();
                 }
+                else{
+                   $("#profile_button").show(); 
+                }
                 $("#login_button").hide();
-                $("#profile_button").show();
                 $("#logout_button").show();
 
                 const modal = bootstrap.Modal.getInstance(document.getElementById('monadModal'));

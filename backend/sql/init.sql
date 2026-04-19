@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS loyaltystatus (
 CREATE TABLE IF NOT EXISTS useraccount (
     UserID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     UserName VARCHAR(255) NOT NULL,
-    UserEmail VARCHAR(255),
+    UserEmail VARCHAR(255) UNIQUE,
     UserPassword VARCHAR(100),
     UserBirthDate DATE,
     LoyaltyStatusID INT DEFAULT 1,
