@@ -1,6 +1,6 @@
 export async function getNavbar(lang, url_splitted) {
     let getnavbar = (await (await fetch("/api/getnavbar", { method: "GET", headers: { "Accept-Language": lang } })).json()).navbar;
-    $("#back_to_main_page").prop("href", `/${lang}`)
+    $("#back_to_main_page").prop("href", `/${lang}`);
     let $about_us_nav = $("#about_us_nav");
     $about_us_nav.text(getnavbar.about_us);
     $about_us_nav.prop("href", `/${lang}/rolunk`)
@@ -55,13 +55,20 @@ export async function getPlanner(lang) {
 export async function getFooter(lang) {
     let getfooter = (await (await fetch("/api/getfooter", { method: "GET", headers: { "Accept-Language": lang } })).json()).footer;
     $("#title_about_us_footer").text(getfooter.title_about_us);
-    $("#company_infos_footer").text(getfooter.company_infos);
+    let $company_infos_footer = $("#company_infos_footer");
+    $company_infos_footer.text(getfooter.company_infos);
+    $company_infos_footer.prop("href", `/${lang}/rolunk`);
     $("#magazine_footer").text(getfooter.magazine);
     $("#title_services_footer").text(getfooter.title_services);
-    $("#loyalty_program_footer").text(getfooter.loyalty_program);
-    $("#flight_search_footer").text(getfooter.flight_search);
-    $("#my_flights_footer").text(getfooter.my_flights);
-    $("#travel_planner_footer").text(getfooter.travel_planner);
+    let $loyalty_program_footer = $("#loyalty_program_footer");
+    $loyalty_program_footer.text(getfooter.loyalty_program);
+    $loyalty_program_footer.prop("href", `/${lang}/husegprogram`);
+    let $my_flights_footer = $("#my_flights_footer");
+    $my_flights_footer.text(getfooter.my_flights);
+    $my_flights_footer.prop("href", `/${lang}/profil`);
+    let $travel_planner_footer = $("#travel_planner_footer");
+    $travel_planner_footer.text(getfooter.travel_planner);
+    $travel_planner_footer.prop("href", `/${lang}/map`);
     $("#title_contact_footer").text(getfooter.title_contact);
     $("#all_rights_reserved_footer").text(getfooter.all_rights_reserved);
 

@@ -25,21 +25,19 @@ export async function modalInit(current_language, end_point) {
             return;
         }
 
-        try {
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept-Language': current_language
-                },
-                body: JSON.stringify({ email, password })
-            });
 
-            const data = await response.json();
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept-Language': current_language
+            },
+            body: JSON.stringify({ email, password })
+        });
 
-            if (response.ok) {
-
-                // Navbar frissítése - Bejelentkezés gomb elrejtése, Profilom gomb megjelenítése
+        const data = await response.json();
+        switch (response.status) {
+            case 200:
 
                 if (data.admin) {
                     $("#admin_button").show();
@@ -48,15 +46,10 @@ export async function modalInit(current_language, end_point) {
                 $("#profile_button").show();
                 $("#logout_button").show();
 
-
-                // Modal bezárása
                 const modal = bootstrap.Modal.getInstance(document.getElementById('monadModal'));
                 if (modal) {
                     modal.hide();
                 }
-
-
-                // itt lesz majd a toast
 
                 switch (end_point) {
                     case "index":
@@ -76,20 +69,27 @@ export async function modalInit(current_language, end_point) {
                 }
 
                 generateToast(getmodal.success.login_successful, "success");
+                break;
 
-            } else {
+            default:
                 generateToast(getmodal.error.login_unsuccessful + " " + data.error, "danger");
                 console.error(data.error);
-            }
-        } catch (error) {
-            generateToast(getmodal.error.server_error_during_login, "danger")
-            console.error("ERROR: ", error);
+                break;
         }
-    });
+
+    }
+    );
     $(document).on("click", ".submit-register", async function (event) {
         event.preventDefault();
 
-        const userName = $("#first_name").val().trim() + "&" + $("#last_name").val().trim();
+        let userName;
+        if (current_language == "hu") {
+            userName = $("#last_name").val().trim() + "&" + $("#first_name").val().trim();
+        } else {
+            userName = $("#first_name").val().trim() + "&" + $("#last_name").val().trim();
+        }
+
+
         const email = $("#new_usr_email").val().trim();
         const password = $("#new_usr_passw").val().trim();
 
@@ -427,7 +427,7 @@ function regis_modal(i18n_values) {
         "type": "text",
         "placeholder": `${i18n_values.field.birth_date}`
     });
-    $birth_date.datepicker();
+    $birth_date.datepicker({ changeYear: true, changeMonth: true, yearRange: "-120:-14" });
 
     let $e_mail = $("<input/>", {
         "id": "new_usr_email",
@@ -471,6 +471,7 @@ function regis_modal(i18n_values) {
 
     $modal_body.append($input_group_for_name);
     $modal_body.append($birth_date);
+    $modal_body.append($("#ui-datepicker-div"));
     $modal_body.append($e_mail);
     $modal_body.append($input_group_for_passw);
 
@@ -496,7 +497,47 @@ export async function initReservationCancellationModal(current_language, i18n_va
 
     let getmodal = await getModal(current_language);
 
-    initPasswordVerificationModalForReservationCancellation(current_language, getmodal);
+    initPasswordVerificationModal("2", getmodal);
+    $("#verification_button2").on("click", async function (event) {
+        event.preventDefault();
+        let password = $("#usr_passw2").val().trim();
+        let response = await fetch("/api/verifypassword", { method: "POST", headers: { "Content-Type": "application/json", "Accept-Language": current_language }, body: JSON.stringify({ password }) });
+        switch (response.status) {
+            case 200:
+                generateToast((await response.json()).message, "success");
+
+                let $to_be_cancelled_reservations_frame = $("#to_be_cancelled_reservations_frame");
+                $to_be_cancelled_reservations_frame.html("");
+
+                let $active_reservations_clone = $("#active_reservations").clone();
+                $active_reservations_clone.removeClass("table-hover");
+                let $inputs = $active_reservations_clone.find("tbody tr td input.cancel_active_reservation");
+
+                for (let i = 0; i < $inputs.length; i++) {
+                    if (!$inputs.eq(i).prop("checked")) {
+                        $inputs.eq(i).parent().parent().remove()
+                    }
+                }
+
+                $active_reservations_clone.find("#i_cancel_column_th").remove();
+                $active_reservations_clone.find(".i_cancel_column_td").remove();
+
+                let $last_td_s = $active_reservations_clone.find("tbody tr").last().find("td");
+                $last_td_s.first().addClass("rounded-bottom border-bottom-0");
+                $last_td_s.last().addClass("rounded-bottom border-bottom-0");
+
+                $to_be_cancelled_reservations_frame.append($active_reservations_clone);
+
+                bootstrap.Modal.getOrCreateInstance($("#monadModal2")).hide();
+                bootstrap.Modal.getOrCreateInstance($("#childModal2")).show();
+                break;
+
+            default:
+                generateToast((await response.json()).error, "danger");
+                break;
+        }
+
+    });
 
     init_child_modal("childModal2", "childModal2_content", "modal_frame2");
     init_modal_content_template("childModal2_content", "child2");
@@ -591,7 +632,35 @@ export async function initEditProfileModal(profile_data, current_language, i18n_
 
     let getmodal = await getModal(current_language);
 
-    initPasswordVerificationModalForEditProfile(profile_data, current_language, getmodal);
+    initPasswordVerificationModal("3", getmodal);
+    $("#verification_button3").on("click", async function (event) {
+        event.preventDefault();
+        let password = $("#usr_passw3").val().trim();
+        let response = await fetch("/api/verifypassword", { method: "POST", headers: { "Content-Type": "application/json", "Accept-Language": current_language }, body: JSON.stringify({ password }) });
+        switch (response.status) {
+            case 200:
+                generateToast((await response.json()).message, "success");
+
+                let name_obj = nameDeFormatter(profile_data.UserName, current_language);
+
+                console.log(name_obj)
+                $("#edit_first_name").val(name_obj.last_name);
+                $("#edit_last_name").val(name_obj.first_name);
+
+                $("#edit_birth_date").val(dateDeFormatter(profile_data.UserBirthDate, current_language));
+                $("#edit_usr_email").val(profile_data.UserEmail);
+                $("#edit_usr_passw").val(password);
+
+                bootstrap.Modal.getOrCreateInstance($("#monadModal3")).hide();
+                bootstrap.Modal.getOrCreateInstance($("#childModal3")).show();
+                break;
+
+            default:
+                generateToast((await response.json()).error, "danger");
+                break;
+        }
+
+    });
 
     init_child_modal("childModal3", "childModal3_content", "modal_frame3");
     init_modal_content_template("childModal3_content", "child3");
@@ -641,7 +710,7 @@ export async function initEditProfileModal(profile_data, current_language, i18n_
         "type": "text",
         "placeholder": `${getmodal.field.birth_date}`
     });
-    $birth_date.datepicker();
+    $birth_date.datepicker({ changeYear: true, changeMonth: true, yearRange: "-120:-14" });
 
     let $e_mail = $("<input/>", {
         "id": "edit_usr_email",
@@ -677,7 +746,7 @@ export async function initEditProfileModal(profile_data, current_language, i18n_
         "id": "confirm_edit_button",
         "class": "btn btn-danger w-75 mb-2 mt-2",
         "type": "submit",
-        "text": `${i18n_values.save_changes}`,
+        "text": `${getmodal.button.save}`,
         on: {
             "click": async function (event) {
                 event.preventDefault();
@@ -755,9 +824,9 @@ export async function initEditProfileModal(profile_data, current_language, i18n_
     $modal_header.append($title);
     $modal_header.append($close_button);
 
-
     $modal_body.append($input_group_for_name);
     $modal_body.append($birth_date);
+    $modal_body.append($("#ui-datepicker-div"));
     $modal_body.append($e_mail);
     $modal_body.append($input_group_for_passw);
 
@@ -765,20 +834,42 @@ export async function initEditProfileModal(profile_data, current_language, i18n_
 
 }
 
-function initPasswordVerificationModalForReservationCancellation(language, i18n_values) {
-    if ($("#monadModal2").next().length != 0) {
-        $("#modal_frame2").children().last().remove();
-    }
-    init_modal_content_template("monadModal2_content", "monad2");
+export async function initDeleteProfileModal(current_language) {
 
-    let $modal_header = $("#monad2Modal_header");
-    let $modal_body = $("#monad2Modal_body");
-    let $modal_footer = $("#monad2Modal_footer");
+    let getmodal = await getModal(current_language);
+
+    initPasswordVerificationModal("4", getmodal);
+    $("#verification_button4").on("click", async function (event) {
+        event.preventDefault();
+        let password = $("#usr_passw4").val().trim();
+        let response = await fetch("/api/verifypassword", { method: "POST", headers: { "Content-Type": "application/json", "Accept-Language": current_language }, body: JSON.stringify({ password }) });
+        switch (response.status) {
+            case 200:
+                generateToast((await response.json()).message, "success");
+
+                bootstrap.Modal.getOrCreateInstance($("#monadModal4")).hide();
+                bootstrap.Modal.getOrCreateInstance($("#childModal4")).show();
+                break;
+
+            default:
+                generateToast((await response.json()).error, "danger");
+                break;
+        }
+
+    });
+
+    init_child_modal("childModal4", "childModal4_content", "modal_frame4");
+    init_modal_content_template("childModal4_content", "child4");
+
+    let $modal_header = $("#child4Modal_header");
+    let $modal_body = $("#child4Modal_body");
+    let $modal_footer = $("#child4Modal_footer");
+
 
     let $title = $("<h1>", {
-        "id": "modalMonadLabel",
+        "id": "modalChildLabe4",
         "class": "text-danger modal-title fs-2",
-        "text": `${i18n_values.title.verify_password}`
+        "text": `${getmodal.title.delete_profile}`
     });
 
     let $close_button = $("<button>", {
@@ -788,99 +879,74 @@ function initPasswordVerificationModalForReservationCancellation(language, i18n_
         "data-bs-dismiss": "modal"
     });
 
-    let $input_group_for_passw = $("<div>", {
-        "class": "input-group w-75"
+    let $p = $("<p>", {
+        "class": "mb-0",
+        "text": `${getmodal.caption.delete_profile}`
     });
 
-    let $passw = $("<input>", {
-        "id": "usr_passw",
-        "class": "form-control modal_input",
-        "type": "password",
-        "placeholder": `${i18n_values.field.password}`
+    let $buttons_frame = $("<div>", {
+        "class": "w-50 row justify-content-around",
     });
 
-    let $see_passw_button = $("<button>", {
-        "id": "passw_button",
-        "class": "btn btn-outline-secondary",
-        "html": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-eye-fill\" viewBox=\"0 0 16 16\"> <path d=\"M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0\"/><path d=\"M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7\"/></svg>",
+    let $yes_button = $("<button>", {
+        "class": "col-3 btn btn-danger",
+        "text": getmodal.button.yes,
         on: {
-            "click": seePassw
-        }
-    });
+            "click": async function () {
+                let response = await fetch("/api/deleteprofile", { method: "PUT", headers: { "Content-Type": "application/json", "Accept-Language": current_language } });
 
-    $input_group_for_passw.append($passw);
-    $input_group_for_passw.append($see_passw_button);
-
-    let $verification_button = $("<button>", {
-        "id": "verification_button",
-        "class": "btn btn-danger w-75 mb-2",
-        "type": "submit",
-        "text": `${i18n_values.button.verification}`,
-        on: {
-            "click": async function (event) {
-                event.preventDefault();
-                let password = $passw.val().trim();
-                let response = await fetch("/api/verifypassword", { method: "POST", headers: { "Content-Type": "application/json", "Accept-Language": language }, body: JSON.stringify({ password }) });
                 switch (response.status) {
                     case 200:
+                        $(".profile_button").off();
+                        bootstrap.Modal.getOrCreateInstance($("#childModal4")).hide();
                         generateToast((await response.json()).message, "success");
-
-                        let $to_be_cancelled_reservations_frame = $("#to_be_cancelled_reservations_frame");
-                        $to_be_cancelled_reservations_frame.html("");
-
-                        let $active_reservations_clone = $("#active_reservations").clone();
-                        $active_reservations_clone.removeClass("table-hover");
-                        let $inputs = $active_reservations_clone.find("tbody tr td input.cancel_active_reservation");
-
-                        for (let i = 0; i < $inputs.length; i++) {
-                            if (!$inputs.eq(i).prop("checked")) {
-                                $inputs.eq(i).parent().parent().remove()
-                            }
-                        }
-
-
-                        $active_reservations_clone.find("#i_cancel_column_th").remove();
-                        $active_reservations_clone.find(".i_cancel_column_td").remove();
-
-                        let $last_td_s = $active_reservations_clone.find("tbody tr").last().find("td");
-                        $last_td_s.first().addClass("rounded-bottom border-bottom-0");
-                        $last_td_s.last().addClass("rounded-bottom border-bottom-0");
-
-                        $to_be_cancelled_reservations_frame.append($active_reservations_clone);
-
-                        bootstrap.Modal.getOrCreateInstance($("#monadModal2")).hide();
-                        bootstrap.Modal.getOrCreateInstance($("#childModal2")).show();
+                        setTimeout(function () {
+                            window.location.replace(`/${current_language}`);
+                        }, 5000);
                         break;
 
                     default:
                         generateToast((await response.json()).error, "danger");
                         break;
                 }
-
             }
         }
     });
+
+    let $no_button = $("<button>", {
+        "class": "col-3 btn btn-danger",
+        "text": getmodal.button.no,
+        on: {
+            "click": function () {
+                bootstrap.Modal.getOrCreateInstance($("#childModal4")).hide();
+            }
+        }
+    });
+
+    $buttons_frame.append($yes_button);
+    $buttons_frame.append($no_button);
 
     $modal_header.append($title);
     $modal_header.append($close_button);
 
-    $modal_body.append($input_group_for_passw);
+    $modal_body.append($p);
 
-    $modal_footer.append($verification_button);
+    $modal_footer.append($buttons_frame);
+
 }
 
-function initPasswordVerificationModalForEditProfile(profile_data, language, i18n_values) {
-    if ($("#monadModal3").next().length != 0) {
-        $("#modal_frame3").children().last().remove();
+function initPasswordVerificationModal(id_num, i18n_values) {
+    if ($("#monadModal" + id_num).next().length != 0) {
+        $("#modal_frame" + id_num).children().last().remove();
     }
-    init_modal_content_template("monadModal3_content", "monad3");
+    init_modal_content_template("monadModal" + id_num + "_content", "monad" + id_num);
 
-    let $modal_header = $("#monad3Modal_header");
-    let $modal_body = $("#monad3Modal_body");
-    let $modal_footer = $("#monad3Modal_footer");
+    let $modal_header = $("#monad" + id_num + "Modal_header");
+    let $modal_body = $("#monad" + id_num + "Modal_body");
+    let $modal_footer = $("#monad" + id_num + "Modal_footer");
 
     let $title = $("<h1>", {
-        "id": "modalMonadLabel3",
+        "id": "modalMonadLabel" + id_num,
         "class": "text-danger modal-title fs-2",
         "text": `${i18n_values.title.verify_password}`
     });
@@ -897,7 +963,7 @@ function initPasswordVerificationModalForEditProfile(profile_data, language, i18
     });
 
     let $passw = $("<input>", {
-        "id": "usr_passw",
+        "id": "usr_passw" + id_num,
         "class": "form-control modal_input",
         "type": "password",
         "placeholder": `${i18n_values.field.password}`
@@ -916,43 +982,10 @@ function initPasswordVerificationModalForEditProfile(profile_data, language, i18
     $input_group_for_passw.append($see_passw_button);
 
     let $verification_button = $("<button>", {
-        "id": "verification_button",
+        "id": "verification_button" + id_num,
         "class": "btn btn-danger w-75 mb-2",
         "type": "submit",
         "text": `${i18n_values.button.verification}`,
-        on: {
-            "click": async function (event) {
-                event.preventDefault();
-                let password = $passw.val().trim();
-                let response = await fetch("/api/verifypassword", { method: "POST", headers: { "Content-Type": "application/json", "Accept-Language": language }, body: JSON.stringify({ password }) });
-                switch (response.status) {
-                    case 200:
-                        generateToast((await response.json()).message, "success");
-
-                        let name_obj = nameDeFormatter(profile_data.UserName, language);
-
-                        if (language == "en") {
-                            $("#edit_first_name").val(name_obj.last_name);
-                            $("#edit_last_name").val(name_obj.first_name);
-                        } else {
-                            $("#edit_first_name").val(name_obj.first_name);
-                            $("#edit_last_name").val(name_obj.last_name);
-                        }
-                        $("#edit_birth_date").val(dateDeFormatter(profile_data.UserBirthDate, language));
-                        $("#edit_usr_email").val(profile_data.UserEmail);
-                        $("#edit_usr_passw").val(password);
-
-                        bootstrap.Modal.getOrCreateInstance($("#monadModal3")).hide();
-                        bootstrap.Modal.getOrCreateInstance($("#childModal3")).show();
-                        break;
-
-                    default:
-                        generateToast((await response.json()).error, "danger");
-                        break;
-                }
-
-            }
-        }
     });
 
     $modal_header.append($title);

@@ -111,6 +111,10 @@ router.get('/hu/profil', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/profile.html'));
 });
 
+router.get('/admin', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/admin.html'));
+});
+
 router.get('/hu/admin', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/admin.html'));
 });

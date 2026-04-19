@@ -1,5 +1,5 @@
 import { getPlanner } from "./locale.js";
-import { popoverManualTrigger, dateFormatter} from "./toolbox.js";
+import { popoverManualTrigger, dateFormatter } from "./toolbox.js";
 import { inputDisabler, passengers_popoverInit, inputSwitcher, airportSelector, returnEnabler, turnOff, airportSwapperEnabler } from "./planner.js";
 
 
@@ -20,6 +20,9 @@ export async function plannerMapInit(current_language) {
 
     // Datepickerek
     let $departure = $("#departure_input");
+    $departure.on("click", function () {
+        $("body").append($("#ui-datepicker-div"));
+    });
     let available_departure_dates = (await (await fetch("/api/availabledeparturedatesfiltered", { method: "GET" })).json()).departuredates
     let $departure_datepicker = $departure.datepicker({
         beforeShowDay: function (d) {
@@ -86,6 +89,9 @@ export async function plannerMapInit(current_language) {
     });
 
     let $return = $("#return_input");
+    $return.on("click", function () {
+        $("body").append($("#ui-datepicker-div"));
+    });
     let available_return_dates = [];
     let $return_datepicker = $return.datepicker({
         beforeShowDay: function (d) {

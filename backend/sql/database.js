@@ -6,7 +6,7 @@ const pool = mysql.createPool({
     user: 'root',
     password: '',
     database: 'flyguys',
-    dateStrings : true,
+    dateStrings: true,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
@@ -59,7 +59,7 @@ async function selectAvailableReturnDates(departureAirport, arrivalAirport, dest
 async function selectAvailableArrivalDatesFiltered(departureAirport, arrivalAirport, departureDate) {
     const query = 'SELECT DISTINCT DATE(ArrivalDateTime) AS "ArrivalDate" FROM active_flights_hun WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DATE(DepartureDateTime) LIKE ?;';
     const [rows] = await pool.execute(query, [`%${departureAirport}%`, `%${arrivalAirport}%`, `%${departureDate}%`]);
-    
+
     return rows;
 }
 
@@ -67,28 +67,28 @@ async function selectAvailableArrivalDatesFiltered(departureAirport, arrivalAirp
 async function selectSwappableFlightsWithSameDepartureDates(departureAirport, arrivalAirport, departureDate) {
     const query = 'SELECT DISTINCT afs1.DepartureAirport FROM available_flights_simplified afs1, available_flights_simplified afs2 WHERE (afs1.DepartureAirport LIKE ? AND afs2.DepartureAirport LIKE ?) AND (afs1.ArrivalAirport LIKE ? AND afs2.ArrivalAirport LIKE ?) AND afs1.DepartureDate LIKE ? AND afs2.DepartureDate LIKE ?;';
     const [rows] = await pool.execute(query, [departureAirport, arrivalAirport, arrivalAirport, departureAirport, `%${departureDate}%`, `%${departureDate}%`]);
-    
+
     return rows;
 }
 
 async function selectSwappableFlights(departureAirport, arrivalAirport) {
     const query = 'SELECT DISTINCT afs1.DepartureAirport FROM available_flights_simplified afs1, available_flights_simplified afs2 WHERE (afs1.DepartureAirport LIKE ? AND afs2.DepartureAirport LIKE ?) AND (afs1.ArrivalAirport LIKE ? AND afs2.ArrivalAirport LIKE ?)';
     const [rows] = await pool.execute(query, [departureAirport, arrivalAirport, arrivalAirport, departureAirport]);
-    
+
     return rows;
 }
 
 async function selectAvailableFlightsFilteredHun(departureAirport, arrivalAirport, departureDate, numOfPassengers, userId) {
     const query = 'SELECT num_of_available_seats_on_active_flights_hun.FlightID, num_of_available_seats_on_active_flights_hun.DepartureAirport, num_of_available_seats_on_active_flights_hun.DepartureCity, num_of_available_seats_on_active_flights_hun.ArrivalCity, num_of_available_seats_on_active_flights_hun.ArrivalAirport, num_of_available_seats_on_active_flights_hun.DepartureDate, num_of_available_seats_on_active_flights_hun.ArrivalDate, num_of_available_seats_on_active_flights_hun.DepartureTime, num_of_available_seats_on_active_flights_hun.ArrivalTime, num_of_available_seats_on_active_flights_hun.FlightTime, num_of_available_seats_on_active_flights_hun.AircraftModelID, num_of_available_seats_on_active_flights_hun.NumOfAvailableSeats, ROUND(num_of_available_seats_on_active_flights_hun.BasePriceInHUF*(CASE WHEN ? LIKE "NULL" THEN 1 ELSE ((100-(SELECT loyaltystatus.DiscountInPercentage FROM useraccount INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserID = ?))/100) END)) AS "PriceInHUF" FROM num_of_available_seats_on_active_flights_hun WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate LIKE ? AND NumOfAvailableSeats >= ?;';
     const [rows] = await pool.execute(query, [`${userId}`, `${userId}`, `${departureAirport}`, `${arrivalAirport}`, `${departureDate}`, `${numOfPassengers}`]);
-    
+
     return rows;
 }
 
 async function selectAvailableFlightsFilteredEn(departureAirport, arrivalAirport, departureDate, numOfPassengers, userId) {
     const query = 'SELECT num_of_available_seats_on_active_flights_en.FlightID, num_of_available_seats_on_active_flights_en.DepartureAirport, num_of_available_seats_on_active_flights_en.DepartureCity, num_of_available_seats_on_active_flights_en.ArrivalCity, num_of_available_seats_on_active_flights_en.ArrivalAirport, num_of_available_seats_on_active_flights_en.DepartureDate, num_of_available_seats_on_active_flights_en.ArrivalDate, num_of_available_seats_on_active_flights_en.DepartureTime, num_of_available_seats_on_active_flights_en.ArrivalTime, num_of_available_seats_on_active_flights_en.FlightTime, num_of_available_seats_on_active_flights_en.AircraftModelID, num_of_available_seats_on_active_flights_en.NumOfAvailableSeats, ROUND(num_of_available_seats_on_active_flights_en.BasePriceInHUF*(CASE WHEN ? LIKE "NULL" THEN 1 ELSE ((100-(SELECT loyaltystatus.DiscountInPercentage FROM useraccount INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserID = ?))/100) END)) AS "PriceInHUF" FROM num_of_available_seats_on_active_flights_en WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate LIKE ? AND NumOfAvailableSeats >= ?;';
-    const [rows] = await pool.execute(query, [`${userId}`, `${userId}`,`${departureAirport}`, `${arrivalAirport}`, `${departureDate}`, `${numOfPassengers}`]);
-    
+    const [rows] = await pool.execute(query, [`${userId}`, `${userId}`, `${departureAirport}`, `${arrivalAirport}`, `${departureDate}`, `${numOfPassengers}`]);
+
     return rows;
 }
 
@@ -152,7 +152,7 @@ async function selectPreviousFlightsByUserIdHun(userId) {
 
     return rows;
 }
-async function getUserById(id){
+async function getUserById(id) {
     const query = 'SELECT * FROM useraccount WHERE UserID = ?';
     const [rows] = await pool.execute(query, [id]);
     return rows;
@@ -160,10 +160,10 @@ async function getUserById(id){
 
 
 //Register
-async function Register(userName, userEmail, hashedPassword, userBirthDate){
+async function Register(userName, userEmail, hashedPassword, userBirthDate) {
     const query = 'INSERT INTO useraccount (UserName, UserEmail, UserPassword, UserBirthDate, LoyaltyStatusID) VALUES (?, ?, ?, ?, 1)';
     const [result] = await pool.execute(query, [userName, userEmail, hashedPassword, userBirthDate]);
-    return result.affectedRows>0;
+    return result.affectedRows > 0;
 }
 
 //LOGIN
@@ -175,58 +175,63 @@ async function Login(email, password){
 }
 
 //Hűségprogram
-async function Husegprogram(id){
-    const query = 'SELECT UserName, NumberOfFlights, LoyaltyStatusName From useraccount LEFT JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID INNER JOIN number_of_flights_of_users ON useraccount.UserID = number_of_flights_of_users.UserID WHERE useraccount.UserId = ?';
+async function Husegprogram(id) {
+    const query = 'SELECT UserName, NumberOfFlights, LoyaltyStatusName From useraccount LEFT JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID INNER JOIN number_of_flights_of_users ON useraccount.UserID = number_of_flights_of_users.UserID WHERE useraccount.UserId = ? ';
     const [rows] = await pool.execute(query, [id]);
     return rows;
 }
 
 
 //Helyfoglalas INSERT
-async function SeatReservation(PassengerID, flightID, rowID, columnID, adult){
+async function SeatReservation(PassengerID, flightID, rowID, columnID, adult) {
     let lekerdezes = 'SELECT ReservationID FROM reservation WHERE FlightID = ? AND RowID = ? AND ColumnID = ? AND NOT IsCancelled'
     const [sorok] = await pool.execute(lekerdezes, [flightID, rowID, columnID]);
     let vissza = false;
-    if (sorok.length==0) {
+    if (sorok.length == 0) {
         const query = 'INSERT INTO reservation (PassengerID, FlightID, RowID, ColumnID, IsCancelled, IsAdult) VALUES (?, ?, ?, ?, 0, ?)';
         const [rows] = await pool.execute(query, [PassengerID, flightID, rowID, columnID, adult]);
-        vissza=rows.affectedRows>0;
+        vissza = rows.affectedRows > 0;
     }
     return vissza;
 }
 
 // Profil
-async function Profil(id){
+async function Profil(id) {
     const query = 'SELECT UserName, UserEmail, LoyaltyStatusName, UserBirthDate From useraccount LEFT JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID WHERE useraccount.UserId = ?';
     const [rows] = await pool.execute(query, [id]);
     return rows;
 }
 
-async function selectActiveReservationsByUserIdAndFlightId(userId, flightId){
+async function selectActiveReservationsByUserIdAndFlightId(userId, flightId) {
     const query = 'SELECT not_cancelled_reservations.ReservationID, not_cancelled_reservations.RowID, not_cancelled_reservations.ColumnID, fareclass.FareClassName, not_cancelled_reservations.IsAdult FROM not_cancelled_reservations INNER JOIN flight ON not_cancelled_reservations.FlightID = flight.FlightID INNER JOIN fareclass ON fareclass.FareClassID = not_cancelled_reservations.FareClassID WHERE flight.DepartureDateTime > NOW() AND not_cancelled_reservations.PassengerID = ? AND not_cancelled_reservations.FlightID = ? ORDER BY not_cancelled_reservations.RowID ASC, not_cancelled_reservations.ColumnID;';
     const [rows] = await pool.execute(query, [userId, flightId]);
     return rows;
 }
 
-async function selectPreviousReservationsByUserIdAndFlightId(userId, flightId){
+async function selectPreviousReservationsByUserIdAndFlightId(userId, flightId) {
     const query = 'SELECT not_cancelled_reservations.RowID, not_cancelled_reservations.ColumnID, fareclass.FareClassName, not_cancelled_reservations.IsAdult FROM not_cancelled_reservations INNER JOIN flight ON not_cancelled_reservations.FlightID = flight.FlightID INNER JOIN fareclass ON fareclass.FareClassID = not_cancelled_reservations.FareClassID WHERE flight.DepartureDateTime < NOW() AND not_cancelled_reservations.PassengerID = ? AND not_cancelled_reservations.FlightID = ? ORDER BY not_cancelled_reservations.RowID ASC, not_cancelled_reservations.ColumnID;';
     const [rows] = await pool.execute(query, [userId, flightId]);
     return rows;
 }
 
-async function updateUserProfile(userId, userName, email, password, birthDate){
+async function updateUserProfile(userId, userName, email, password, birthDate) {
     const query = 'UPDATE useraccount SET UserName = ?, UserEmail = ?, UserPassword = ?, UserBirthDate = ? WHERE UserID = ?;';
     const [result] = await pool.execute(query, [userName, email, password, birthDate, userId]);
     return result;
 }
 
-async function cancelReservations(reservation_ids){
-    let formatted_reservation_ids = reservation_ids.map((x) => parseInt(x));
-    const query = `UPDATE reservation SET IsCancelled = 1 WHERE ReservationID IN (?);`;
-    const [result] = await pool.query(query, [formatted_reservation_ids]);
+async function deleteUserProfile(userId) {
+    const query = 'UPDATE useraccount SET UserName = "User&Deleted", UserEmail = NULL, UserPassword = NULL, UserBirthDate = NULL, LoyaltyStatusID = NULL, AdminStatus = NULL WHERE UserID = ?;';
+    const [result] = await pool.execute(query, [userId]);
     return result;
 }
 
+async function cancelReservations(reservation_ids, userId) {
+    let formatted_reservation_ids = reservation_ids.map((x) => parseInt(x));
+    const query = `UPDATE reservation SET IsCancelled = 1 WHERE ReservationID IN (?) AND PassengerID = ? AND FlightID NOT IN (SELECT flight.FlightID FROM flight WHERE flight.DepartureDateTime < NOW() OR flight.IsCancelled = 1);`;
+    const [result] = await pool.query(query, [formatted_reservation_ids, userId]);
+    return result;
+}
 async function AdminGetUsers(){
     const query = `
         SELECT
@@ -565,8 +570,41 @@ async function AdminCreateFlight(departureAirport, arrivalAirport, departureDate
 }
 
 
+async function cancelAllReservationsOfUser(userId) {
+    const query = `UPDATE reservation SET IsCancelled = 1 WHERE ReservationID IN (SELECT ReservationID FROM reservation r1 WHERE r1.PassengerID = ? AND r1.IsCancelled = 0) AND FlightID NOT IN (SELECT flight.FlightID FROM flight WHERE flight.DepartureDateTime < NOW() OR flight.IsCancelled = 1);`;
+    const [result] = await pool.query(query, [userId]);
+    return result;
+}
 
-// SELECT reservations_with_prices.RowID, reservations_with_prices.ColumnID, reservations_with_prices.FareClassID FROM reservations_with_prices WHERE reservations_with_prices.IsCancelled = 0;
+async function updateLoyaltyStatus(userId) {
+    const query = 'UPDATE useraccount SET useraccount.LoyaltyStatusID = (CASE WHEN (SELECT COUNT(l1.NumberOfFlightsRequired) FROM loyaltystatus l1 WHERE l1.LoyaltyStatusID = useraccount.LoyaltyStatusID+1) = 1 THEN (CASE WHEN (SELECT number_of_flights_of_users.NumberOfFlights FROM number_of_flights_of_users WHERE number_of_flights_of_users.UserID = ?) >= (SELECT l2.NumberOfFlightsRequired FROM loyaltystatus l2 WHERE l2.LoyaltyStatusID = useraccount.LoyaltyStatusID+1) THEN useraccount.LoyaltyStatusID+1 ELSE useraccount.LoyaltyStatusID END) ELSE useraccount.LoyaltyStatusID END) WHERE useraccount.UserID = ?';
+    const [result] = await pool.execute(query, [userId, userId]);
+    return result;
+}
+
+async function cancelReservationCheckForRemainingOnlyChildren(reservation_ids, userId) {
+    let formatted_reservation_ids = reservation_ids.map((x) => parseInt(x));
+    const query = `SELECT COUNT(not_cancelled_reservations.ReservationID) AS "NumberOfPassengers", not_cancelled_reservations.IsAdult, not_cancelled_reservations.FlightID FROM not_cancelled_reservations INNER JOIN flight ON not_cancelled_reservations.FlightID = flight.FlightID WHERE not_cancelled_reservations.PassengerID = ? AND flight.DepartureDateTime > NOW() AND not_cancelled_reservations.FlightID IN(SELECT DISTINCT r1.FlightID FROM reservation r1 WHERE r1.ReservationID IN(?)) AND not_cancelled_reservations.ReservationID NOT IN(?) GROUP BY not_cancelled_reservations.FlightID, not_cancelled_reservations.IsAdult ASC;`;
+    const [result] = await pool.query(query, [userId, formatted_reservation_ids, formatted_reservation_ids]);
+    
+    let flag = false;
+    let i = 0;
+    while (i < result.length && !(flag)){
+        if (result[i].IsAdult == 0) {
+            if (i+1 == result.length) {
+                flag = true
+            } else {
+                if (result[i].FlightID != result[i+1].FlightID) {
+                    flag = true;
+                }
+            }
+        }
+        i++
+    }
+
+    return flag;
+
+}
 
 //!Export
 module.exports = {
@@ -596,11 +634,15 @@ module.exports = {
     selectActiveReservationsByUserIdAndFlightId,
     selectPreviousReservationsByUserIdAndFlightId,
     updateUserProfile,
+    deleteUserProfile,
     selectActiveFlightsByUserIdEn,
     selectActiveFlightsByUserIdHun,
     selectPreviousFlightsByUserIdEn,
     selectPreviousFlightsByUserIdHun,
     cancelReservations,
+    cancelAllReservationsOfUser,
+    updateLoyaltyStatus,
+    cancelReservationCheckForRemainingOnlyChildren,
     AdminSearchUsers,
     AdminGetUsers,
     AdminGetUserReservations,
