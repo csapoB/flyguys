@@ -1,17 +1,19 @@
-$(async function(){
-    try {
-        const response = await fetch('api/LoginCheck', {
-            method: 'GET',
-        });
+import { getProfile } from "./locale.js";
+import { initI18n, errorPageGenerator, initProfile } from "./toolbox.js";
+$(async function () {
 
-        const data = await response.json();
-        if (!data.allapot) {
-            window.location.href="/"
-        }
-        else{
-            alert("Be vagy jeletnkezve")
-        }
+
+    let language = await initI18n("profil"); 
+    let getprofile = await getProfile(language);
+    try {
+        await initProfile(language, getprofile);
+
     } catch (error) {
-        console.log("hiba: " + error)
+        let $cont = $("#cont");
+        $cont.html("")
+        errorPageGenerator($cont, (await (await fetch("/api/geterrors", { method: "GET", headers: { "Accept-Language": language } })).json()).errors.client_error);
     }
+    
 });
+
+

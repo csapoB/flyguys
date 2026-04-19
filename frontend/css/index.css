@@ -6,7 +6,7 @@
   border-color: #000;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #000;
 }
-h3 {
+.brick_color {
     color: #660708;
 }
 
@@ -35,18 +35,91 @@ a:hover{
     }
 
 }
+
 #hatterkep {
-    background-image: url('../css/images/footer_background.png');
-    background-size: cover; 
-    background-position: center;
-    background-repeat: no-repeat;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    background-image: url('images/vilagos_footer.png');
+    background-size: 600px;
+    background-repeat: repeat;
+    background-position: top left;
+    padding-top: 60px;
+    padding-bottom: 40px;
+    border-top: 3px solid #A4161A;
+    box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-#hatterkep *{
-  color: #0b090a;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+#hatterkep .row {
+    gap: 0;
+}
+
+#hatterkep .col-xl-2,
+#hatterkep .col-xl-3,
+#hatterkep .col-lg-2,
+#hatterkep .col-lg-3,
+#hatterkep .col-md-4,
+#hatterkep .col-sm-4,
+#hatterkep .col-6 {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin: 0.4rem;
+}
+
+#hatterkep h4 {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #1a1a1a;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid #A4161A;
+    display: inline-block;
+    text-shadow: none;
+}
+
+#hatterkep ul li {
+    margin-bottom: 0.35rem;
+}
+
+#hatterkep a {
+    color: #222;
+    font-size: 0.95rem;
+    transition: color 0.2s ease, padding-left 0.2s ease;
+    text-shadow: none;
+    word-break: break-all;
+    overflow-wrap: break-word;
+}
+
+#hatterkep a:hover {
+    color: #A4161A;
+    padding-left: 4px;
+}
+
+#hatterkep p {
+    color: #222;
+    font-size: 0.95rem;
+    margin-bottom: 0.35rem;
+    text-shadow: none;
+}
+
+.copyright {
+    margin-top: 2rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.15);
+    width: 100%;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border-radius: 8px;
+}
+
+.copyright p {
+    color: #444;
+    font-size: 0.85rem;
+    text-shadow: none;
 }
 
 /* FONT teszt */
@@ -68,9 +141,11 @@ a:hover{
   background-color: var(--bs-backdrop-bg);
 }
 
-/*.popover{
-  max-width: 450px;
-}*/
+.popover{
+  max-width: 250px;
+  max-height: 450px;
+  overflow-y: scroll;
+}
 
 /*.planner_div:focus {
   border-color: #A4161A;
@@ -79,14 +154,25 @@ a:hover{
 
 .planner_input {
   padding: 0;
+  width: 100%;
   outline: none;
   border: none;
-  max-width: inherit;
   line-height: 1.5;
   font-size: 1rem;
 }
 .planner_label {
+  
   display: block;
   font-size: 12px;
   
+}
+.input_container{
+  width: 100%;
+  
+}
+
+.acDivs{
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
 }
