@@ -1,0 +1,42 @@
+
+body {
+    background-image: url(/css/images/planebg.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.bg {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding-bottom: 120px;
+    max-height: calc(100vh - 400px);
+}
+
+@media (max-width: 768px) {
+    .bg {
+        max-height: calc(100vh - 600px);
+    }
+
+    body{
+        background-color: white;
+        background-image: none;
+    }
+}
+
+.card {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 30px;
+    border-radius: 10px;
+    border: solid 1px #DC3545;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+}
+
+h2 {
+    width: fit-content;
+    border-bottom: 2px solid #A4161A;
+    padding-bottom: 5px;
+}

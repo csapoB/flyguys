@@ -1,0 +1,245 @@
+{
+    "locale": "en",
+    "index": {
+        "title": "FlyGuys",
+        "body": {
+            "cheapest_flights": {
+                "title": "Cheapest flights",
+                "currency": "&nbsp€",
+                "per_person": "&nbsp/ person",
+                "choose_seats": "Choose seats!"
+            }
+        }
+    },
+    "footer": {
+        "title_about_us": "About us",
+        "title_services": "Services",
+        "title_contact": "Contacts",
+        "company_infos": "Company informations",
+        "magazine": "Magazine",
+        "loyalty_program": "Loyalty Program",
+        "flight_search": "Flight searcher",
+        "my_flights": "My flights",
+        "travel_planner": "Travel Planner",
+        "all_rights_reserved": "© FlyGuys. All rights reserved."
+    },
+    "navbar": {
+        "about_us": "About us",
+        "planner": "Travel Planner",
+        "loyalty_program": "Loyalty Program",
+        "language_code": "en",
+        "language": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 480\" height=\"24\" width=\"32\"><g fill-rule=\"evenodd\"><path fill=\"#fff\" d=\"M640 480H0V0h640z\"></path><path fill=\"#388d00\" d=\"M640 480H0V320h640z\"></path><path fill=\"#d43516\" d=\"M640 160H0V0h640z\"></path></g></svg>",
+        "login": "Login",
+        "admin": "Admin",
+        "my_profile": "My profile",
+        "logout": "Logout"
+    },
+    "planner": {
+        "origin_label": "Origin",
+        "destination_label": "Destination",
+        "departure_label": "Departure",
+        "return_label": "Return",
+        "passengers_label": "Passengers",
+        "search_flights_button": "Start Booking",
+        "passengers_input": "1 adult, 0 children"
+    },
+    "planner_passengers_popover": {
+        "adults_inc_dec": "Adults",
+        "children_inc_dec": "Children",
+        "adult": "adult",
+        "adults": "adults",
+        "child": "child",
+        "children": "children"
+    },
+    "flights": {
+        "title": "Flights",
+        "choose_flight": "Choose a flight!",
+        "choose_seats": "Choose seats!",
+        "currency": "&nbsp€",
+        "per_person": " &nbsp/ person",
+        "errors": {
+            "no_flights_by_parameters": "Unfortunately, there's no flight by the given parameters."
+        }
+    },
+    "errors": {
+        "bad_http_get_request": "The HTTP-GET request isn't proper!",
+        "bad_url_parameter": "ERROR : Some of the URL parameters are wrong.",
+        "client_error": "Unfortunately, an error occured in the client site. Please, try again later!",
+        "server_error": "Unfortunately, an error occured in the server. Please, try again later!",
+        "login_needed_get": "Access denied. You need to log in to access data!",
+        "login_needed_post": "Access denied. You need to log in to modify data!",
+        "missing_data": "Required data are missing!",
+        "end_point_not_working": "This end point doesn't work!",
+        "no_active_session": "No active session!",
+        "missing_url_parameter": "Missing URL parameter!"
+    },
+    "modal": {
+        "title": {
+            "login": "Login",
+            "registration": "Registration",
+            "edit_profile": "Edit Profile",
+            "verify_password": "Verify Password",
+            "cancel_bookings": "Cancel Bookings"
+        },
+        "field": {
+            "email": "E-mail",
+            "password": "Password",
+            "first_name": "Last name",
+            "last_name": "First name",
+            "birth_date": "Birth date (dd/mm/yyyy)"
+        },
+        "error": {
+            "login_unsuccessful": "Login unsuccessful!",
+            "logout_unsuccessful": "Logout unsuccessful!",
+            "missing_email_and_password_fields": "Please, fill out the email and password fields!",
+            "server_error_during_login": "A server error occured during login. Please, try again later!",
+            "registration_unsuccessful": "Registration unsuccessful!",
+            "password_char_limit": "Password needs to be at least 6 charaters long!",
+            "server_error_during_registration": "A server error occured during registraiton. Please, try again later!",
+            "server_error_during_logout": "A server error occured during logout. Please, try again later!",
+            "missing_password_field": "Please enter your password!",
+            "wrong_password": "Wrong password!",
+            "server_error_during_password_verification": "A server error occured during password verification. Please, try again later!",
+            "missing_fields": "Please, fill out all fields!",
+            "profile_update_failed": "Profile update failed!",
+            "server_error_during_profile_update": "A server error occured during profile update. Please, try again later!",
+            "wrong_email_or_password": "Wrong email or password!"
+        },
+        "success": {
+            "login_successful": "Login successful!",
+            "logout_successful": "Logout successful!",
+            "registration_successful": "Registration successful!",
+            "password_verified_for_profile_edit": "Password verified! You can now edit your profile.",
+            "profile_updated_successfully": "Profile updated successfully!",
+            "password_verified": "Password verified!",
+            "bookings_have_been_cancelled_successfully": "Selected bookings have been cancelled successfully!"
+        },
+        "button": {
+            "save": "Save Changes",
+            "verification": "Verification"
+        },
+        "caption": {
+            "no_account": "Don't have an account? Sign up here:",
+            "cancel_selected_reservations": "The bookings below will be cancelled:"
+        }
+    },
+    "map": {
+        "title": "Travel Planner",
+        "choose_button": "Choose",
+        "error": {
+            "map_not_loaded": "Due to an unknown error, the map can't be loaded."
+        }
+    },
+    "about_us": {
+        "title": "About Us",
+        "about_us_section": {
+            "title": "About Us",
+            "content": "<p>At FlyGuys, we believe that air travel should be more than simply getting from point A to point B — it should be comfortable, reliable, and genuinely enjoyable. Founded in Hungary and proudly based in the heart of Europe, FlyGuys is a new-generation commercial airline built on modern values, innovative thinking, and a commitment to exceptional passenger experience.</p>"
+        },
+        "our_story_section": {
+            "title": "Our Story",
+            "content": "<p>FlyGuys was created with a clear mission: to make air travel accessible, efficient, and comfortable. From our home base in Hungary, we’ve expanded rapidly to connect travelers to key destinations across Europe and the Middle East, offering a growing network of routes designed for both business and leisure passengers.</p><p>As a startup airline, we embrace flexibility and forward-thinking solutions. This allows us to continually refine our services, adopt the latest aviation technologies, and ensure our aircraft meet the highest standards of safety, comfort, and environmental responsibility.</p>"
+        },
+        "destinations_section": {
+            "title": "Destinations",
+            "content": "<p>Our expanding route network links Hungary with major cities and gateway hubs throughout:</p><ul><li>Western, Central & Eastern Europe</li><li>The Balkans</li><li>The Mediterranean region</li><li>The Middle East’s most dynamic destinations</li></ul><p>Whether traveling for work, relaxation, or adventure, FlyGuys offers smooth connections, convenient schedules, and thoughtfully curated services to make each journey effortless.</p>"
+        },
+        "our_commitment_section": {
+            "title": "Our Commitment",
+            "content": "<p>At FlyGuys, we prioritize:</p><ul><li>Passenger comfort – Modern cabins, friendly service, and a customer-first mindset</li><li>Efficient travel – Streamlined operations for punctual, stress-free flights</li><li>Safety & Reliability – Aircraft maintained to world-class standards</li><li>Innovation – Smart technology that enhances every stage of the travel experience</li><li>Sustainability – A focus on fuel-efficient operations and responsible growth</li></ul>"
+        },
+        "the_experience_section": {
+            "title": "The FlyGuys Experience",
+            "content": "<p>We’re more than an airline — we’re your travel partners. Every member of our team, from check-in to cockpit, is dedicated to providing warm service with a personal touch. At FlyGuys, you’re not just a passenger; you’re part of our journey as we redefine what a modern European airline can be.</p>"
+        },
+        "join_us_section": {
+            "title": "Join Us in the Sky",
+            "content": "<p>As we continue to expand our destinations and services, we invite you to fly with us and experience a new standard of travel.<br>FlyGuys — Your journey starts with us.</p>"
+        }
+    },
+    "seat_chooser": {
+        "title": "Choose seats!",
+        "currency": "&nbsp€",
+        "trip_to": "Trip to",
+        "trip_back": "Trip back",
+        "seat": "seat",
+        "sum": "Sum:",
+        "booking": "Booking",
+        "selected_seats": "Selected seats",
+        "no_seats_selected": "No seats have been selected!",
+        "errors": {
+            "not_logged_in": "You have to be logged in to book a flight.",
+            "no_adults": "When booking, there has to be at least 1 adult."
+        }
+    },
+    "profile": {
+        "flights_tabel": {
+            "seat_column": "Seat",
+            "fare_class_column": "Fare class",
+            "passenger_column": "Passenger",
+            "i_cancel_column": "Cancel",
+            "adult": "adult",
+            "child": "child"
+        },
+        "profile_data": {
+            "name": "Name",
+            "rank": {
+                "title": "Rank",
+                "no_rank" : "No rank",
+                "bronze": "Bronze",
+                "silver": "Silver",
+                "gold": "Gold",
+                "platinum": "Platinum",
+                "diamond": "Diamond"
+            },
+            "email": "Email",
+            "birth_date": "Birth date"
+        },
+        "bookings": "Bookings",
+        "active_bookings": "Active bookings",
+        "previous_bookings": "Previous bookings",
+        "choose_flight": "Choose a flight!",
+        "no_active_bookings": "It seems like you have no active bookings.",
+        "no_previous_bookings": "It seems like you have no previous bookings.",
+        "no_bookings": "It seems like you have not travelled with us.",
+        "select_all_for_cancellation": "Select all for cancellation",
+        "cancel_selected": "Cancel selected",
+        "edit_profile": "Edit profile",
+        "save_changes": "Save Changes",
+        "error": {
+            "user_not_found": "User not found in the database!"
+        }
+    },
+    "loyalty_program": {
+        "title": "Loyalty Program",
+        "num_of_my_flights": "Number of my flights",
+        "no_rank": "No rank",
+        "max_rank_reached": "Max rank reached!",
+        "num_of_travels_to_reach_next_level": "travel to the next level",
+        "bronze": {
+            "title": "Bronze",
+            "range": "Number of your flights: 0-5",
+            "discount": "For discounts, travel more with us!"
+        },
+        "silver": {
+            "title": "Silver",
+            "range": "Number of your flights: 6-15",
+            "discount": "1% discount on bookings"
+        },
+        "gold": {
+            "title": "Gold",
+            "range": "Number of your flights: 16-25",
+            "discount": "5% discount on bookings"
+        },
+        "platinum": {
+            "title": "Platinum",
+            "range": "Number of your flights: 26-35",
+            "discount": "7% discount on bookings"
+        },
+        "diamond": {
+            "title": "Diamond",
+            "range": "Number of your flights: 36+",
+            "discount": "10% discount on bookings"
+        }
+    }
+}
