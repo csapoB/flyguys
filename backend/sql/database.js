@@ -1,4 +1,5 @@
 const mysql = require('mysql2/promise');
+const bcrypt = require('bcryptjs');
 
 const pool = mysql.createPool({
     host: '127.0.0.1',
@@ -166,10 +167,11 @@ async function Register(userName, userEmail, hashedPassword, userBirthDate){
 }
 
 //LOGIN
-async function Login(email){
+async function Login(email, password){
     const query = 'SELECT UserID, AdminStatus, UserPassword FROM useraccount WHERE UserEmail = ?';
     const [rows] = await pool.execute(query, [email]);
-    return rows[0] || null;
+    const siker = rows.length > 0 && await bcrypt.compare(password, rows[0].UserPassword);
+    return siker ? { UserID: rows[0].UserID, AdminStatus: rows[0].AdminStatus } : null;
 }
 
 //Hűségprogram
