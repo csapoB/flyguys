@@ -27,14 +27,6 @@ a:hover{
 }
 
 
-/* Kisméretű kép változások */
-@media only screen and (max-width: 992px) {
-
-    #eltunes{
-        display: none;
-    }
-
-}
 
 #hatterkep {
     background-image: url('images/vilagos_footer.png');

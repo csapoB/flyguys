@@ -671,36 +671,22 @@ router.post('/login', async (request, response) => {
     try {
         const { email, password } = request.body
         if (email && password) {
-            const login = await database.Login(email);
+            const login = await database.Login(email, password);
             if (!login) {
-                return response.status(400).json({
+                response.status(400).json({
                     error: request.t("modal.error.wrong_email_or_password", { returnObjects: true })
                 });
             }
             else {
-                if (await bcrypt.compare(password, login.UserPassword)) {
-                    request.session.user = {
-                        id: login.UserID,
-                        role: login.AdminStatus,
-                        timestamp: Date.now()
-                    }
-                    console.log(request.session.user)
-                    if (request.session.user.role === 1) {
-                        response.status(201).json({
-                            message: request.t("modal.success.login_successful", { returnObjects: true }),
-                            admin: true
-                        });
-                    }
-                    response.status(201).json({
-                        message: request.t("modal.success.login_successful", { returnObjects: true }),
-                        admin: false
-                    });
-                }
-                else {
-                    response.status(400).json({
-                        error: request.t("modal.error.wrong_password", { returnObjects: true })
-                    });
-                }
+                request.session.user = {
+                    id: login.UserID,
+                    role: login.AdminStatus,
+                    timestamp: Date.now()
+                };
+                response.status(201).json({
+                    message: request.t("modal.success.login_successful", { returnObjects: true }),
+                    admin: login.AdminStatus === 1
+                });
             }
         }
         else {
@@ -1065,7 +1051,7 @@ router.get('/AdminGetUserReservations', async (request, response) => {
         const rawUserID = request.query.userID ?? request.query.userId;
         const userID = Number.parseInt(rawUserID, 10);
         if (!Number.isInteger(userID) || userID <= 0) {
-            throw new Error("Hibás userID") 
+            throw new Error("Hibás userID")
         }
 
         const adatvissza = await database.AdminGetUserReservations(userID);
@@ -1174,14 +1160,14 @@ router.post('/AdminCancelFlight', async (request, response) => {
 
         let message = "A járat törölve lett";
         if (existingFlight.IsCancelled === 1 || existingFlight.IsCancelled === true) {
-            message= 'A járat már törölve van';
+            message = 'A járat már törölve van';
         }
-        else{
+        else {
             await database.AdminCancelFlight(flightID);
         }
         response.status(200).json({
-                message
-            });
+            message
+        });
     } catch (error) {
         console.log(error);
         response.status(500).json({
