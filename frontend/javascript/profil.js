@@ -4,11 +4,10 @@ $(async function () {
 
 
     let language; 
-    let getprofile;
 
     try {
         language = await initI18n("profil"); 
-        getprofile = await getProfile(language);
+        let getprofile = await getProfile(language);
         $(document).prop('title', `${getprofile.title}`);
         await initProfile(language, getprofile);
 

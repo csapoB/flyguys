@@ -1,5 +1,21 @@
+import { getAdmin } from "./locale.js";
+import { initI18n } from "./toolbox.js";
+
 $(async function () {
-    await adminCheck();
+
+    let language;
+    try {
+        language = await initI18n("admin");
+        let getadmin = await getAdmin(language);
+        await adminCheck(language, getadmin);
+
+    } catch (error) {
+        let $frame = $("#frame");
+        $frame.html("");
+        console.error(error);
+        errorPageGenerator($frame, (await (await fetch("/api/geterrors", { method: "GET", headers: { "Accept-Language": language } })).json()).errors.client_error);
+    }
+
 });
 
 // --- HTTP segédfüggvények ---
@@ -20,14 +36,14 @@ async function requestJson(url, options) {
     return data;
 }
 
-async function adminCheck() {
-    try {
+async function adminCheck(language, i18n_values) {
+    //try {
         const response = await fetch('/api/AdminCheck', { method: 'GET' });
         let data = {};
 
         data = await response.json();
         if (!response.ok || !data.admin) {
-            window.location.href = '/';
+            window.location.href = '/' + language;
         } else {
             wireModeSwitch();
             wireUserSelection();
@@ -36,10 +52,10 @@ async function adminCheck() {
             wireAdminFlightActions();
             await switchAdminMode('users');
         }
-    } catch (error) {
+    /*} catch (error) {
         console.error(error.message);
         renderReservationError('Nem sikerült betölteni az admin adatokat.');
-    }
+    }*/
 }
 
 // --- API hívások ---

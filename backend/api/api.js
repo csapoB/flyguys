@@ -9,6 +9,7 @@ const multer = require('multer'); //?npm install multer
 const path = require('path');
 const session = require('express-session');
 const { default: i18next } = require('i18next');
+const { error } = require('console');
 
 const storage = multer.diskStorage({
     destination: (request, file, callback) => {
@@ -656,6 +657,20 @@ router.get('/getloyaltyprogram', (request, response) => {
     }
 });
 
+router.get('/getadmin', (request, response) => {
+    try {
+
+        response.status(200).json({
+            admin: request.t("admin", { returnObjects: true })
+        });
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
 router.get('/checklogin', (request, response) => {
     try {
         response.status(200).json({
@@ -790,6 +805,7 @@ router.get('/husegprogram', async (request, response) => {
 router.get('/profil', async (request, response) => {
     try {
         if (LoggedInCheck(request)) {
+            await database.updateLoyaltyStatus(request.session.user.id);
             const user = await database.Profil(request.session.user.id);
             response.status(200).json({
                 result: user
@@ -1083,17 +1099,20 @@ router.post('/helyfoglalas', async (request, response) => {
 router.get('/AdminGetUsers', async (request, response) => {
     try {
         if (!EnsureAdminSession(request)) {
-            throw new Error("Nem vagy bejelentkezve!")
+            response.status(400).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        } else {
+            const adatvissza = await database.AdminGetUsers();
+            response.status(200).json({
+                adat: adatvissza
+            });
         }
 
-        const adatvissza = await database.AdminGetUsers();
-        response.status(200).json({
-            adat: adatvissza
-        });
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -1101,22 +1120,29 @@ router.get('/AdminGetUsers', async (request, response) => {
 router.get('/AdminSearchUsers', async (request, response) => {
     try {
         if (!EnsureAdminSession(request)) {
-            throw new Error("Nem vagy bejelentkezve!")
+            response.status(400).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+
+        } else {
+
+            if (typeof request.query.email !== 'string') {
+                response.status(400).json({
+                    error: request.t("admin.error.wrong_email", { returnObjects: true })
+                });
+            } else {
+                const email = request.query.email.trim();
+                const adatvissza = await database.AdminSearchUsers(email);
+                response.status(200).json({
+                    adat: adatvissza
+                });
+            }
         }
 
-        if (typeof request.query.email !== 'string') {
-            throw new Error("Hibás email")
-        }
-
-        const email = request.query.email.trim();
-        const adatvissza = await database.AdminSearchUsers(email);
-        response.status(200).json({
-            adat: adatvissza
-        });
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -1124,23 +1150,28 @@ router.get('/AdminSearchUsers', async (request, response) => {
 router.get('/AdminGetUserReservations', async (request, response) => {
     try {
         if (!EnsureAdminSession(request)) {
-            throw new Error("Nem vagy bejelentkezve!")
+            response.status(400).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        } else {
+            const rawUserID = request.query.userID ?? request.query.userId;
+            const userID = Number.parseInt(rawUserID, 10);
+            if (!Number.isInteger(userID) || userID <= 0) {
+                response.status(400).json({
+                    error: request.t("admin.error.wrong_userid", { returnObjects: true })
+                });
+            } else {
+                const adatvissza = await database.AdminGetUserReservations(userID);
+                response.status(200).json({
+                    adat: adatvissza
+                });
+            }
         }
 
-        const rawUserID = request.query.userID ?? request.query.userId;
-        const userID = Number.parseInt(rawUserID, 10);
-        if (!Number.isInteger(userID) || userID <= 0) {
-            throw new Error("Hibás userID")
-        }
-
-        const adatvissza = await database.AdminGetUserReservations(userID);
-        response.status(200).json({
-            adat: adatvissza
-        });
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -1148,23 +1179,28 @@ router.get('/AdminGetUserReservations', async (request, response) => {
 router.get('/AdminGetUserFlights', async (request, response) => {
     try {
         if (!EnsureAdminSession(request)) {
-            throw new Error("Nem vagy bejelentkezve!");
+            response.status(400).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        } else {
+            const rawUserID = request.query.userID ?? request.query.userId;
+            const userID = Number.parseInt(rawUserID, 10);
+            if (!Number.isInteger(userID) || userID <= 0) {
+                response.status(400).json({
+                    error: request.t("admin.error.wrong_userid", { returnObjects: true })
+                });
+            } else {
+                const adatvissza = await database.AdminGetUserFlights(userID);
+                response.status(200).json({
+                    adat: adatvissza
+                });
+            }
         }
 
-        const rawUserID = request.query.userID ?? request.query.userId;
-        const userID = Number.parseInt(rawUserID, 10);
-        if (!Number.isInteger(userID) || userID <= 0) {
-            throw new Error("Hibás userID")
-        }
-
-        const adatvissza = await database.AdminGetUserFlights(userID);
-        response.status(200).json({
-            adat: adatvissza
-        });
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -1172,31 +1208,38 @@ router.get('/AdminGetUserFlights', async (request, response) => {
 router.get('/AdminGetUserFlightSeats', async (request, response) => {
     try {
         if (!EnsureAdminSession(request)) {
-            throw new Error("Nem vagy bejelentkezve!");
+            response.status(400).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        } else {
+            const rawUserID = request.query.userID ?? request.query.userId;
+            const userID = Number.parseInt(rawUserID, 10);
+
+            if (!Number.isInteger(userID) || userID <= 0) {
+                response.status(400).json({
+                    error: request.t("admin.error.wrong_userid", { returnObjects: true })
+                });
+            } else {
+                const rawFlightID = request.query.flightID ?? request.query.flightId;
+                const flightID = Number.parseInt(rawFlightID, 10);
+
+                if (!Number.isInteger(flightID) || flightID <= 0) {
+                    response.status(400).json({
+                        error: request.t("admin.error.wrong_flightid", { returnObjects: true })
+                    });
+                } else {
+                    const adatvissza = await database.AdminGetUserFlightSeats(userID, flightID);
+                    response.status(200).json({
+                        adat: adatvissza
+                    });
+                }
+            }
         }
 
-        const rawUserID = request.query.userID ?? request.query.userId;
-        const rawFlightID = request.query.flightID ?? request.query.flightId;
-
-        const userID = Number.parseInt(rawUserID, 10);
-        const flightID = Number.parseInt(rawFlightID, 10);
-
-        if (!Number.isInteger(userID) || userID <= 0) {
-            throw new Error("Hibás userID")
-        }
-
-        if (!Number.isInteger(flightID) || flightID <= 0) {
-            throw new Error("Hibás flightID")
-        }
-
-        const adatvissza = await database.AdminGetUserFlightSeats(userID, flightID);
-        response.status(200).json({
-            adat: adatvissza
-        });
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -1204,17 +1247,20 @@ router.get('/AdminGetUserFlightSeats', async (request, response) => {
 router.get('/AdminGetFlights', async (request, response) => {
     try {
         if (!EnsureAdminSession(request)) {
-            throw new Error("nem vagy bejelentkezve");
+            response.status(400).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        } else {
+            const adatvissza = await database.AdminGetFlights();
+            response.status(200).json({
+                adat: adatvissza
+            });
         }
 
-        const adatvissza = await database.AdminGetFlights();
-        response.status(200).json({
-            adat: adatvissza
-        });
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -1222,35 +1268,42 @@ router.get('/AdminGetFlights', async (request, response) => {
 router.post('/AdminCancelFlight', async (request, response) => {
     try {
         if (!EnsureAdminSession(request)) {
-            throw new Error("nem vagy bejelentkezve");
+            response.status(400).json({
+                error: request.t("errors.login_needed_post", { returnObjects: true })
+            });
+        } else {
+            const rawFlightID = request.body.flightID ?? request.body.flightId;
+            const flightID = Number.parseInt(rawFlightID, 10);
+
+            if (!Number.isInteger(flightID) || flightID <= 0) {
+                response.status(400).json({
+                    error: request.t("admin.error.wrong_flightid", { returnObjects: true })
+                });
+            } else {
+                const existingFlight = await database.AdminGetFlightById(flightID);
+                if (!existingFlight) {
+                    response.status(400).json({
+                        error: request.t("admin.error.flight_not_exist", { returnObjects: true })
+                    });
+                } else {
+                    let message = request.t("admin.success.flight_cancelled_successfully", { returnObjects: true });
+                    if (existingFlight.IsCancelled === 1 || existingFlight.IsCancelled === true) {
+                        message = request.t("admin.success.flight_was_already_cancelled", { returnObjects: true });
+                    }
+                    else {
+                        await database.AdminCancelFlight(flightID);
+                    }
+                    response.status(200).json({
+                        message
+                    });
+                }
+            }
         }
 
-        const rawFlightID = request.body.flightID ?? request.body.flightId;
-        const flightID = Number.parseInt(rawFlightID, 10);
-
-        if (!Number.isInteger(flightID) || flightID <= 0) {
-            throw new Error("Hibás flightID");
-        }
-
-        const existingFlight = await database.AdminGetFlightById(flightID);
-        if (!existingFlight) {
-            throw new Error("Nem létező járat");
-        }
-
-        let message = "A járat törölve lett";
-        if (existingFlight.IsCancelled === 1 || existingFlight.IsCancelled === true) {
-            message = 'A járat már törölve van';
-        }
-        else {
-            await database.AdminCancelFlight(flightID);
-        }
-        response.status(200).json({
-            message
-        });
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -1258,17 +1311,21 @@ router.post('/AdminCancelFlight', async (request, response) => {
 router.get('/AdminGetFlightCreateContext', async (request, response) => {
     try {
         if (!EnsureAdminSession(request, response)) {
-            throw new Error("nem vagy bejelentkezve");
+            response.status(400).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        } else {
+            const adatvissza = await database.AdminGetFlightCreateContext();
+            response.status(200).json({
+                adat: adatvissza
+            });
         }
 
-        const adatvissza = await database.AdminGetFlightCreateContext();
-        response.status(200).json({
-            adat: adatvissza
-        });
+
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -1276,7 +1333,9 @@ router.get('/AdminGetFlightCreateContext', async (request, response) => {
 router.post('/AdminCreateFlight', async (request, response) => {
     try {
         if (!EnsureAdminSession(request, response)) {
-            throw new Error("nem vagy bejelentkezve");
+            response.status(400).json({
+                error: request.t("errors.login_needed_post", { returnObjects: true })
+            });
         }
 
         const {
@@ -1384,9 +1443,9 @@ router.post('/AdminCreateFlight', async (request, response) => {
             flightID: eredmeny.insertId
         });
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });

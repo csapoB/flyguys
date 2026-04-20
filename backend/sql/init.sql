@@ -24,9 +24,9 @@ CREATE TABLE IF NOT EXISTS loyaltystatus (
 CREATE TABLE IF NOT EXISTS useraccount (
     UserID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     UserName VARCHAR(255) NOT NULL,
-    UserEmail VARCHAR(255),
+    UserEmail VARCHAR(255) UNIQUE,
     UserPassword VARCHAR(100),
-    UserBirthDate DATE,
+    UserBirthDate DATE DEFAULT "2001-09-11",
     LoyaltyStatusID INT DEFAULT 1,
     AdminStatus BOOLEAN DEFAULT 0,
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -124,10 +124,10 @@ CREATE VIEW IF NOT EXISTS airports_in_hungarian AS
     	FROM airport INNER JOIN city ON airport.CityID = city.CityID INNER JOIN country ON airport.CountryID = country.CountryID ORDER BY country.Hungarian ASC, city.Hungarian ASC;
 
 CREATE VIEW IF NOT EXISTS flights_with_flight_time_hun AS
-    SELECT flight.FlightID, flight.DepartureAirport, origin_city.Hungarian AS "DepartureCity", flight.ArrivalAirport, destination_city.Hungarian AS "ArrivalCity", flight.DepartureDateTime, flight.ArrivalDateTime, TIMEDIFF(flight.ArrivalDateTime, ADDTIME(flight.DepartureDateTime, SUBTIME(TIME(ABS(TIME(destination.UTCOffset))), TIME(ABS(TIME(origin.UTCOffset))))))  AS "FlightTime", flight.BasePriceInHUF, flight.AircraftID FROM flight INNER JOIN airport origin ON flight.DepartureAirport = origin.AirportCode INNER JOIN airport destination ON flight.ArrivalAirport = destination.AirportCode INNER JOIN city origin_city ON origin.CityID = origin_city.CityID INNER JOIN city destination_city ON destination.CityID = destination_city.CityID; 
+    SELECT flight.FlightID, flight.DepartureAirport, origin_city.Hungarian AS "DepartureCity", flight.ArrivalAirport, destination_city.Hungarian AS "ArrivalCity", flight.DepartureDateTime, flight.ArrivalDateTime, TIMEDIFF(flight.ArrivalDateTime, ADDTIME(flight.DepartureDateTime, SUBTIME(TIME(ABS(TIME(destination.UTCOffset))), TIME(ABS(TIME(origin.UTCOffset))))))  AS "FlightTime", flight.BasePriceInHUF, flight.AircraftID, flight.IsCancelled FROM flight INNER JOIN airport origin ON flight.DepartureAirport = origin.AirportCode INNER JOIN airport destination ON flight.ArrivalAirport = destination.AirportCode INNER JOIN city origin_city ON origin.CityID = origin_city.CityID INNER JOIN city destination_city ON destination.CityID = destination_city.CityID; 
 
 CREATE VIEW IF NOT EXISTS flights_with_flight_time_en AS
-    SELECT flight.FlightID, flight.DepartureAirport, origin_city.English AS "DepartureCity", flight.ArrivalAirport, destination_city.English AS "ArrivalCity", flight.DepartureDateTime, flight.ArrivalDateTime, TIMEDIFF(flight.ArrivalDateTime, ADDTIME(flight.DepartureDateTime, SUBTIME(TIME(ABS(TIME(destination.UTCOffset))), TIME(ABS(TIME(origin.UTCOffset))))))  AS "FlightTime", flight.BasePriceInHUF, flight.AircraftID FROM flight INNER JOIN airport origin ON flight.DepartureAirport = origin.AirportCode INNER JOIN airport destination ON flight.ArrivalAirport = destination.AirportCode INNER JOIN city origin_city ON origin.CityID = origin_city.CityID INNER JOIN city destination_city ON destination.CityID = destination_city.CityID; 
+    SELECT flight.FlightID, flight.DepartureAirport, origin_city.English AS "DepartureCity", flight.ArrivalAirport, destination_city.English AS "ArrivalCity", flight.DepartureDateTime, flight.ArrivalDateTime, TIMEDIFF(flight.ArrivalDateTime, ADDTIME(flight.DepartureDateTime, SUBTIME(TIME(ABS(TIME(destination.UTCOffset))), TIME(ABS(TIME(origin.UTCOffset))))))  AS "FlightTime", flight.BasePriceInHUF, flight.AircraftID, flight.IsCancelled FROM flight INNER JOIN airport origin ON flight.DepartureAirport = origin.AirportCode INNER JOIN airport destination ON flight.ArrivalAirport = destination.AirportCode INNER JOIN city origin_city ON origin.CityID = origin_city.CityID INNER JOIN city destination_city ON destination.CityID = destination_city.CityID; 
 -- SELECT flight.DepartureAirport, flight.ArrivalAirport, flight.DepartureDateTime, flight.ArrivalDateTime, flight.BasePrice FROM flight;
 
 CREATE VIEW IF NOT EXISTS active_flights_hun AS
@@ -154,7 +154,7 @@ CREATE VIEW IF NOT EXISTS not_cancelled_reservations AS
 	SELECT reservations_with_prices.ReservationID, reservations_with_prices.PassengerID, reservations_with_prices.FlightID, reservations_with_prices.RowID, reservations_with_prices.ColumnID, reservations_with_prices.FareClassID, reservations_with_prices.IsAdult FROM reservations_with_prices WHERE !reservations_with_prices.IsCancelled;
 
 CREATE VIEW IF NOT EXISTS number_of_flights_of_users AS
-	SELECT useraccount.UserID, COUNT(DISTINCT not_cancelled_reservations.FlightID) AS "NumberOfFlights" FROM useraccount LEFT JOIN not_cancelled_reservations ON useraccount.UserID = not_cancelled_reservations.PassengerID  INNER JOIN flight ON not_cancelled_reservations.FlightID = flight.FlightID WHERE flight.DepartureDateTime < NOW() GROUP BY useraccount.UserID;
+	SELECT useraccount.UserID, COUNT(DISTINCT not_cancelled_reservations.FlightID) AS "NumberOfFlights" FROM useraccount LEFT JOIN not_cancelled_reservations ON useraccount.UserID = not_cancelled_reservations.PassengerID  INNER JOIN flight ON not_cancelled_reservations.FlightID = flight.FlightID WHERE flight.DepartureDateTime < NOW() AND flight.IsCancelled = 0 GROUP BY useraccount.UserID;
 
 INSERT INTO loyaltystatus (loyaltystatus.LoyaltyStatusName, loyaltystatus.DiscountInPercentage, loyaltystatus.NumberOfFlightsRequired) VALUES 
 ("Bronze", 0, 0),

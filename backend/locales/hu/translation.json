@@ -72,6 +72,7 @@
         "end_point_not_working": "Ez a végpont nem működik!",
         "no_active_session": "Nincs aktív session!",
         "missing_url_parameter": "Hiányzó URL paraméter!"
+        
     },
     "modal": {
         "title": {
