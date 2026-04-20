@@ -44,6 +44,9 @@ export async function modalInit(current_language, end_point) {
                 } else {
                     $("#profile_button").show();
                 }
+                else{
+                   $("#profile_button").show(); 
+                }
                 $("#login_button").hide();
                 $("#logout_button").show();
 
