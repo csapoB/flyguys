@@ -1161,7 +1161,24 @@ router.get('/AdminGetUserReservations', async (request, response) => {
                     error: request.t("admin.error.wrong_userid", { returnObjects: true })
                 });
             } else {
-                const adatvissza = await database.AdminGetUserReservations(userID);
+
+                let adatvissza;
+
+                if (request.get("Accept-Language") == "hu") {
+                    adatvissza = await database.AdminGetUserReservationsHun(userID);
+                } else {
+                    let current_eur_exch_rate;
+
+                    try {
+                        current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+                    } catch {
+                        current_eur_exch_rate = 0.00259;
+                    }
+
+                    adatvissza = await database.AdminGetUserReservationsEn(userID);
+                    adatvissza.map(x => x.Price = Math.round(x.Price * current_eur_exch_rate));
+                }
+
                 response.status(200).json({
                     adat: adatvissza
                 });
@@ -1190,7 +1207,24 @@ router.get('/AdminGetUserFlights', async (request, response) => {
                     error: request.t("admin.error.wrong_userid", { returnObjects: true })
                 });
             } else {
-                const adatvissza = await database.AdminGetUserFlights(userID);
+
+                let adatvissza;
+
+                if (request.get("Accept-Language") == "hu") {
+                    adatvissza = await database.AdminGetUserFlightsHun(userID);
+                } else {
+                    let current_eur_exch_rate;
+
+                    try {
+                        current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+                    } catch {
+                        current_eur_exch_rate = 0.00259;
+                    }
+
+                    adatvissza = await database.AdminGetUserFlightsEn(userID);
+                    adatvissza.map(x => x.TotalPrice = Math.round(x.TotalPrice * current_eur_exch_rate));
+                }
+
                 response.status(200).json({
                     adat: adatvissza
                 });
@@ -1228,7 +1262,24 @@ router.get('/AdminGetUserFlightSeats', async (request, response) => {
                         error: request.t("admin.error.wrong_flightid", { returnObjects: true })
                     });
                 } else {
-                    const adatvissza = await database.AdminGetUserFlightSeats(userID, flightID);
+
+                    let adatvissza;
+                    if (request.get("Accept-Language") == "hu") {
+                        adatvissza = await database.AdminGetUserFlightSeatsHun(userID, flightID);
+                    } else {
+
+                        let current_eur_exch_rate;
+
+                        try {
+                            current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+                        } catch {
+                            current_eur_exch_rate = 0.00259;
+                        }
+
+                        adatvissza = await database.AdminGetUserFlightSeatsEn(userID, flightID);
+                        adatvissza.map(x => x.Price = Math.round(x.Price * current_eur_exch_rate));
+
+                    }
                     response.status(200).json({
                         adat: adatvissza
                     });
@@ -1251,7 +1302,23 @@ router.get('/AdminGetFlights', async (request, response) => {
                 error: request.t("errors.login_needed_get", { returnObjects: true })
             });
         } else {
-            const adatvissza = await database.AdminGetFlights();
+            let adatvissza;
+            if (request.get("Accept-Language") == "hu") {
+                adatvissza = await database.AdminGetFlightsHun();
+            } else {
+                let current_eur_exch_rate;
+
+                try {
+                    current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+                } catch {
+                    current_eur_exch_rate = 0.00259;
+                }
+
+                adatvissza = await database.AdminGetFlightsEn();
+                adatvissza.map(x => x.BasePriceInHUF = Math.round(x.BasePriceInHUF * current_eur_exch_rate));
+
+            }
+
             response.status(200).json({
                 adat: adatvissza
             });
@@ -1315,7 +1382,13 @@ router.get('/AdminGetFlightCreateContext', async (request, response) => {
                 error: request.t("errors.login_needed_get", { returnObjects: true })
             });
         } else {
-            const adatvissza = await database.AdminGetFlightCreateContext();
+            let adatvissza;
+            if (request.get("Accept-Language") == "hu") {
+                adatvissza = await database.AdminGetFlightCreateContextHun();
+            } else {
+                adatvissza = await database.AdminGetFlightCreateContextEn();
+            }
+
             response.status(200).json({
                 adat: adatvissza
             });
@@ -1336,112 +1409,137 @@ router.post('/AdminCreateFlight', async (request, response) => {
             response.status(400).json({
                 error: request.t("errors.login_needed_post", { returnObjects: true })
             });
-        }
+        } else {
 
-        const {
-            departureAirport,
-            arrivalAirport,
-            departureDateTime,
-            arrivalDateTime,
-            aircraftID,
-            basePriceInHUF
-        } = request.body;
+            const {
+                departureAirport,
+                arrivalAirport,
+                departureDateTime,
+                arrivalDateTime,
+                aircraftID,
+                basePriceInHUF
+            } = request.body;
 
-        if (!departureAirport || !arrivalAirport || !departureDateTime || !arrivalDateTime || aircraftID === undefined || basePriceInHUF === undefined) {
-            return response.status(400).json({
-                message: 'Hiányzó adatok'
-            });
-        }
+            console.log(request.body);
 
-        const normalizedDepartureAirport = `${departureAirport}`.trim().toUpperCase();
-        const normalizedArrivalAirport = `${arrivalAirport}`.trim().toUpperCase();
-        const parsedAircraftID = Number.parseInt(aircraftID, 10);
-        const parsedBasePrice = Number.parseInt(basePriceInHUF, 10);
-
-        if (normalizedDepartureAirport.length === 0 || normalizedArrivalAirport.length === 0) {
-            return response.status(400).json({
-                message: 'Hibás reptér kód'
-            });
-        }
-
-        if (normalizedDepartureAirport === normalizedArrivalAirport) {
-            return response.status(400).json({
-                message: 'Az induló és érkező reptér nem lehet ugyanaz'
-            });
-        }
-
-        if (!Number.isInteger(parsedAircraftID) || parsedAircraftID <= 0) {
-            return response.status(400).json({
-                message: 'Hibás aircraftID'
-            });
-        }
-
-        if (!Number.isInteger(parsedBasePrice) || parsedBasePrice <= 0) {
-            return response.status(400).json({
-                message: 'Hibás alapár'
-            });
-        }
-
-        const parsedDepartureDate = new Date(departureDateTime);
-        const parsedArrivalDate = new Date(arrivalDateTime);
-
-        if (Number.isNaN(parsedDepartureDate.getTime()) || Number.isNaN(parsedArrivalDate.getTime())) {
-            return response.status(400).json({
-                message: 'Hibás dátum formátum'
-            });
-        }
-
-        if (parsedArrivalDate <= parsedDepartureDate) {
-            return response.status(400).json({
-                message: 'Az érkezés időpontja később kell legyen, mint az indulás'
-            });
-        }
-
-        const latestKnownLeg = await database.AdminGetLatestKnownAircraftLeg(parsedAircraftID);
-        if (!latestKnownLeg) {
-            return response.status(400).json({
-                message: 'Nem létező repülő'
-            });
-        }
-
-        if (latestKnownLeg.LastArrivalAirport) {
-            if (`${latestKnownLeg.LastArrivalAirport}`.toUpperCase() !== normalizedDepartureAirport) {
+            if (!departureAirport || !arrivalAirport || !departureDateTime || !arrivalDateTime || aircraftID === undefined || basePriceInHUF === undefined) {
                 return response.status(400).json({
-                    message: `A repülő csak innen indulhat: ${latestKnownLeg.LastArrivalAirport}`
+                    error: request.t("errors.missing_data", { returnObjects: true })
                 });
             }
 
-            const latestArrivalDate = new Date(latestKnownLeg.LastArrivalDateTime);
-            if (!Number.isNaN(latestArrivalDate.getTime()) && parsedDepartureDate <= latestArrivalDate) {
+            const normalizedDepartureAirport = `${departureAirport}`.trim().toUpperCase();
+            const normalizedArrivalAirport = `${arrivalAirport}`.trim().toUpperCase();
+            const parsedAircraftID = Number.parseInt(aircraftID, 10);
+            const parsedBasePrice = Number.parseInt(basePriceInHUF, 10);
+
+            if (normalizedDepartureAirport.length === 0 || normalizedArrivalAirport.length === 0) {
                 return response.status(400).json({
-                    message: 'Az indulásnak későbbinek kell lennie, mint az utolsó érkezés'
+                    error: request.t("admin.error.wrong_airport_code", { returnObjects: true })
                 });
             }
-        }
 
-        const sqlDepartureDateTime = ToSqlDateTime(parsedDepartureDate);
-        const sqlArrivalDateTime = ToSqlDateTime(parsedArrivalDate);
-        const hasOverlap = await database.AdminHasFlightOverlap(parsedAircraftID, sqlDepartureDateTime, sqlArrivalDateTime);
+            if (normalizedDepartureAirport === normalizedArrivalAirport) {
+                return response.status(400).json({
+                    error: request.t("admin.error.same_origin_and_destination", { returnObjects: true })
+                });
+            }
 
-        if (hasOverlap) {
-            return response.status(400).json({
-                message: 'A repülő időben ütköző járattal mar foglalt'
+            if (!Number.isInteger(parsedAircraftID) || parsedAircraftID <= 0) {
+                return response.status(400).json({
+                    error: request.t("admin.error.wrong_aircraftid", { returnObjects: true })
+                });
+            }
+
+            if (!Number.isInteger(parsedBasePrice) || parsedBasePrice <= 0) {
+                return response.status(400).json({
+                    error: request.t("admin.error.wrong_base_price", { returnObjects: true })
+                });
+            }
+
+            const parsedDepartureDate = new Date(departureDateTime);
+            const parsedArrivalDate = new Date(arrivalDateTime);
+
+            if (Number.isNaN(parsedDepartureDate.getTime()) || Number.isNaN(parsedArrivalDate.getTime())) {
+                return response.status(400).json({
+                    error: request.t("admin.error.wrong_date_format", { returnObjects: true })
+                });
+            }
+
+            if (parsedArrivalDate <= parsedDepartureDate) {
+                return response.status(400).json({
+                    error: request.t("admin.error.arrival_before_departure", { returnObjects: true })
+                });
+            }
+
+            const latestKnownLeg = await database.AdminGetLatestKnownAircraftLeg(parsedAircraftID);
+            if (!latestKnownLeg) {
+                return response.status(400).json({
+                    error: request.t("admin.error.aircraft_not_exist", { returnObjects: true })
+                });
+            }
+
+            if (latestKnownLeg.LastArrivalAirport) {
+                if (`${latestKnownLeg.LastArrivalAirport}`.toUpperCase() !== normalizedDepartureAirport) {
+                    return response.status(400).json({
+                        error: request.t("admin.error.aircraft_must_take_off_here", { returnObjects: true }) + latestKnownLeg.LastArrivalAirport
+                    });
+                }
+
+                const latestArrivalDate = new Date(latestKnownLeg.LastArrivalDateTime);
+                if (!Number.isNaN(latestArrivalDate.getTime()) && parsedDepartureDate <= latestArrivalDate) {
+                    return response.status(400).json({
+                        error: request.t("admin.error.new_departure_before_old_departure", { returnObjects: true })
+                    });
+                }
+            }
+
+            const sqlDepartureDateTime = ToSqlDateTime(parsedDepartureDate);
+            const sqlArrivalDateTime = ToSqlDateTime(parsedArrivalDate);
+            const hasOverlap = await database.AdminHasFlightOverlap(parsedAircraftID, sqlDepartureDateTime, sqlArrivalDateTime);
+
+            if (hasOverlap) {
+                return response.status(400).json({
+                    error: request.t("admin.error.time_overlap", { returnObjects: true })
+                });
+            }
+
+            let eredmeny;
+            if (request.get("Accept-Language") == "hu") {
+                eredmeny = await database.AdminCreateFlight(
+                    normalizedDepartureAirport,
+                    normalizedArrivalAirport,
+                    sqlDepartureDateTime,
+                    sqlArrivalDateTime,
+                    parsedAircraftID,
+                    parsedBasePrice
+                );
+            } else {
+                let current_huf_exch_rate;
+
+                try {
+                    current_huf_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF", { method: "GET" })).json()).rates.HUF;
+                } catch {
+                    current_huf_exch_rate = 385;
+                }
+
+                eredmeny = await database.AdminCreateFlight(
+                    normalizedDepartureAirport,
+                    normalizedArrivalAirport,
+                    sqlDepartureDateTime,
+                    sqlArrivalDateTime,
+                    parsedAircraftID,
+                    Math.round(parsedBasePrice * current_huf_exch_rate)
+                );
+            }
+
+
+            response.status(201).json({
+                message: request.t("admin.success.flight_created_successfully", { returnObjects: true }),
+                flightID: eredmeny.insertId
             });
         }
 
-        const eredmeny = await database.AdminCreateFlight(
-            normalizedDepartureAirport,
-            normalizedArrivalAirport,
-            sqlDepartureDateTime,
-            sqlArrivalDateTime,
-            parsedAircraftID,
-            parsedBasePrice
-        );
-
-        response.status(201).json({
-            message: 'A járat sikeresen létrehozva',
-            flightID: eredmeny.insertId
-        });
     } catch (error) {
         console.error(error)
         response.status(500).json({

@@ -292,7 +292,7 @@ async function AdminSearchUsers(email){
     return rows;
 }
 
-async function AdminGetUserReservations(userId){
+async function AdminGetUserReservationsHun(userId){
     const query = `
         SELECT
             reservation.ReservationID,
@@ -330,7 +330,45 @@ async function AdminGetUserReservations(userId){
     return rows;
 }
 
-async function AdminGetUserFlights(userId){
+async function AdminGetUserReservationsEn(userId){
+    const query = `
+        SELECT
+            reservation.ReservationID,
+            reservation.PassengerID AS "UserID",
+            reservation.FlightID,
+            flight.DepartureAirport,
+            departure_city.English AS "DepartureCity",
+            flight.ArrivalAirport,
+            arrival_city.English AS "ArrivalCity",
+            flight.DepartureDateTime,
+            flight.ArrivalDateTime,
+            reservation.RowID,
+            reservation.ColumnID,
+            reservation.IsAdult,
+            reservation.IsCancelled,
+            fareclass.FareClassName,
+            ROUND((flight.BasePriceInHUF * fareclass.Multiplier) * ((100 - loyaltystatus.DiscountInPercentage) / 100)) AS "Price"
+        FROM reservation
+        INNER JOIN flight ON reservation.FlightID = flight.FlightID
+        INNER JOIN aircraft ON flight.AircraftID = aircraft.AircraftID
+        INNER JOIN seat ON reservation.RowID = seat.RowID
+            AND reservation.ColumnID = seat.ColumnID
+            AND aircraft.AircraftModelID = seat.AircraftModelID
+        INNER JOIN fareclass ON seat.FareClassID = fareclass.FareClassID
+        INNER JOIN useraccount ON reservation.PassengerID = useraccount.UserID
+        INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID
+        INNER JOIN airport departure_airport ON flight.DepartureAirport = departure_airport.AirportCode
+        INNER JOIN city departure_city ON departure_airport.CityID = departure_city.CityID
+        INNER JOIN airport arrival_airport ON flight.ArrivalAirport = arrival_airport.AirportCode
+        INNER JOIN city arrival_city ON arrival_airport.CityID = arrival_city.CityID
+        WHERE reservation.PassengerID = ?
+        ORDER BY flight.DepartureDateTime DESC, reservation.ReservationID DESC;
+    `;
+    const [rows] = await pool.execute(query, [userId]);
+    return rows;
+}
+
+async function AdminGetUserFlightsHun(userId){
     const query = `
         SELECT
             flight.FlightID,
@@ -379,7 +417,56 @@ async function AdminGetUserFlights(userId){
     return rows;
 }
 
-async function AdminGetUserFlightSeats(userId, flightId){
+async function AdminGetUserFlightsEn(userId){
+    const query = `
+        SELECT
+            flight.FlightID,
+            flight.DepartureAirport,
+            departure_city.English AS "DepartureCity",
+            flight.ArrivalAirport,
+            arrival_city.English AS "ArrivalCity",
+            flight.DepartureDateTime,
+            flight.ArrivalDateTime,
+            flight.IsCancelled AS "FlightIsCancelled",
+            COUNT(reservation.ReservationID) AS "ReservationCount",
+            SUM(CASE WHEN reservation.IsCancelled = 1 THEN 1 ELSE 0 END) AS "CancelledReservationCount",
+            SUM(CASE WHEN reservation.IsCancelled = 0 THEN 1 ELSE 0 END) AS "ActiveReservationCount",
+            SUM(ROUND((flight.BasePriceInHUF * fareclass.Multiplier) * ((100 - loyaltystatus.DiscountInPercentage) / 100))) AS "TotalPrice",
+            CASE
+                WHEN SUM(CASE WHEN reservation.IsCancelled = 0 THEN 1 ELSE 0 END) = 0 THEN 'Törölt'
+                WHEN SUM(CASE WHEN reservation.IsCancelled = 1 THEN 1 ELSE 0 END) = 0 THEN 'Aktív'
+                ELSE 'Vegyes'
+            END AS "GroupStatus"
+        FROM reservation
+        INNER JOIN flight ON reservation.FlightID = flight.FlightID
+        INNER JOIN aircraft ON flight.AircraftID = aircraft.AircraftID
+        INNER JOIN seat ON reservation.RowID = seat.RowID
+            AND reservation.ColumnID = seat.ColumnID
+            AND aircraft.AircraftModelID = seat.AircraftModelID
+        INNER JOIN fareclass ON seat.FareClassID = fareclass.FareClassID
+        INNER JOIN useraccount ON reservation.PassengerID = useraccount.UserID
+        INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID
+        INNER JOIN airport departure_airport ON flight.DepartureAirport = departure_airport.AirportCode
+        INNER JOIN city departure_city ON departure_airport.CityID = departure_city.CityID
+        INNER JOIN airport arrival_airport ON flight.ArrivalAirport = arrival_airport.AirportCode
+        INNER JOIN city arrival_city ON arrival_airport.CityID = arrival_city.CityID
+        WHERE reservation.PassengerID = ?
+        GROUP BY
+            flight.FlightID,
+            flight.DepartureAirport,
+            departure_city.English,
+            flight.ArrivalAirport,
+            arrival_city.English,
+            flight.DepartureDateTime,
+            flight.ArrivalDateTime,
+            flight.IsCancelled
+        ORDER BY flight.DepartureDateTime DESC, flight.FlightID DESC;
+    `;
+    const [rows] = await pool.execute(query, [userId]);
+    return rows;
+}
+
+async function AdminGetUserFlightSeatsHun(userId, flightId){
     const query = `
         SELECT
             reservation.ReservationID,
@@ -418,7 +505,46 @@ async function AdminGetUserFlightSeats(userId, flightId){
     return rows;
 }
 
-async function AdminGetFlights(){
+async function AdminGetUserFlightSeatsEn(userId, flightId){
+    const query = `
+        SELECT
+            reservation.ReservationID,
+            reservation.PassengerID AS "UserID",
+            reservation.FlightID,
+            flight.DepartureAirport,
+            departure_city.English AS "DepartureCity",
+            flight.ArrivalAirport,
+            arrival_city.English AS "ArrivalCity",
+            flight.DepartureDateTime,
+            flight.ArrivalDateTime,
+            flight.IsCancelled AS "FlightIsCancelled",
+            reservation.RowID,
+            reservation.ColumnID,
+            reservation.IsAdult,
+            reservation.IsCancelled,
+            fareclass.FareClassName,
+            ROUND((flight.BasePriceInHUF * fareclass.Multiplier) * ((100 - loyaltystatus.DiscountInPercentage) / 100)) AS "Price"
+        FROM reservation
+        INNER JOIN flight ON reservation.FlightID = flight.FlightID
+        INNER JOIN aircraft ON flight.AircraftID = aircraft.AircraftID
+        INNER JOIN seat ON reservation.RowID = seat.RowID
+            AND reservation.ColumnID = seat.ColumnID
+            AND aircraft.AircraftModelID = seat.AircraftModelID
+        INNER JOIN fareclass ON seat.FareClassID = fareclass.FareClassID
+        INNER JOIN useraccount ON reservation.PassengerID = useraccount.UserID
+        INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID
+        INNER JOIN airport departure_airport ON flight.DepartureAirport = departure_airport.AirportCode
+        INNER JOIN city departure_city ON departure_airport.CityID = departure_city.CityID
+        INNER JOIN airport arrival_airport ON flight.ArrivalAirport = arrival_airport.AirportCode
+        INNER JOIN city arrival_city ON arrival_airport.CityID = arrival_city.CityID
+        WHERE reservation.PassengerID = ? AND reservation.FlightID = ?
+        ORDER BY reservation.RowID ASC, reservation.ColumnID ASC, reservation.ReservationID DESC;
+    `;
+    const [rows] = await pool.execute(query, [userId, flightId]);
+    return rows;
+}
+
+async function AdminGetFlightsHun(){
     const query = `
         SELECT
             flight.FlightID,
@@ -460,6 +586,48 @@ async function AdminGetFlights(){
     return rows;
 }
 
+async function AdminGetFlightsEn(){
+    const query = `
+        SELECT
+            flight.FlightID,
+            flight.DepartureAirport,
+            departure_city.English AS "DepartureCity",
+            flight.ArrivalAirport,
+            arrival_city.English AS "ArrivalCity",
+            flight.DepartureDateTime,
+            flight.ArrivalDateTime,
+            flight.AircraftID,
+            aircraftmodel.AircraftModelName,
+            flight.BasePriceInHUF,
+            flight.IsCancelled,
+            COUNT(reservation.ReservationID) AS "ReservationCount",
+            SUM(CASE WHEN reservation.IsCancelled = 0 THEN 1 ELSE 0 END) AS "ActiveReservationCount"
+        FROM flight
+        INNER JOIN aircraft ON aircraft.AircraftID = flight.AircraftID
+        INNER JOIN aircraftmodel ON aircraftmodel.AircraftModelID = aircraft.AircraftModelID
+        INNER JOIN airport departure_airport ON departure_airport.AirportCode = flight.DepartureAirport
+        INNER JOIN city departure_city ON departure_city.CityID = departure_airport.CityID
+        INNER JOIN airport arrival_airport ON arrival_airport.AirportCode = flight.ArrivalAirport
+        INNER JOIN city arrival_city ON arrival_city.CityID = arrival_airport.CityID
+        LEFT JOIN reservation ON reservation.FlightID = flight.FlightID
+        GROUP BY
+            flight.FlightID,
+            flight.DepartureAirport,
+            departure_city.English,
+            flight.ArrivalAirport,
+            arrival_city.English,
+            flight.DepartureDateTime,
+            flight.ArrivalDateTime,
+            flight.AircraftID,
+            aircraftmodel.AircraftModelName,
+            flight.BasePriceInHUF,
+            flight.IsCancelled
+        ORDER BY flight.DepartureDateTime DESC, flight.FlightID DESC;
+    `;
+    const [rows] = await pool.execute(query);
+    return rows;
+}
+
 async function AdminCancelFlight(flightId){
     const query = 'UPDATE flight SET IsCancelled = 1 WHERE FlightID = ? AND IsCancelled = 0;';
     const [result] = await pool.execute(query, [flightId]);
@@ -472,7 +640,7 @@ async function AdminGetFlightById(flightId){
     return rows[0] || null;
 }
 
-async function AdminGetFlightCreateContext(){
+async function AdminGetFlightCreateContextHun(){
     const airportQuery = `
         SELECT
             airport.AirportCode,
@@ -482,6 +650,46 @@ async function AdminGetFlightCreateContext(){
         INNER JOIN city ON city.CityID = airport.CityID
         INNER JOIN country ON country.CountryID = airport.CountryID
         ORDER BY country.Hungarian ASC, city.Hungarian ASC;
+    `;
+
+    const aircraftQuery = `
+        SELECT
+            aircraft.AircraftID,
+            aircraftmodel.AircraftModelName,
+            latest_flight.ArrivalAirport AS "LastArrivalAirport",
+            latest_flight.ArrivalDateTime AS "LastArrivalDateTime"
+        FROM aircraft
+        INNER JOIN aircraftmodel ON aircraftmodel.AircraftModelID = aircraft.AircraftModelID
+        LEFT JOIN flight latest_flight ON latest_flight.FlightID = (
+            SELECT f2.FlightID
+            FROM flight f2
+            WHERE f2.AircraftID = aircraft.AircraftID
+                AND f2.IsCancelled = 0
+            ORDER BY f2.ArrivalDateTime DESC, f2.FlightID DESC
+            LIMIT 1
+        )
+        ORDER BY aircraft.AircraftID ASC;
+    `;
+
+    const [airports] = await pool.execute(airportQuery);
+    const [aircraft] = await pool.execute(aircraftQuery);
+
+    return {
+        airports,
+        aircraft
+    };
+}
+
+async function AdminGetFlightCreateContextEn(){
+    const airportQuery = `
+        SELECT
+            airport.AirportCode,
+            city.English AS "City",
+            country.English AS "Country"
+        FROM airport
+        INNER JOIN city ON city.CityID = airport.CityID
+        INNER JOIN country ON country.CountryID = airport.CountryID
+        ORDER BY country.English ASC, city.English ASC;
     `;
 
     const aircraftQuery = `
@@ -599,7 +807,7 @@ async function cancelReservationCheckForRemainingOnlyChildren(reservation_ids, u
                 }
             }
         }
-        i++
+        i++;
     }
 
     return flag;
@@ -645,13 +853,18 @@ module.exports = {
     cancelReservationCheckForRemainingOnlyChildren,
     AdminSearchUsers,
     AdminGetUsers,
-    AdminGetUserReservations,
-    AdminGetUserFlights,
-    AdminGetUserFlightSeats,
-    AdminGetFlights,
+    AdminGetUserReservationsHun,
+    AdminGetUserReservationsEn,
+    AdminGetUserFlightsHun,
+    AdminGetUserFlightsEn,
+    AdminGetUserFlightSeatsHun,
+    AdminGetUserFlightSeatsEn,
+    AdminGetFlightsHun,
+    AdminGetFlightsEn,
     AdminCancelFlight,
     AdminGetFlightById,
-    AdminGetFlightCreateContext,
+    AdminGetFlightCreateContextHun,
+    AdminGetFlightCreateContextEn,
     AdminGetLatestKnownAircraftLeg,
     AdminHasFlightOverlap,
     AdminCreateFlight

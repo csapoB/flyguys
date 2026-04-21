@@ -110,5 +110,35 @@ export async function getLoyaltyProgram(lang) {
     return (await (await fetch("/api/getloyaltyprogram", { method: "GET", headers: { "Accept-Language": lang } })).json()).loyalty_program;
 }
 export async function getAdmin(lang) {
-    return (await (await fetch("/api/admin", { method: "GET", headers: { "Accept-Language": lang } })).json()).admin;
+    let getadmin = (await (await fetch("/api/getadmin", { method: "GET", headers: { "Accept-Language": lang } })).json()).admin;
+    $("#mode_users").text(getadmin.title.users);
+    $("#mode_flights").text(getadmin.title.flights);
+
+    $("#admin_mode_users .admin-title").text(getadmin.title.users);
+    $("#admin_mode_users .users-card .admin-subtitle").text(getadmin.caption.select_line_to_see_bookings);
+    $("#user_email_search_clear").text(getadmin.button.delete);
+    $("#admin_mode_users .admin-title-sm").text(getadmin.title.bookings);
+    $("#admin_mode_users .reservations-card .admin-subtitle").text(getadmin.caption.select_user_from_tabel);
+    $("#reservation_area .empty-state").text(getadmin.caption.select_user_from_tabel);
+    $("#user_email_search").prop("placeholder", getadmin.caption.search_by_email);
+
+    $("#admin_mode_flights .admin-title").text(getadmin.title.flight_control);
+    $("#admin_mode_flights .flights-card .admin-subtitle").text(getadmin.caption.flight_control);
+    $("#refresh_admin_flights").text(getadmin.button.update);
+    $("#admin_flights_table .loading-state").text(getadmin.loading_flights);
+    $("#admin_mode_flights .flight-create-card .admin-title-sm").text(getadmin.title.create_new_flight);
+    $("#admin_mode_flights .flight-create-card .admin-subtitle").text(getadmin.caption.create_flight);
+    $("#create_aircraft_id_label").text(getadmin.title.aircraft);
+    $("#create_aircraft_id option").text(getadmin.caption.choose_aircraft);
+    $("#create_departure_airport").text(getadmin.title.origin_airport);
+    $("#create_departure_airport_label").text(getadmin.caption.choose_origin_airport);
+    $("#create_arrival_airport_label").text(getadmin.title.destination_airport);
+    $("#create_arrival_airport").text(getadmin.caption.choose_destination_airport);
+    $("#create_departure_datetime_label").text(getadmin.title.departure_date);
+    $("#create_arrival_datetime_label").text(getadmin.title.arrival_date);
+    $("#create_base_price_label").text(getadmin.title.base_price);
+    $("#create_flight_button").text(getadmin.button.create_flight);
+    $("#create_flight_reset").text(getadmin.button.delete_form)
+
+    return getadmin;
 }

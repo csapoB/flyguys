@@ -195,7 +195,6 @@ export async function plannerMapInit(current_language) {
 
     // Utasok popover
     let passengers = await passengers_popoverInit("passengers_input", "passengers_popover");
-    popoverManualTrigger(passengers[0], passengers[1]);
 
 
     $("#search_flights").on("click", function (e) {
