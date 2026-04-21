@@ -106,7 +106,8 @@
             "profile_update_failed": "A profiladatok frissítése meghiúsult!",
             "server_error_during_profile_update": "A profiladatok frissítésekor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
             "wrong_email_or_password": "Rossz email vagy jelszó!",
-            "cancel_bookings_no_adults": "A foglalások lemondásánál, 1 felnőttnek maradnia kell a gyerekek mellett!"
+            "cancel_bookings_no_adults": "A foglalások lemondásánál, 1 felnőttnek maradnia kell a gyerekek mellett!",
+            "invalid_email": "Kérjük, adjon meg érvényes e-mail címet!"
         },
         "success": {
             "login_successful": "Sikeres bejelentkezés!",
