@@ -106,7 +106,8 @@
             "profile_deletion_failed": "Profile deletion failed!",
             "server_error_during_profile_update": "A server error occured during profile update. Please, try again later!",
             "wrong_email_or_password": "Wrong email or password!",
-            "cancel_bookings_no_adults": "When cancelling bookings, there has to be at least 1 adult remaining beside children!"
+            "cancel_bookings_no_adults": "When cancelling bookings, there has to be at least 1 adult remaining beside children!",
+            "invalid_email": "Please enter a valid email address!"
         },
         "success": {
             "login_successful": "Login successful!",

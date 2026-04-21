@@ -1,6 +1,10 @@
 import { getFlights, getIndex, getLoyaltyProgram, getModal, getProfile } from "./locale.js";
 import { dateDeFormatter, dateFormatter, generateToast, initCheapestFlights, initFlights, initHusegprogram, initProfile, nameDeFormatter } from "./toolbox.js";
 
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 export async function modalInit(current_language, end_point) {
 
 
@@ -22,65 +26,65 @@ export async function modalInit(current_language, end_point) {
 
         if (!email || !password) {
             generateToast(getmodal.error.missing_email_and_password_fields, "danger");
-            return;
         }
+        else {
+            if (!isValidEmail(email)) {
+                generateToast(getmodal.error.invalid_email, "danger");
+            }
+            else {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept-Language': current_language
+                    },
+                    body: JSON.stringify({ email, password })
+                });
 
+                const data = await response.json();
+                switch (response.status) {
+                    case 201:
 
-        const response = await fetch('/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept-Language': current_language
-            },
-            body: JSON.stringify({ email, password })
-        });
+                        if (data.admin) {
+                            $("#admin_button").show();
+                        } else {
+                            $("#profile_button").show();
+                        }
+                        $("#login_button").hide();
+                        $("#logout_button").show();
 
-        const data = await response.json();
-        switch (response.status) {
-            case 201:
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('monadModal'));
+                        if (modal) {
+                            modal.hide();
+                        }
 
-                if (data.admin) {
-                    $("#admin_button").show();
-                } else {
-                    $("#profile_button").show();
-                }
-                else{
-                   $("#profile_button").show(); 
-                }
-                $("#login_button").hide();
-                $("#logout_button").show();
+                        switch (end_point) {
+                            case "index":
+                                await initCheapestFlights(current_language, getindex);
+                                break;
+                            case "flights":
+                                await initFlights(current_language, getflights);
+                                break;
+                            case "husegprogram":
+                                await initHusegprogram(current_language, getloyaltyprogram);
+                                break;
+                            case "profil":
+                                await initProfile(current_language, getprofile);
+                                break;
+                            default:
+                                break;
+                        }
 
-                const modal = bootstrap.Modal.getInstance(document.getElementById('monadModal'));
-                if (modal) {
-                    modal.hide();
-                }
-
-                switch (end_point) {
-                    case "index":
-                        await initCheapestFlights(current_language, getindex);
+                        generateToast(getmodal.success.login_successful, "success");
                         break;
-                    case "flights":
-                        await initFlights(current_language, getflights);
-                        break;
-                    case "husegprogram":
-                        await initHusegprogram(current_language, getloyaltyprogram);
-                        break;
-                    case "profil":
-                        await initProfile(current_language, getprofile);
-                        break;
+
                     default:
+                        generateToast(getmodal.error.login_unsuccessful, "danger");
+                        console.error(data.error);
                         break;
                 }
-
-                generateToast(getmodal.success.login_successful, "success");
-                break;
-
-            default:
-                generateToast(getmodal.error.login_unsuccessful + " " + data.error, "danger");
-                console.error(data.error);
-                break;
+            }
         }
-
     }
     );
     $(document).on("click", ".submit-register", async function (event) {
@@ -99,64 +103,56 @@ export async function modalInit(current_language, end_point) {
 
         // Születési dátum konvertálása mm/dd/yyyy formátumból YYYY-MM-DD formátumba
         const birthDateInput = $("#birth_date").val().trim();
-
         let birthDate = null;
 
         if (birthDateInput) {
-
-            birthDate = dateFormatter(birthDateInput, current_language)
+            birthDate = dateFormatter(birthDateInput, current_language);
         }
 
-        if (!userName.trim() || !email || !password) {
+        if (!userName.trim() || !email || !password || !birthDate) {
             generateToast(getmodal.error.missing_fields, "danger");
-            return;
-        }
-
-        if (password.length < 6) {
+        } else if (password.length < 6) {
             generateToast(getmodal.error.password_char_limit, "danger");
-            return;
-        }
-        try {
+        } else if (!isValidEmail(email)) {
+            generateToast(getmodal.error.invalid_email, "danger");
+        } else {
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept-Language': current_language
+                    },
+                    body: JSON.stringify({
+                        nev: userName.trim(),
+                        email,
+                        jelszo: password,
+                        szuldatum: birthDate || null
+                    })
+                });
+                const data = await response.json();
 
-            const response = await fetch('/api/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept-Language': current_language
-                },
-                body: JSON.stringify({
-                    nev: userName.trim(),
-                    email,
-                    jelszo: password,
-                    szuldatum: birthDate || null
-                })
-            });
-            const data = await response.json();
+                if (response.ok) {
+                    const childModal = bootstrap.Modal.getInstance(document.getElementById('childModal'));
+                    const parentModal = bootstrap.Modal.getInstance(document.getElementById('monadModal'));
 
-            if (response.ok) {
+                    if (childModal) {
+                        childModal.hide();
+                    }
+                    if (parentModal) {
+                        parentModal.hide();
+                    }
 
-                // Modal bezárása
-                const childModal = bootstrap.Modal.getInstance(document.getElementById('childModal'));
-                const parentModal = bootstrap.Modal.getInstance(document.getElementById('monadModal'));
+                    generateToast(getmodal.success.registration_successful, "success");
 
-                if (childModal) {
-                    childModal.hide();
+                } else {
+                    console.error(data.error);
+                    generateToast(getmodal.error.registration_unsuccessful, "danger");
                 }
-                if (parentModal) {
-                    parentModal.hide();
-                }
-
-                generateToast(getmodal.success.registration_successful, "success");
-
-            } else {
-
-                console.error(data.error);
-                generateToast(getmodal.error.registration_unsuccessful + " " + data.error, "danger");
-
+            } catch (error) {
+                console.error('ERROR: ', error);
+                generateToast(getmodal.error.server_error_during_registration, "danger");
             }
-        } catch (error) {
-            console.error('ERROR: ', error);
-            generateToast(getmodal.error.server_error_during_registration, "danger");
         }
     });
     $("#logout_button").on("click", async function () {
