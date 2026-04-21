@@ -1,5 +1,5 @@
 import { getAdmin } from "./locale.js";
-import { initI18n } from "./toolbox.js";
+import { initI18n, generateToast, errorPageGenerator } from "./toolbox.js";
 
 $(async function () {
 
@@ -24,13 +24,14 @@ async function requestJson(url, options) {
     const response = await fetch(url, options);
     const data = await response.json();
     if (!response.ok) {
-        let message = `Szerverhiba (${response.status})`;
-        if (data.error) {
+        let message = data.error; //= `Szerverhiba (${response.status})`;
+        /*if (data.error) {
             message = data.error;
         }
         if (data.message) {
             message = data.message;
-        }
+        }*/
+        generateToast(message, "danger");
         throw new Error(message);
     }
     return data;
@@ -45,12 +46,12 @@ async function adminCheck(language, i18n_values) {
         if (!response.ok || !data.admin) {
             window.location.href = '/' + language;
         } else {
-            wireModeSwitch();
-            wireUserSelection();
-            wireUserSearch();
-            wireFlightSelection();
-            wireAdminFlightActions();
-            await switchAdminMode('users');
+            wireModeSwitch(language, i18n_values);
+            wireUserSelection(language, i18n_values);
+            wireUserSearch(i18n_values);
+            wireFlightSelection(language, i18n_values);
+            wireAdminFlightActions(language, i18n_values);
+            await switchAdminMode('users', language, i18n_values);
         }
     /*} catch (error) {
         console.error(error.message);
@@ -68,59 +69,61 @@ async function searchUsers(email) {
     return requestJson(`/api/AdminSearchUsers?email=${email}`, { method: 'GET' });
 }
 
-async function getUserFlights(userId) {
-    return requestJson(`/api/AdminGetUserFlights?userID=${userId}`, { method: 'GET' });
+async function getUserFlights(userId, language) {
+    return requestJson(`/api/AdminGetUserFlights?userID=${userId}`, { method: 'GET', headers: { "Accept-Language": language } });
 }
 
-async function getUserFlightSeats(userId, flightId) {
-    return requestJson(`/api/AdminGetUserFlightSeats?userID=${userId}&flightID=${flightId}`, { method: 'GET' });
+async function getUserFlightSeats(userId, flightId, language) {
+    return requestJson(`/api/AdminGetUserFlightSeats?userID=${userId}&flightID=${flightId}`, { method: 'GET', headers: {"Accept-Language": language} });
 }
 
-async function getAdminFlights() {
-    return requestJson('/api/AdminGetFlights', { method: 'GET' });
+async function getAdminFlights(language) {
+    return requestJson('/api/AdminGetFlights', { method: 'GET', headers: { "Accept-Language": language }});
 }
 
-async function getAdminFlightCreateContext() {
-    return requestJson('/api/AdminGetFlightCreateContext', { method: 'GET' });
+async function getAdminFlightCreateContext(language) {
+    return requestJson('/api/AdminGetFlightCreateContext', { method: 'GET', headers: { "Accept-Language": language } });
 }
 
-async function cancelAdminFlight(flightId) {
+async function cancelAdminFlight(flightId, language) {
     return requestJson('/api/AdminCancelFlight', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', "Accept-Language": language },
         body: JSON.stringify({ flightID: flightId })
     });
 }
 
-async function createAdminFlight(payload) {
+async function createAdminFlight(payload, language) {
     return requestJson('/api/AdminCreateFlight', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', "Accept-Language": language },
         body: JSON.stringify(payload)
     });
 }
 
 // --- Mód váltás ---
 
-function wireModeSwitch() {
-    $('.admin-mode-btn').off('click').on('click', handleModeSwitchClick);
+function wireModeSwitch(language, i18n_values) {
+    $('.admin-mode-btn').off('click').on('click', function () {
+        handleModeSwitchClick($(this), language, i18n_values)
+    });
 }
 
-async function handleModeSwitchClick() {
-    const mode = $(this).attr('data-admin-mode');
-    await switchAdminMode(mode);
+async function handleModeSwitchClick($this, language, i18n_values) {
+    const mode = $this.attr('data-admin-mode');
+    await switchAdminMode(mode, language, i18n_values);
 }
 
-async function switchAdminMode(mode) {
+async function switchAdminMode(mode, language, i18n_values) {
     if (mode === 'users' || mode === 'flights') {
         renderModePanels(mode);
         if (mode === 'users') {
             const searchEmail = $('#user_email_search').val().trim();
-            await loadUsers(searchEmail);
-            renderIdleReservationsState();
-            renderSelectedUserInfo();
+            await loadUsers(searchEmail, i18n_values);
+            renderIdleReservationsState(i18n_values);
+            renderSelectedUserInfo("",i18n_values);
         } else {
-            await loadAdminFlightsMode();
+            await loadAdminFlightsMode(language, i18n_values);
         }
     }
 }
@@ -135,7 +138,7 @@ function renderModePanels(mode) {
 
 // --- Felhasználók ---
 
-async function loadUsers(searchEmail) {
+async function loadUsers(searchEmail, i18n_values) {
     let usersResponse;
     if (searchEmail === '') {
         usersResponse = await getUsers();
@@ -146,40 +149,45 @@ async function loadUsers(searchEmail) {
     if (Array.isArray(usersResponse.adat)) {
         users = usersResponse.adat;
     }
-    renderUsersTable(users);
+    renderUsersTable(users, i18n_values);
 }
 
-function wireUserSearch() {
-    $('#user_email_search').off('input').on('input', handleUserSearchInput);
-    $('#user_email_search_clear').off('click').on('click', handleUserSearchClear);
+function wireUserSearch(i18n_values) {
+    $('#user_email_search').off('input').on('input', function () {
+        handleUserSearchInput(i18n_values);
+    });
+    $('#user_email_search_clear').off('click').on('click', async function () {
+        await handleUserSearchClear(i18n_values);
+    });
 }
 
-function handleUserSearchInput() {
-    const searchEmail = $(this).val().trim();
-    clearTimeout($(this).data('searchTimeout'));
-    $(this).data('searchTimeout', setTimeout(() => handleUserSearch(searchEmail), 250));
+function handleUserSearchInput(i18n_values) {
+    let $user_email_search = $('#user_email_search');
+    const searchEmail = $user_email_search.val().trim();
+    clearTimeout($user_email_search.data('searchTimeout'));
+    $user_email_search.data('searchTimeout', setTimeout(() => handleUserSearch(searchEmail, i18n_values), 250));
 }
 
-async function handleUserSearchClear() {
+async function handleUserSearchClear(i18n_values) {
     const $input = $('#user_email_search');
     clearTimeout($input.data('searchTimeout'));
     $input.val('');
-    await handleUserSearch('');
+    await handleUserSearch('', i18n_values);
 }
 
-async function handleUserSearch(searchEmail) {
+async function handleUserSearch(searchEmail, i18n_values) {
     try {
-        await loadUsers(searchEmail);
+        await loadUsers(searchEmail, i18n_values);
         $('#tabla tbody tr.user-row').removeClass('selected-user');
-        renderSelectedUserInfo();
-        renderIdleReservationsState();
+        renderSelectedUserInfo("", i18n_values);
+        renderIdleReservationsState(i18n_values);
     } catch (error) {
         renderReservationError(error.message);
     }
 }
 
-function renderUsersTable(users) {
-    const headers = ['Név', 'E-mail', 'Foglalások', 'Szint', 'Létrehozva'];
+function renderUsersTable(users, i18n_values) {
+    const headers = [i18n_values.tabel.users.header.name, i18n_values.tabel.users.header.email, i18n_values.tabel.users.header.bookings, i18n_values.tabel.users.header.rank, i18n_values.tabel.users.header.created_at];
     const $table = $('#tabla');
     $table.empty();
 
@@ -193,7 +201,7 @@ function renderUsersTable(users) {
     if (users.length == 0) {
         $tbody.append(
             $('<tr></tr>').append(
-                $('<td></td>', { colspan: headers.length, text: 'Nincs megjeleníthető felhasználó.' })
+                $('<td></td>', { colspan: headers.length, text: i18n_values.tabel.users.body.no_users })
             )
         );
     } else {
@@ -220,35 +228,39 @@ function renderUsersTable(users) {
     $table.append($tbody);
 }
 
-function wireUserSelection() {
-    $('#tabla').off('click', 'tbody tr.user-row').on('click', 'tbody tr.user-row', handleUserRowClick);
+function wireUserSelection(language, i18n_values) {
+    $('#tabla').off('click', 'tbody tr.user-row').on('click', 'tbody tr.user-row', function () {
+        handleUserRowClick($(this), language, i18n_values)
+    });
 }
 
-async function handleUserRowClick() {
-    const $row = $(this);
+async function handleUserRowClick($this, language, i18n_values) {
+    const $row = $this;
     const userId = Number.parseInt($row.attr('data-user-id'), 10);
     try {
         if (!Number.isInteger(userId) || userId <= 0) {
-            throw new Error('Érvénytelen felhasználó azonosító.');
+            let message = i18n_values.error.wrong_userid;
+            generateToast(message, "danger")
+            throw new Error(message);
         }
         $('#tabla tbody tr.user-row').removeClass('selected-user');
         $row.addClass('selected-user');
-        renderSelectedUserInfo($row);
-        renderLoadingFlightsState();
-        const flightsResponse = await getUserFlights(userId);
+        renderSelectedUserInfo($row, i18n_values);
+        renderLoadingFlightsState(i18n_values);
+        const flightsResponse = await getUserFlights(userId, language);
         let flights = [];
         if (Array.isArray(flightsResponse.adat)) {
             flights = flightsResponse.adat;
         }
-        renderFlightsTable(flights, userId);
+        renderFlightsTable(flights, userId, i18n_values);
     } catch (error) {
         renderReservationError(error.message);
     }
 }
 
-function renderSelectedUserInfo($row) {
-    if (!$row) {
-        $('#selected_user_info').text('Válassz ki egy felhasználót a bal oldali táblázatból.');
+function renderSelectedUserInfo($row, i18n_values) {
+    if ($row == "") {
+        $('#selected_user_info').text(i18n_values.caption.select_user_from_tabel);
     } else {
         const userName = $row.attr('data-user-name');
         const userEmail = $row.attr('data-user-email');
@@ -256,16 +268,16 @@ function renderSelectedUserInfo($row) {
     }
 }
 
-function renderIdleReservationsState() {
-    $('#reservation_area').html('<div class="empty-state">Válassz ki egy felhasználót a járatok megtekintéséhez.</div>');
+function renderIdleReservationsState(i18n_values) {
+    $('#reservation_area').html(`<div class="empty-state">${i18n_values.caption.select_line_to_see_bookings}</div>`);
 }
 
-function renderEmptyReservationsState() {
-    $('#reservation_area').html('<div class="empty-state">A kiválasztott felhasználónak nincs foglalása.</div>');
+function renderEmptyReservationsState(i18n_values) {
+    $('#reservation_area').html(`<div class="empty-state">${i18n_values.caption.no_bookings_of_user}</div>`);
 }
 
-function renderLoadingFlightsState() {
-    $('#reservation_area').html('<div class="loading-state">Járatok betöltése...</div>');
+function renderLoadingFlightsState(i18n_values) {
+    $('#reservation_area').html(`<div class="loading-state">${i18n_values.caption.loading_flights}</div>`);
 }
 
 function renderReservationError(message) {
@@ -276,7 +288,7 @@ function renderReservationError(message) {
 
 // --- Foglalások táblázat ---
 
-function renderFlightsTable(flights, userId) {
+function renderFlightsTable(flights, userId, i18n_values) {
     let validFlights = [];
     if (Array.isArray(flights)) {
         validFlights = flights.filter(f => {
@@ -286,9 +298,9 @@ function renderFlightsTable(flights, userId) {
     }
 
     if (!validFlights.length) {
-        renderEmptyReservationsState();
+        renderEmptyReservationsState(i18n_values);
     } else {
-        const headers = ['Járat', 'Indulás / Érkezés', 'Foglalások', 'Összár', 'Státusz', 'Megnyitás'];
+        const headers = [i18n_values.tabel.users.header.flight, i18n_values.tabel.users.header.origin_departure, i18n_values.tabel.users.header.bookings, i18n_values.tabel.users.header.sum_price, i18n_values.tabel.users.header.status, i18n_values.tabel.users.header.open];
         const $table = $('<table></table>', { class: 'table reservation-table mb-0' });
         const $headRow = $('<tr></tr>');
         for (const header of headers) {
@@ -305,8 +317,8 @@ function renderFlightsTable(flights, userId) {
 
             const routeLabel = `${flight.DepartureAirport} (${flight.DepartureCity}) → ${flight.ArrivalAirport} (${flight.ArrivalCity})`;
             const timeLabel = `${formatDateTime(flight.DepartureDateTime)} – ${formatDateTime(flight.ArrivalDateTime)}`;
-            const countLabel = `${reservationCount} db (Aktív: ${activeCount}, Törölt: ${cancelledCount})`;
-            const status = getFlightStatus(flight, activeCount, cancelledCount, reservationCount);
+            const countLabel = `${i18n_values.tabel.users.body.quantity} : ${reservationCount} (${i18n_values.tabel.users.body.status.active}: ${activeCount}, ${i18n_values.tabel.users.body.status.cancelled}: ${cancelledCount})`;
+            const status = getFlightStatus(flight, activeCount, cancelledCount, reservationCount, i18n_values);
 
             const $groupRow = $('<tr></tr>', {
                 class: 'flight-group-row',
@@ -316,7 +328,7 @@ function renderFlightsTable(flights, userId) {
             $groupRow.append($('<td></td>', { text: routeLabel, 'data-label': headers[0] }));
             $groupRow.append($('<td></td>', { text: timeLabel, 'data-label': headers[1] }));
             $groupRow.append($('<td></td>', { text: countLabel, class: 'flight-summary', 'data-label': headers[2] }));
-            $groupRow.append($('<td></td>', { text: formatPrice(flight.TotalPrice), 'data-label': headers[3] }));
+            $groupRow.append($('<td></td>', { text: formatPrice(flight.TotalPrice, i18n_values), 'data-label': headers[3] }));
             $groupRow.append(
                 $('<td></td>', { 'data-label': headers[4] }).append(
                     $('<span></span>', { class: `status-badge ${status.className}`, text: status.label })
@@ -329,7 +341,7 @@ function renderFlightsTable(flights, userId) {
             );
 
             const $detailCell = $('<td></td>', { colspan: headers.length }).append(
-                $('<div></div>', { class: 'empty-state', text: 'Kattints a járatra az ülésrészletek betöltéséhez.' })
+                $('<div></div>', { class: 'empty-state', text: i18n_values.caption.click_on_flight_to_see_details })
             );
             const $detailRow = $('<tr></tr>', {
                 class: 'flight-detail-row d-none',
@@ -345,14 +357,16 @@ function renderFlightsTable(flights, userId) {
     }
 }
 
-function wireFlightSelection() {
+function wireFlightSelection(language, i18n_values) {
     $('#reservation_area')
         .off('click', '.flight-group-row')
-        .on('click', '.flight-group-row', handleFlightToggle);
+        .on('click', '.flight-group-row', async function () {
+            await handleFlightToggle($(this), language, i18n_values)
+        });
 }
 
-async function handleFlightToggle() {
-    let $row = $(this)
+async function handleFlightToggle($this, language, i18n_values) {
+    let $row = $this;
     const userId = Number.parseInt($row.attr('data-user-id'), 10);
     const flightId = Number.parseInt($row.attr('data-flight-id'), 10);
     const $detailRow = $(`#reservation_area .flight-detail-row[data-user-id="${userId}"][data-flight-id="${flightId}"]`);
@@ -361,7 +375,7 @@ async function handleFlightToggle() {
         if ($row.hasClass('expanded')) {
             collapseFlightRow($row, $detailRow);
         } else {
-            await expandFlightRow($row, $detailRow, userId, flightId);
+            await expandFlightRow($row, $detailRow, userId, flightId, language, i18n_values);
         }
     }
 }
@@ -372,21 +386,21 @@ function collapseFlightRow($row, $detailRow) {
     $detailRow.addClass('d-none');
 }
 
-async function expandFlightRow($row, $detailRow, userId, flightId) {
+async function expandFlightRow($row, $detailRow, userId, flightId, language, i18n_values) {
     $row.addClass('expanded');
     $row.find('.toggle-indicator').text('-');
     $detailRow.removeClass('d-none');
 
     const $detailCell = $detailRow.find('td').first();
-    $detailCell.html('<div class="loading-state loading-inline">Ülésrészletek betöltése...</div>');
+    $detailCell.html(`<div class="loading-state loading-inline">${i18n_values.caption.loading_seats_details}</div>`);
 
     try {
-        const seatsResponse = await getUserFlightSeats(userId, flightId);
+        const seatsResponse = await getUserFlightSeats(userId, flightId, language);
         let seats = [];
         if (Array.isArray(seatsResponse.adat)) {
             seats = seatsResponse.adat;
         }
-        $detailCell.empty().append(renderSeatsTable(seats));
+        $detailCell.empty().append(renderSeatsTable(seats, i18n_values));
     } catch (error) {
         console.error(error.message);
         $detailCell.empty().append(
@@ -395,7 +409,7 @@ async function expandFlightRow($row, $detailRow, userId, flightId) {
     }
 }
 
-function getFlightStatus(flight, activeCount, cancelledCount, reservationCount) {
+function getFlightStatus(flight, activeCount, cancelledCount, reservationCount, i18n_values) {
     let groupStatusRaw = '';
     if (flight.GroupStatus) {
         groupStatusRaw = String(flight.GroupStatus);
@@ -406,27 +420,27 @@ function getFlightStatus(flight, activeCount, cancelledCount, reservationCount) 
     const active = Number.parseInt(activeCount, 10);
     const total = Number.parseInt(reservationCount, 10);
 
-    let result = { label: 'Vegyes', className: 'status-mixed' };
+    let result = { label: i18n_values.tabel.flights.body.status.mixed, className: 'status-mixed' };
     if (flightCancelled) {
-        result = { label: 'Járat törölve', className: 'status-flight-cancelled' };
+        result = { label: i18n_values.tabel.flights.body.status._flight_deleted, className: 'status-flight-cancelled' };
     } else {
         if (groupStatus === 'torolt' || (total > 0 && cancelled === total)) {
-            result = { label: 'Törölt', className: 'status-cancelled' };
+            result = { label: i18n_values.tabel.flights.body.status.deleted, className: 'status-cancelled' };
         } else {
             if (groupStatus === 'aktiv' || active === total) {
-                result = { label: 'Aktív', className: 'status-active' };
+                result = { label: i18n_values.tabel.flights.body.status.active, className: 'status-active' };
             }
         }
     }
     return result;
 }
 
-function renderSeatsTable(seats) {
+function renderSeatsTable(seats, i18n_values) {
     let result;
     if (!Array.isArray(seats) || !seats.length) {
-        result = $('<div></div>', { class: 'empty-state', text: 'Ehhez a járathoz nincs megjeleníthető ülőhely-foglalás.' });
+        result = $('<div></div>', { class: 'empty-state', text: i18n_values.caption.no_bookings_for_flight });
     } else {
-        const headers = ['Ülés', 'Tarifa', 'Ár', 'Státusz', 'Utas típus', 'Járat'];
+        const headers = [i18n_values.tabel.users.header.seat, i18n_values.tabel.users.header.fare_class, i18n_values.tabel.users.header.price, i18n_values.tabel.users.header.status, i18n_values.tabel.users.header.passenger_type, i18n_values.tabel.users.header.flight];
         const $table = $('<table></table>', { class: 'table seat-table mb-0' });
         const $headRow = $('<tr></tr>');
         for (const header of headers) {
@@ -451,13 +465,13 @@ function renderSeatsTable(seats) {
             }
             $row.append($('<td></td>', { text: `${seat.RowID}${seat.ColumnID}`, 'data-label': headers[0] }));
             $row.append($('<td></td>', { text: fareClassName, 'data-label': headers[1] }));
-            $row.append($('<td></td>', { text: formatPrice(seat.Price), 'data-label': headers[2] }));
+            $row.append($('<td></td>', { text: formatPrice(seat.Price, i18n_values), 'data-label': headers[2] }));
 
             let statusClass = 'status-active';
-            let statusText = 'Aktív';
+            let statusText = i18n_values.tabel.users.body.status.active;
             if (cancelled) {
                 statusClass = 'status-cancelled';
-                statusText = 'Törölt';
+                statusText = i18n_values.tabel.users.body.status.cancelled;
             }
             $row.append(
                 $('<td></td>', { 'data-label': headers[3] }).append(
@@ -465,9 +479,9 @@ function renderSeatsTable(seats) {
                 )
             );
 
-            let passengerType = 'Gyerek';
+            let passengerType = i18n_values.tabel.users.body.passenger_type.child;
             if (adult) {
-                passengerType = 'Felnőtt';
+                passengerType = i18n_values.tabel.users.body.passenger_type.adult;
             }
             $row.append(
                 $('<td></td>', { 'data-label': headers[4] }).append(
@@ -476,10 +490,10 @@ function renderSeatsTable(seats) {
             );
 
             let flightStatusClass = 'status-active-light';
-            let flightStatusText = 'Rendben';
+            let flightStatusText = i18n_values.tabel.users.body.status.active;
             if (flightCancelled) {
                 flightStatusClass = 'status-flight-cancelled';
-                flightStatusText = 'Járat törölve';
+                flightStatusText = i18n_values.tabel.users.body.status.flight_deleted;
             }
             $row.append(
                 $('<td></td>', { 'data-label': headers[5] }).append(
@@ -497,34 +511,40 @@ function renderSeatsTable(seats) {
 
 // --- Járatkezelő ---
 
-function wireAdminFlightActions() {
-    $('#refresh_admin_flights').off('click').on('click', handleRefreshAdminFlights);
-    $('#admin_flights_table').off('click', '.cancel-flight-btn').on('click', '.cancel-flight-btn', handleCancelFlightClick);
-    $('#create_aircraft_id').off('change').on('change', applyAircraftConstraint);
+function wireAdminFlightActions(language, i18n_values) {
+    $('#refresh_admin_flights').off('click').on('click', async function () {
+        await handleRefreshAdminFlights(language, i18n_values)
+    });
+    $('#admin_flights_table').off('click', '.cancel-flight-btn').on('click', '.cancel-flight-btn', async function () {
+        await handleCancelFlightClick($(this), language, i18n_values);
+    });
+    $('#create_aircraft_id').off('change').on('change', function () {
+        applyAircraftConstraint(i18n_values);
+    });
     $('#create_departure_datetime').off('change').on('change', handleDepartureDateTimeChange);
     $('#create_flight_reset').off('click').on('click', resetCreateFlightForm);
-    $('#create_flight_form').off('submit').on('submit', handleCreateFlightSubmit);
+    $('#create_flight_form').off('submit').on('submit', function () {
+        handleCreateFlightSubmit(event, language, i18n_values);
+    });
 }
 
-async function handleRefreshAdminFlights() {
+async function handleRefreshAdminFlights(language, i18n_values) {
     const currentMode = $('.admin-mode-btn.active').attr('data-admin-mode');
     if (currentMode === 'flights') {
-        await loadAdminFlightsMode();
+        await loadAdminFlightsMode(language, i18n_values);
     }
 }
 
-async function handleCancelFlightClick() {
-    const flightId = Number.parseInt($(this).attr('data-flight-id'), 10);
+async function handleCancelFlightClick($this, language, i18n_values) {
+    const flightId = Number.parseInt($this.attr('data-flight-id'), 10);
     const isValidFlight = Number.isInteger(flightId) && flightId > 0;
-    const confirmed = isValidFlight && window.confirm('Biztosan törölni szeretnéd ezt a járatot?');
+    const confirmed = isValidFlight && window.confirm(i18n_values.caption.want_to_delete_flight_question);
     if (confirmed) {
         try {
-            const result = await cancelAdminFlight(flightId);
-            await loadAdminFlightsMode();
+            const result = await cancelAdminFlight(flightId, language);
+            await loadAdminFlightsMode(language, i18n_values);
             let successMessage = result.message;
-            if (!successMessage) {
-                successMessage = 'A járat törölve lett.';
-            }
+
             renderAdminFeedback('#admin_flights_feedback', successMessage, 'success');
         } catch (error) {
             renderAdminFeedback('#admin_flights_feedback', error.message, 'error');
@@ -532,22 +552,22 @@ async function handleCancelFlightClick() {
     }
 }
 
-async function loadAdminFlightsMode() {
-    renderAdminFlightsTableLoading();
+async function loadAdminFlightsMode(language, i18n_values) {
+    renderAdminFlightsTableLoading(i18n_values);
     renderAdminFeedback('#admin_flights_feedback');
     renderAdminFeedback('#create_flight_feedback');
 
     try {
         const [flightsResponse, createContextResponse] = await Promise.all([
-            getAdminFlights(),
-            getAdminFlightCreateContext()
+            getAdminFlights(language),
+            getAdminFlightCreateContext(language)
         ]);
 
         let flights = [];
         if (Array.isArray(flightsResponse.adat)) {
             flights = flightsResponse.adat;
         }
-        renderAdminFlightsManagementTable(flights);
+        renderAdminFlightsManagementTable(flights, i18n_values);
 
         let createContext = {};
         if (createContextResponse.adat) {
@@ -561,23 +581,23 @@ async function loadAdminFlightsMode() {
         if (Array.isArray(createContext.aircraft)) {
             aircraft = createContext.aircraft;
         }
-        populateCreateFlightOptions(airports, aircraft);
+        populateCreateFlightOptions(airports, aircraft, i18n_values);
         resetCreateFlightForm();
     } catch (error) {
-        $('#admin_flights_table').html('<div class="error-state">Nem sikerült betölteni a járatkezelő adatokat.</div>');
+        $('#admin_flights_table').html(`<div class="error-state">${i18n_values.error.loading_flight_control}</div>`);
         renderAdminFeedback('#admin_flights_feedback', error.message, 'error');
     }
 }
 
-function renderAdminFlightsTableLoading() {
-    $('#admin_flights_table').html('<div class="loading-state">Járatok betöltése...</div>');
+function renderAdminFlightsTableLoading(i18n_values) {
+    $('#admin_flights_table').html(`<div class="loading-state">${i18n_values.caption.loading_flights}</div>`);
 }
 
-function renderAdminFlightsManagementTable(validFlights) {
+function renderAdminFlightsManagementTable(validFlights, i18n_values) {
     if (!validFlights.length) {
-        $('#admin_flights_table').html('<div class="empty-state">Nincs megjeleníthető járat.</div>');
+        $('#admin_flights_table').html(`<div class="empty-state">${i18n_values.caption.loading_flights}</div>`);
     } else {
-        const headers = ['FlightID', 'Repülő', 'Útvonal', 'Indulás', 'Érkezés', 'Alapár', 'Foglalások', 'Státusz', 'Művelet'];
+        const headers = [i18n_values.tabel.flights.header.id, i18n_values.tabel.flights.header.aircraft, i18n_values.tabel.flights.header.route, i18n_values.tabel.flights.header.departure, i18n_values.tabel.flights.header.arrival, i18n_values.tabel.flights.header.base_price, i18n_values.tabel.flights.header.bookings, i18n_values.tabel.flights.header.status, i18n_values.tabel.flights.header.action];
         const $table = $('<table></table>', { class: 'table reservation-table mb-0' });
         const $headRow = $('<tr></tr>');
         for (const header of headers) {
@@ -607,16 +627,16 @@ function renderAdminFlightsManagementTable(validFlights) {
                 aircraftText = `#${flight.AircraftID} - ${flight.AircraftModelName}`;
             }
 
-            let statusLabel = 'Aktív';
+            let statusLabel = i18n_values.tabel.flights.body.status.active;
             let statusClass = 'status-active';
             if (isCancelled) {
-                statusLabel = 'Törölve';
+                statusLabel = i18n_values.tabel.flights.body.status.deleted;
                 statusClass = 'status-flight-cancelled';
             }
 
-            let cancelButtonText = 'Járat törlése';
+            let cancelButtonText = i18n_values.button.delete_flight;
             if (isCancelled) {
-                cancelButtonText = 'Már törölve';
+                cancelButtonText = i18n_values.button.deleted_already;
             }
 
             const routeText = `${flight.DepartureAirport} (${flight.DepartureCity}) → ${flight.ArrivalAirport} (${flight.ArrivalCity})`;
@@ -627,8 +647,8 @@ function renderAdminFlightsManagementTable(validFlights) {
             $row.append($('<td></td>', { text: routeText, 'data-label': headers[2] }));
             $row.append($('<td></td>', { text: formatDateTime(flight.DepartureDateTime), 'data-label': headers[3] }));
             $row.append($('<td></td>', { text: formatDateTime(flight.ArrivalDateTime), 'data-label': headers[4] }));
-            $row.append($('<td></td>', { text: formatPrice(flight.BasePriceInHUF), 'data-label': headers[5] }));
-            $row.append($('<td></td>', { text: `${reservationCount} db (aktív: ${activeReservationCount})`, 'data-label': headers[6] }));
+            $row.append($('<td></td>', { text: formatPrice(flight.BasePriceInHUF, i18n_values), 'data-label': headers[5] }));
+            $row.append($('<td></td>', { text: `${i18n_values.tabel.users.body.quantity}: ${reservationCount} (${i18n_values.tabel.flights.body.status.active}: ${activeReservationCount})`, 'data-label': headers[6] }));
             $row.append(
                 $('<td></td>', { 'data-label': headers[7] }).append(
                     $('<span></span>', { class: `status-badge ${statusClass}`, text: statusLabel })
@@ -653,9 +673,9 @@ function renderAdminFlightsManagementTable(validFlights) {
     }
 }
 
-function populateCreateFlightOptions(airports, aircraft) {
+function populateCreateFlightOptions(airports, aircraft, i18n_values) {
     const $aircraftSelect = $('#create_aircraft_id');
-    $aircraftSelect.empty().append($('<option></option>', { value: '', text: 'Válassz repülőt...' }));
+    $aircraftSelect.empty().append($('<option></option>', { value: '', text: i18n_values.caption.choose_aircraft }));
     for (const row of aircraft) {
         const $option = $('<option></option>', {
             value: row.AircraftID,
@@ -672,8 +692,8 @@ function populateCreateFlightOptions(airports, aircraft) {
 
     const $departureSelect = $('#create_departure_airport');
     const $arrivalSelect = $('#create_arrival_airport');
-    $departureSelect.empty().append($('<option></option>', { value: '', text: 'Válassz indulási repteret...' }));
-    $arrivalSelect.empty().append($('<option></option>', { value: '', text: 'Válassz cél repteret...' }));
+    $departureSelect.empty().append($('<option></option>', { value: '', text: i18n_values.caption.choose_origin_airport }));
+    $arrivalSelect.empty().append($('<option></option>', { value: '', text: i18n_values.caption.choose_destination_airport }));
 
     for (const airport of airports) {
         const optionText = `${airport.AirportCode} - ${airport.City} (${airport.Country})`;
@@ -723,7 +743,7 @@ function getSelectedAircraftContext() {
     return result;
 }
 
-function applyAircraftConstraint() {
+function applyAircraftConstraint(i18n_values) {
     const selectedAircraft = getSelectedAircraftContext();
     const $departureAirport = $('#create_departure_airport');
     const $departureDateTime = $('#create_departure_datetime');
@@ -746,11 +766,11 @@ function applyAircraftConstraint() {
             if (!currentDeparture || new Date(currentDeparture) < new Date(minDepartureValue)) {
                 $departureDateTime.val(minDepartureValue);
             }
-            $hint.text(`A repülő utolsó ismert érkezése: ${requiredAirport}, ${formatDateTime(selectedAircraft.LastArrivalDateTime)}. Az indulásnak legalább 30 perccel később kell lennie.`);
+            $hint.text(`${i18n_values.caption.last_know_arrival_of_aircraft} ${requiredAirport}, ${formatDateTime(selectedAircraft.LastArrivalDateTime)}. ${i18n_values.caption.new_take_off_restriction}`);
         } else {
             $departureAirport.prop('disabled', false);
             $departureDateTime.attr('min', '');
-            $hint.text('Ennek a repülőnek még nincs előző járata, bármelyik repülőtérről indulhat.');
+            $hint.text(i18n_values.caption.selected_aircraft_has_no_previous_flights);
         }
     }
     $departureDateTime.trigger('change');
@@ -758,36 +778,36 @@ function applyAircraftConstraint() {
 
 // --- Járat létrehozás validáció ---
 
-function validateCreateFlightForm(aircraftID, departureAirport, arrivalAirport, departureDate, arrivalDate, basePriceInHUF) {
+function validateCreateFlightForm(aircraftID, departureAirport, arrivalAirport, departureDate, arrivalDate, basePriceInHUF, i18n_values) {
     let error = null;
     if (!Number.isInteger(aircraftID) || aircraftID <= 0) {
-        error = 'Válassz érvényes repülőt.';
+        error = i18n_values.error.choose_valid_aircraft;
     } else if (!departureAirport || !arrivalAirport) {
-        error = 'Válassz indulási és érkezési repteret.';
+        error = i18n_values.error.choose_origin_and_destination_airport;
     } else if (departureAirport == arrivalAirport) {
-        error = 'Az indulási és érkezési repülőtér nem lehet ugyanaz.';
+        error = i18n_values.error.origin_equals_destination;
     } else if (Number.isNaN(departureDate.getTime()) || Number.isNaN(arrivalDate.getTime())) {
-        error = 'Adj meg érvényes dátumokat.';
+        error = i18n_values.error.choose_valid_dates;
     } else if (arrivalDate <= departureDate) {
-        error = 'Az érkezés időpontja később kell legyen, mint az indulás.';
+        error = i18n_values.error.new_departure_before_old_departure;
     } else if (!Number.isInteger(basePriceInHUF) || basePriceInHUF <= 0) {
-        error = 'Az alapár csak pozitív egész szám lehet.';
+        error = i18n_values.error.base_price_must_be_positive_integer;
     }
     return error;
 }
 
-function validateAircraftConstraint(selectedAircraft, departureAirport, departureDate) {
+function validateAircraftConstraint(selectedAircraft, departureAirport, departureDate, i18n_values) {
     let error = null;
     if (selectedAircraft && selectedAircraft.LastArrivalAirport) {
         const lastKnownAirport = String(selectedAircraft.LastArrivalAirport).toUpperCase();
         if (departureAirport != lastKnownAirport) {
-            error = `A kiválasztott repülő innen indulhat: ${lastKnownAirport}.`;
+            error = `${i18n_values.error.aircraft_must_take_off_here}: ${lastKnownAirport}.`;
         } else {
             const lastArrivalDate = new Date(selectedAircraft.LastArrivalDateTime);
             if (!Number.isNaN(lastArrivalDate.getTime())) {
                 const minDepartureDate = new Date(lastArrivalDate.getTime() + 30 * 60 * 1000);
                 if (departureDate < minDepartureDate) {
-                    error = 'Az indulásnak legalább 30 perccel az utolsó érkezés után kell lennie.';
+                    error = i18n_values.error.new_take_off_just_after_previous_take_off;
                 }
             }
         }
@@ -795,13 +815,12 @@ function validateAircraftConstraint(selectedAircraft, departureAirport, departur
     return error;
 }
 
-async function handleCreateFlightSubmit(event) {
+async function handleCreateFlightSubmit(event, language, i18n_values) {
     event.preventDefault();
     renderAdminFeedback('#create_flight_feedback');
 
     const aircraftID = Number.parseInt($('#create_aircraft_id').val(), 10);
     const departureAirport = $('#create_departure_airport').val().trim().toUpperCase();
-    console.log(departureAirport);
     const arrivalAirport = $('#create_arrival_airport').val().trim().toUpperCase();
     const departureDateTime = $('#create_departure_datetime').val();
     const arrivalDateTime = $('#create_arrival_datetime').val();
@@ -810,9 +829,9 @@ async function handleCreateFlightSubmit(event) {
     const arrivalDate = new Date(arrivalDateTime);
     const selectedAircraft = getSelectedAircraftContext();
 
-    let validationError = validateCreateFlightForm(aircraftID, departureAirport, arrivalAirport, departureDate, arrivalDate, basePriceInHUF);
+    let validationError = validateCreateFlightForm(aircraftID, departureAirport, arrivalAirport, departureDate, arrivalDate, basePriceInHUF, i18n_values);
     if (validationError === null) {
-        validationError = validateAircraftConstraint(selectedAircraft, departureAirport, departureDate);
+        validationError = validateAircraftConstraint(selectedAircraft, departureAirport, departureDate, i18n_values);
     }
 
     if (validationError) {
@@ -828,12 +847,10 @@ async function handleCreateFlightSubmit(event) {
                 departureDateTime,
                 arrivalDateTime,
                 basePriceInHUF
-            });
-            await loadAdminFlightsMode();
+            }, language);
+            await loadAdminFlightsMode(language, i18n_values);
             let successMessage = result.message;
-            if (!successMessage) {
-                successMessage = 'A járat létrehozva.';
-            }
+
             renderAdminFeedback('#create_flight_feedback', successMessage, 'success');
         } catch (error) {
             console.error(error.message);
@@ -885,11 +902,11 @@ function formatDateTime(value) {
     return result;
 }
 
-function formatPrice(value) {
+function formatPrice(value, i18n_values) {
     const numericValue = Number(value);
     let result = '';
     if (!Number.isNaN(numericValue)) {
-        result = `${new Intl.NumberFormat('hu-HU').format(numericValue)} Ft`;
+        result = `${new Intl.NumberFormat('hu-HU').format(numericValue)} ${i18n_values.currency}`;
     }
     return result;
 }

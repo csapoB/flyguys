@@ -254,15 +254,17 @@
         }
     },
     "admin": {
+        "currency": "€",
         "title": {
             "users": "Users",
+            "flights": "Flights",
             "bookings": "Bookings",
             "flight_control": "Flight Control",
             "create_new_flight": "Create New Flight",
             "aircraft": "Aircraft",
             "origin_airport": "Origin Airport",
-            "destination_airport": "Departure Airport",
-            "departure_time": "Departure Date",
+            "destination_airport": "Destination Airport",
+            "departure_date": "Departure Date",
             "arrival_date": "Arrival Date",
             "base_price": "Base Price (€)"
         },
@@ -281,7 +283,20 @@
             "no_bookings_of_user": "The selected user has no bookings.",
             "select_user_from_tabel": "Select a user from the tabel!",
             "flight_control": "List of flights",
-            "create_flight": "Choose an aircraft, origin and destination airport, departure and arrival time, and a base price!"
+            "create_flight": "Choose an aircraft, origin and destination airport, departure and arrival time, and a base price!",
+            "loading_flights": "Loading flights...",
+            "click_on_flight_to_see_details": "Click on flight to see details!",
+            "loading_seats_details": "Loading seat details...",
+            "no_bookings_for_flight": "There is no bookings for this flight.",
+            "want_to_delete_flight_question": "Are you sure you want to delete this flight?",
+            "last_know_arrival_of_aircraft": "Last known arrival of aircraft:",
+            "new_take_off_restriction": "New take off must be at least 30 minutes after the last one.",
+            "selected_aircraft_has_no_previous_flights": "The selected aircraft has no previous flights. For origin airport you can choose any.",
+            "no_flights": "There is no flights",
+            "choose_aircraft": "Choose an aircraft...",
+            "choose_origin_airport": "Choose origin airport...",
+            "choose_destination_airport": "Choose destination airport...",
+            "search_by_email": "Search by e-mail"
         },
         "tabel": {
             "users": {
@@ -298,7 +313,8 @@
                     "status": "Status",
                     "open": "Open",
                     "sum_price": "Sum Price",
-                    "seat": "Seat"
+                    "seat": "Seat",
+                    "price": "Price"
                 },
                 "body": {
                     "passenger_type": {
@@ -309,7 +325,7 @@
                         "active": "Active",
                         "not_ative": "Not-Active",
                         "flight_deleted": "Flight Deleted",
-                        "cacelled": "Cancelled"
+                        "cancelled": "Cancelled"
                     },
                     "rank": {
                         "bronze": "Bronze",
@@ -317,12 +333,14 @@
                         "gold": "Gold",
                         "platinum": "Platinum",
                         "diamond": "Diamond"
-                    }
+                    },
+                    "no_users": "There are no users in the database.",
+                    "quantity": "Quantity"
                 }
             },
             "flights": {
                 "header": {
-                    "id": "ID",
+                    "id": "FlightID",
                     "aircraft": "Aircraft",
                     "route": "Route",
                     "departure": "Departure",
@@ -333,9 +351,13 @@
                     "action": "Action"
                 },
                 "body": {
-                    "active": "Active",
-                    "not_ative": "Not-Active",
-                    "deleted": "Deleted"
+                    "status": {
+                        "active": "Active",
+                        "not_ative": "Not-Active",
+                        "deleted": "Deleted",
+                        "mixed": "Mixed",
+                        "flight_deleted": "Flight Deleted"
+                    }
                 }
             }
         },
@@ -343,9 +365,27 @@
             "wrong_email": "Wrong e-mail!",
             "wrong_userid": "Wrong userID!",
             "wrong_flightid": "Wrong flightID!",
-            "flight_not_exist": "Flight not exist!"
+            "flight_not_exist": "Flight not exist!",
+            "wrong_airport_code": "Wrong airport code!",
+            "same_origin_and_destination": "The origin and destination airport can't be the same!",
+            "wrong_aircraftid": "Wrong aircraftID",
+            "wrong_base_price": "Wrong Base Price!",
+            "wrong_date_format": "Wrong date format!",
+            "arrival_before_departure": "Arrival date can't be before departure date!",
+            "aircraft_not_exist": "Aircraft doesn't exist!",
+            "aircraft_must_take_off_here": "Aircraft must take off here: ",
+            "new_departure_before_old_departure": "The new departure date must be after the previous departure date!",
+            "time_overlap": "Departure and arrival date overlap!",
+            "loading_flight_control": "The flight control data coudn't be loaded!",
+            "new_take_off_just_after_previous_take_off": "New take off has to be at least 30 minutes after previous take off!",
+            "choose_valid_aircraft": "Choose a valid a aircraft!",
+            "choose_origin_and_destination_airport": "Choose an origin and a destination airport!",
+            "origin_equals_destination": "Origin airport equals destination airport!",
+            "choose_valid_dates": "Choose valid dates!",
+            "base_price_must_be_positive_integer": "Base price must be positive integer!"
         },
         "success": {
+            "flight_created_successfully": "Flight created successfully!",
             "flight_cancelled_successfully": "Flight cancelled successfully!",
             "flight_was_already_cancelled": "Flight has already been cancelled!"
         }

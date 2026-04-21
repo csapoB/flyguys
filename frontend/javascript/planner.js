@@ -186,7 +186,6 @@ export async function plannerInit(current_language) {
 
     // Utasok popover
     let passengers = await passengers_popoverInit("passengers_input", "passengers_popover");
-    //popoverManualTrigger(passengers[0], passengers[1]);
 
 
     $("#search_flights").on("click", function (e) {
@@ -274,8 +273,9 @@ export async function passengers_popoverInit(input_field_id, content_div_id) {
         container: "body",
         content: passengers_popover_contentGenerator(content_div_id, getplanner_passengers_popover),
         placement: "bottom",
-        trigger: "click" // A popover mikor jelenjen meg. "manual": a fejlesztő írja meg hozzá a szabályrendszert
+        trigger: "manual" // A popover mikor jelenjen meg. "manual": a fejlesztő írja meg hozzá a szabályrendszert
     });
+    popoverManualTrigger($input_field, popover);
 
     return [$input_field, popover];
 }

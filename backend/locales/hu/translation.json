@@ -251,5 +251,142 @@
             "range": "Repüléseid száma: 36+",
             "discount": "Foglalásoknál 10%-os kedvezmény"
         }
+    },
+    "admin": {
+        "currency": "Ft",
+        "title": {
+            "users": "Felhasználók",
+            "flights": "Járatok",
+            "bookings": "Foglalások",
+            "flight_control": "Járatkezelés",
+            "create_new_flight": "Új járat létrehozása",
+            "aircraft": "Repülő",
+            "origin_airport": "Indulási repülőtér",
+            "destination_airport": "Érkezési repülőtér",
+            "departure_date": "Indulási idő",
+            "arrival_date": "Érkezési idő",
+            "base_price": "Alapár (Ft)"
+        },
+        "button": {
+            "users": "Felhasználók",
+            "delete": "Törlés",
+            "flights": "Járatok",
+            "create_flight": "Járat létrehozása",
+            "delete_flight": "Járat törlése",
+            "delete_form": "Űrlap törlése",
+            "update": "Frissítés",
+            "deleted_already": "Már törölve"
+        },
+        "caption": {
+            "select_line_to_see_bookings": "Válasszon egy sort a foglalások megtekintéséhez!",
+            "no_bookings_of_user": "A kiválasztott felhasználónak nincsenek foglalásai!",
+            "select_user_from_tabel": "Válasszon egy felhasználót a táblázatból!",
+            "flight_control": "Járatok listája",
+            "create_flight": "Válasszon egy repülőt, egy indulási és érkezési repülőteret, egy indulási és érkezési időpontot, és egy alapárat!",
+            "loading_flights": "Járatok töltése...",
+            "click_on_flight_to_see_details": "A részletekért kattintson a járatra!",
+            "loading_seats_details": "Ülőhelyrészletek töltése...",
+            "no_bookings_for_flight": "Ehhez a járathoz nincs egy foglalás sem.",
+            "want_to_delete_flight_question": "Biztosan törölni akarod ezt a járatot?",
+            "last_know_arrival_of_aircraft": "A repülő utolsó érkezési adatatit:",
+            "new_take_off_restriction": "Az új felszállásnak legalább 30 perccel az előző után kell történnie.",
+            "selected_aircraft_has_no_previous_flights": "A kiválasztott repülőgépnek nincsenek korábbi járatai. Indulási repülőtérként bármelyiket választhatja.",
+            "no_flights": "Egyetlen járat sem található az adatbázisban",
+            "choose_aircraft": "Válasszon egy repülőt...",
+            "choose_origin_airport": "Válasszon egy indulási repteret...",
+            "choose_destination_airport": "Válasszon egy érkezési repteret...",
+            "search_by_email": "Keresés e-mail alapján"
+        },
+        "tabel": {
+            "users": {
+                "header": {
+                    "name": "Név",
+                    "email": "E-Mail",
+                    "bookings": "Foglalások",
+                    "rank": "Rang",
+                    "created_at": "Létrehozva ekkor",
+                    "flight": "Járat",
+                    "passenger_type": "Utas típusa",
+                    "fare_class": "Osztály",
+                    "origin_departure": "Indulási / Érkezési repülőtér",
+                    "status": "Státusz",
+                    "open": "Kinyit",
+                    "sum_price": "Ősszár",
+                    "seat": "Ülés",
+                    "price": "Ár"
+                },
+                "body": {
+                    "passenger_type": {
+                        "adult": "Felnőtt",
+                        "child": "Gyermek"
+                    },
+                    "status": {
+                        "active": "Aktív",
+                        "not_ative": "Nem aktív",
+                        "flight_deleted": "Járat törölve",
+                        "cancelled": "Lemondva"
+                    },
+                    "rank": {
+                        "bronze": "Bronz",
+                        "silver": "Ezüst",
+                        "gold": "Arany",
+                        "platinum": "Platina",
+                        "diamond": "Gyémánt"
+                    },
+                    "no_users": "Egyetlen felhasználó sem található az adatbázisban",
+                    "quantity": "Darabszám"
+                }
+            },
+            "flights": {
+                "header": {
+                    "id": "FlightID",
+                    "aircraft": "Repülő",
+                    "route": "Útvonal",
+                    "departure": "Indulás",
+                    "arrival": "Érkezés",
+                    "base_price": "Alapár",
+                    "bookings": "Foglalások",
+                    "status": "Státusz",
+                    "action": "Művelet"
+                },
+                "body": {
+                    "status": {
+                        "active": "Aktív",
+                        "not_ative": "Nem aktív",
+                        "deleted": "Törölt",
+                        "mixed": "Vegyes",
+                        "flight_deleted": "Járat törölve"
+                    }
+                }
+            }
+        },
+        "error": {
+            "wrong_email": "Rossz email",
+            "wrong_userid": "Rossz userID!",
+            "wrong_flightid": "Rossz flightID!",
+            "flight_not_exist": "A járat nem létezik!",
+            "wrong_airport_code": "Rossz repülőtérkód!",
+            "same_origin_and_destination": "Az indulási ésérkezési repülőtér nem lehet azonos!",
+            "wrong_aircraftid": "Rossz aircraftID",
+            "wrong_base_price": "Rossz alapár!",
+            "wrong_date_format": "Rossz dátum formátum!",
+            "arrival_before_departure": "Az érkezési időpont nem lehet az indulási időpont előtt!",
+            "aircraft_not_exist": "A repülőgép nem létezik!",
+            "aircraft_must_take_off_here": "A repülőnek innen kell indulnia: ",
+            "new_departure_before_old_departure": "Az új érkezési időpont nem lehet a régi érkezési időpont előtt!",
+            "time_overlap": "Az indulási és érkezési időpont ütközik egymással!",
+            "loading_flight_control": "A járatkezelőt nem lehetett betölteni!",
+            "new_take_off_just_after_previous_take_off": "Az új felszállásnak legalább 30 perccel az előző után kell történnie!",
+            "choose_valid_aircraft": "Válasszon létező repülőt!",
+            "choose_origin_and_destination_airport": "Válasszon egy indulási és egy érkezési repülőteret!",
+            "origin_equals_destination": "Az indulási repülőtér azonos az érkezési repülőtérrel!",
+            "choose_valid_dates": "Válasszon létező időpontokat!",
+            "base_price_must_be_positive_integer": "Az alapárnak pozitív egész számnak kell lennie!"
+        },
+        "success": {
+            "flight_created_successfully": "Sikeres járat létrehozás!",
+            "flight_cancelled_successfully": "Sikeres járat törlés!",
+            "flight_was_already_cancelled": "A járat már törölve volt!"
+        }
     }
 }
