@@ -109,6 +109,6 @@ export async function getProfile(lang) {
 export async function getLoyaltyProgram(lang) {
     return (await (await fetch("/api/getloyaltyprogram", { method: "GET", headers: { "Accept-Language": lang } })).json()).loyalty_program;
 }
-export async function getCommonMessages(lang) {
-    return (await (await fetch("/api/getcommonmessages", { method: "GET", headers: { "Accept-Language": lang } })).json()).common_messages;
+export async function getAdmin(lang) {
+    return (await (await fetch("/api/admin", { method: "GET", headers: { "Accept-Language": lang } })).json()).admin;
 }

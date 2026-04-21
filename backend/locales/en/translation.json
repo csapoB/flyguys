@@ -252,5 +252,102 @@
             "range": "Number of your flights: 36+",
             "discount": "10% discount on bookings"
         }
+    },
+    "admin": {
+        "title": {
+            "users": "Users",
+            "bookings": "Bookings",
+            "flight_control": "Flight Control",
+            "create_new_flight": "Create New Flight",
+            "aircraft": "Aircraft",
+            "origin_airport": "Origin Airport",
+            "destination_airport": "Departure Airport",
+            "departure_time": "Departure Date",
+            "arrival_date": "Arrival Date",
+            "base_price": "Base Price (€)"
+        },
+        "button": {
+            "users": "Users",
+            "delete": "Delete",
+            "flights": "Flights",
+            "create_flight": "Create Flight",
+            "delete_flight": "Delete Flight",
+            "delete_form": "Delete Form",
+            "update": "Update",
+            "deleted_already": "Deleted Already"
+        },
+        "caption": {
+            "select_line_to_see_bookings": "Select a line to see bookings!",
+            "no_bookings_of_user": "The selected user has no bookings.",
+            "select_user_from_tabel": "Select a user from the tabel!",
+            "flight_control": "List of flights",
+            "create_flight": "Choose an aircraft, origin and destination airport, departure and arrival time, and a base price!"
+        },
+        "tabel": {
+            "users": {
+                "header": {
+                    "name": "Name",
+                    "email": "E-Mail",
+                    "bookings": "Bookings",
+                    "rank": "Rank",
+                    "created_at": "Created At",
+                    "flight": "Flight",
+                    "passenger_type": "Passenger Type",
+                    "fare_class": "Fare Class",
+                    "origin_departure": "Origin / Destination",
+                    "status": "Status",
+                    "open": "Open",
+                    "sum_price": "Sum Price",
+                    "seat": "Seat"
+                },
+                "body": {
+                    "passenger_type": {
+                        "adult": "Adult",
+                        "child": "Child"
+                    },
+                    "status": {
+                        "active": "Active",
+                        "not_ative": "Not-Active",
+                        "flight_deleted": "Flight Deleted",
+                        "cacelled": "Cancelled"
+                    },
+                    "rank": {
+                        "bronze": "Bronze",
+                        "silver": "Silver",
+                        "gold": "Gold",
+                        "platinum": "Platinum",
+                        "diamond": "Diamond"
+                    }
+                }
+            },
+            "flights": {
+                "header": {
+                    "id": "ID",
+                    "aircraft": "Aircraft",
+                    "route": "Route",
+                    "departure": "Departure",
+                    "arrival": "Arrival",
+                    "base_price": "Base Price",
+                    "bookings": "Bookings",
+                    "status": "Status",
+                    "action": "Action"
+                },
+                "body": {
+                    "active": "Active",
+                    "not_ative": "Not-Active",
+                    "deleted": "Deleted"
+                }
+            }
+        },
+        "error": {
+            "wrong_email": "Wrong e-mail!",
+            "wrong_userid": "Wrong userID!",
+            "wrong_flightid": "Wrong flightID!",
+            "flight_not_exist": "Flight not exist!"
+        },
+        "success": {
+            "flight_cancelled_successfully": "Flight cancelled successfully!",
+            "flight_was_already_cancelled": "Flight has already been cancelled!"
+        }
     }
 }

@@ -41,6 +41,8 @@ export async function modalInit(current_language, end_point) {
 
                 if (data.admin) {
                     $("#admin_button").show();
+                } else {
+                    $("#profile_button").show();
                 }
                 else{
                    $("#profile_button").show(); 
@@ -252,7 +254,7 @@ function init_child_modal(id, content_id, frame_id) {
         "class": "modal-dialog modal-dialog-centered"
     });
 
-    let $childModal_content = $("<div>", {
+    let $childModal_content = $("<form>", {
         "id": content_id,
         "class": "modal-content"
     });
@@ -435,7 +437,7 @@ function regis_modal(i18n_values) {
         "id": "new_usr_email",
         "class": "form-control modal_input w-75 mb-4",
         "type": "email",
-        "placeholder": `${i18n_values.field.email}`,
+        "placeholder": `${i18n_values.field.email}`
     });
 
     let $input_group_for_passw = $("<div>", {
@@ -463,7 +465,7 @@ function regis_modal(i18n_values) {
 
     let $regis_button = $("<button>", {
         "class": "btn btn-danger w-75 mb-2 mt-2 submit-register",
-        "type": "button",
+        "type": "submit",
         "text": `${i18n_values.title.registration}`
     });
 
