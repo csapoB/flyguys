@@ -71,7 +71,8 @@
         "missing_data": "Required data are missing!",
         "end_point_not_working": "This end point doesn't work!",
         "no_active_session": "No active session!",
-        "missing_url_parameter": "Missing URL parameter!"
+        "missing_url_parameter": "Missing URL parameter!",
+        "wrong_data_type": "Wrong data type sent!"
     },
     "modal": {
         "title": {
@@ -80,7 +81,8 @@
             "edit_profile": "Edit Profile",
             "delete_profile": "Delete Profile",
             "verify_password": "Verify Password",
-            "cancel_bookings": "Cancel Bookings"
+            "cancel_bookings": "Cancel Bookings",
+            "flight_cancelled": "Flight Cancelled"
         },
         "field": {
             "email": "E-mail",
@@ -117,13 +119,15 @@
             "profile_updated_successfully": "Profile updated successfully!",
             "profile_deleted_successfully": "Profile deleted successfully! You will be redirected in 5 seconds.",
             "password_verified": "Password verified!",
-            "bookings_have_been_cancelled_successfully": "Selected bookings have been cancelled successfully!"
+            "bookings_have_been_cancelled_successfully": "Selected bookings have been cancelled successfully!",
+            "message_acknowledged": "Message acknowledged successfully!"
         },
         "button": {
             "save": "Save Changes",
             "verification": "Verification",
             "yes": "Yes",
-            "no": "No"
+            "no": "No",
+            "ok": "OK"
         },
         "caption": {
             "no_account": "Don't have an account? Sign up here:",
@@ -356,6 +360,7 @@
                         "active": "Active",
                         "not_ative": "Not-Active",
                         "deleted": "Deleted",
+                        "cancelled": "Cancelled",
                         "mixed": "Mixed",
                         "flight_deleted": "Flight Deleted"
                     }

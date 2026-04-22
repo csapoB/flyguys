@@ -111,6 +111,16 @@ CREATE TABLE IF NOT EXISTS reservation (
     FOREIGN KEY (PassengerID) REFERENCES useraccount(UserID)
 );
 
+-- UserMessage Table
+CREATE TABLE IF NOT EXISTS usermessage (
+    MessageID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    UserID INT NOT NULL,
+    MessageHungarian TEXT,
+    MessageEnglish TEXT,
+    IsViewed BOOLEAN DEFAULT 0,
+    FOREIGN KEY (UserID) REFERENCES useraccount(UserID)
+);
+
 CREATE VIEW IF NOT EXISTS reservations_with_prices AS 
 	SELECT reservation.ReservationID, reservation.PassengerID, reservation.FlightID, reservation.RowID, reservation.ColumnID, fareclass.FareClassID, (flight.BasePriceInHUF*fareclass.Multiplier)*((100-loyaltystatus.DiscountInPercentage)/100) AS "PriceInHun", reservation.IsCancelled, reservation.IsAdult FROM reservation INNER JOIN flight ON reservation.FlightID = flight.FlightID INNER JOIN aircraft ON flight.AircraftID = aircraft.AircraftID INNER JOIN seat ON reservation.RowID = seat.RowID AND reservation.ColumnID = seat.ColumnID AND aircraft.AircraftModelID = seat.AircraftModelID INNER JOIN fareclass ON seat.FareClassID = fareclass.FareClassID INNER JOIN useraccount ON reservation.PassengerID = useraccount.UserID INNER JOIN loyaltystatus ON useraccount.LoyaltyStatusID = loyaltystatus.LoyaltyStatusID;
 
@@ -131,10 +141,10 @@ CREATE VIEW IF NOT EXISTS flights_with_flight_time_en AS
 -- SELECT flight.DepartureAirport, flight.ArrivalAirport, flight.DepartureDateTime, flight.ArrivalDateTime, flight.BasePrice FROM flight;
 
 CREATE VIEW IF NOT EXISTS active_flights_hun AS
-	SELECT flights_with_flight_time_hun.* FROM flights_with_flight_time_hun WHERE flights_with_flight_time_hun.DepartureDateTime > NOW();
+	SELECT flights_with_flight_time_hun.* FROM flights_with_flight_time_hun WHERE flights_with_flight_time_hun.DepartureDateTime > NOW() AND flights_with_flight_time_hun.IsCancelled = 0;
 
 CREATE VIEW IF NOT EXISTS active_flights_en AS
-	SELECT flights_with_flight_time_en.* FROM flights_with_flight_time_en WHERE flights_with_flight_time_en.DepartureDateTime > NOW();
+	SELECT flights_with_flight_time_en.* FROM flights_with_flight_time_en WHERE flights_with_flight_time_en.DepartureDateTime > NOW() AND flights_with_flight_time_en.IsCancelled = 0;
 
  CREATE VIEW IF NOT EXISTS num_of_available_seats_on_active_flights_hun AS
     SELECT active_flights_hun.FlightID, active_flights_hun.DepartureAirport, active_flights_hun.DepartureCity, active_flights_hun.ArrivalAirport, active_flights_hun.ArrivalCity, DATE(active_flights_hun.DepartureDateTime) AS "DepartureDate", DATE(active_flights_hun.ArrivalDateTime) AS "ArrivalDate", TIME_FORMAT(TIME(active_flights_hun.DepartureDateTime), '%H:%i') AS "DepartureTime", TIME_FORMAT(TIME(active_flights_hun.ArrivalDateTime), '%H:%i') AS "ArrivalTime", TIME_FORMAT(TIME(active_flights_hun.FlightTime), '%H:%i') AS "FlightTime", active_flights_hun.BasePriceInHUF, aircraftmodel.AircraftModelID, (aircraftmodel.NumberOfSeats - COUNT(CASE WHEN reservation.IsCancelled = 0 THEN reservation.ReservationID END)) AS "NumOfAvailableSeats" FROM active_flights_hun INNER JOIN aircraft ON active_flights_hun.AircraftID = aircraft.AircraftID INNER JOIN aircraftmodel ON aircraft.AircraftModelID = aircraftmodel.AircraftModelID LEFT JOIN reservation ON active_flights_hun.FlightID = reservation.FlightID GROUP BY active_flights_hun.FlightID;
@@ -154,7 +164,7 @@ CREATE VIEW IF NOT EXISTS not_cancelled_reservations AS
 	SELECT reservations_with_prices.ReservationID, reservations_with_prices.PassengerID, reservations_with_prices.FlightID, reservations_with_prices.RowID, reservations_with_prices.ColumnID, reservations_with_prices.FareClassID, reservations_with_prices.IsAdult FROM reservations_with_prices WHERE !reservations_with_prices.IsCancelled;
 
 CREATE VIEW IF NOT EXISTS number_of_flights_of_users AS
-	SELECT useraccount.UserID, COUNT(DISTINCT not_cancelled_reservations.FlightID) AS "NumberOfFlights" FROM useraccount LEFT JOIN not_cancelled_reservations ON useraccount.UserID = not_cancelled_reservations.PassengerID  INNER JOIN flight ON not_cancelled_reservations.FlightID = flight.FlightID WHERE flight.DepartureDateTime < NOW() AND flight.IsCancelled = 0 GROUP BY useraccount.UserID;
+	SELECT useraccount.UserID, COUNT(DISTINCT not_cancelled_reservations.FlightID) AS "NumberOfFlights" FROM useraccount LEFT JOIN not_cancelled_reservations ON useraccount.UserID = not_cancelled_reservations.PassengerID  INNER JOIN flight ON not_cancelled_reservations.FlightID = flight.FlightID WHERE flight.DepartureDateTime < NOW() GROUP BY useraccount.UserID;
 
 INSERT INTO loyaltystatus (loyaltystatus.LoyaltyStatusName, loyaltystatus.DiscountInPercentage, loyaltystatus.NumberOfFlightsRequired) VALUES 
 ("Bronze", 0, 0),

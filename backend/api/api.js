@@ -1359,6 +1359,13 @@ router.post('/AdminCancelFlight', async (request, response) => {
                     }
                     else {
                         await database.AdminCancelFlight(flightID);
+                        let flight_data = await database.selectFlightByID(flightID);
+                        let user_ids = await database.selectUserIDByReservationFlightID(flightID);
+
+                        for (let i = 0; i < user_ids.length; i++) {
+                            await database.createUserMessage(user_ids[i].PassengerID, `A&${flight_data[0].DepartureCityHungarian} (${flight_data[0].DepartureAirport})&${flight_data[0].ArrivalCityHungarian} (${flight_data[0].ArrivalAirport})&${flight_data[0].DepartureDateTimeHungarian}&járat sajnos törlésre került.&A foglalásból származó hűségpontok nem kerülnek levonásra.`, `The&${flight_data[0].DepartureCityEnglish} (${flight_data[0].DepartureAirport})&${flight_data[0].ArrivalCityEnglish} (${flight_data[0].ArrivalAirport})&${flight_data[0].DepartureDateTimeEnglish}&flight has been cancelled.&The loyalty scores will not be deleted.`)
+
+                        }
                     }
                     response.status(200).json({
                         message
@@ -1540,6 +1547,62 @@ router.post('/AdminCreateFlight', async (request, response) => {
             });
         }
 
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.get('/unreadmessages', async (request, response) => {
+    try {
+        if (!LoggedInCheck(request)) {
+            response.status(401).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        }
+        else {
+            response.status(200).json({
+                messages: await database.selectUnreadUserMessageByUserID(request.session.user.id)
+            });
+        }
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.put('/messageread', async (request, response) => {
+    try {
+        if (!LoggedInCheck(request)) {
+            response.status(401).json({
+                error: request.t("errors.login_needed_post", { returnObjects: true })
+            });
+        }
+        else {
+            let message_id = request.body.message_id;
+
+            if (!message_id) {
+                response.status(400).json({
+                    error: request.t("errors.missing_data", { returnObjects: true })
+                });
+            } else {
+                if (parseInt(message_id) == NaN) {
+                    response.status(400).json({
+                        error: request.t("errors.wrong_data_type", { returnObjects: true })
+                    });
+                } else {
+                    await database.setUserMessageIsViewedTrueByMessageId(message_id);
+                    response.status(200).json({
+                        message: request.t("modal.success.message_acknowledged", { returnObjects: true })
+                    });
+                }
+            }
+
+        }
     } catch (error) {
         console.error(error)
         response.status(500).json({

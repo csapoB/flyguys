@@ -811,9 +811,37 @@ async function cancelReservationCheckForRemainingOnlyChildren(reservation_ids, u
     }
 
     return flag;
-
 }
 
+async function createUserMessage(userId, messageHungarian, messageEnglish) {
+    const query = 'INSERT INTO usermessage (UserID, MessageHungarian, MessageEnglish) VALUES (?, ?, ?)';
+    const [result] = await pool.execute(query, [userId, messageHungarian, messageEnglish]);
+    return result.affectedRows > 0;
+}
+
+async function selectUserIDByReservationFlightID(flightId) {
+    const query = 'SELECT DISTINCT not_cancelled_reservations.PassengerID FROM not_cancelled_reservations WHERE not_cancelled_reservations.FlightID = ?;';
+    const [result] = await pool.execute(query, [flightId]);
+    return result
+}
+
+async function selectFlightByID(flightId) {
+    const query = `SELECT flight.DepartureAirport, origin_city.Hungarian AS "DepartureCityHungarian", origin_city.English AS "DepartureCityEnglish", flight.ArrivalAirport, destination_city.Hungarian AS "ArrivalCityHungarian", destination_city.English AS "ArrivalCityEnglish", CONCAT(YEAR(flight.DepartureDateTime), ".", (CASE WHEN MONTH(flight.DepartureDateTime) < 10 THEN CONCAT("0", MONTH(flight.DepartureDateTime)) ELSE MONTH(flight.DepartureDateTime) END), ".", (CASE WHEN DAY(flight.DepartureDateTime) < 10 THEN CONCAT("0", DAY(flight.DepartureDateTime)) ELSE DAY(flight.DepartureDateTime) END), ".", " ", TIME_FORMAT(TIME(flight.DepartureDateTime), '%H:%i')) AS "DepartureDateTimeHungarian", CONCAT(TIME_FORMAT(TIME(flight.DepartureDateTime), '%H:%i'), " ", (CASE WHEN DAY(flight.DepartureDateTime) < 10 THEN CONCAT("0", DAY(flight.DepartureDateTime)) ELSE DAY(flight.DepartureDateTime) END), "/", (CASE WHEN MONTH(flight.DepartureDateTime) < 10 THEN CONCAT("0", MONTH(flight.DepartureDateTime)) ELSE MONTH(flight.DepartureDateTime) END), "/", YEAR(flight.DepartureDateTime)) AS "DepartureDateTimeEnglish" FROM flight INNER JOIN airport origin ON flight.DepartureAirport = origin.AirportCode INNER JOIN airport destination ON flight.ArrivalAirport = destination.AirportCode INNER JOIN city origin_city ON origin.CityID = origin_city.CityID INNER JOIN city destination_city ON destination.CityID = destination_city.CityID WHERE flight.FlightID = ?;`;
+    const [result] = await pool.execute(query, [flightId]);
+    return result
+}
+
+async function setUserMessageIsViewedTrueByMessageId(messageId) {
+    const query = 'UPDATE usermessage SET IsViewed = 1 WHERE MessageID = ?;';
+    const [result] = await pool.execute(query, [messageId]);
+    return result;
+}
+
+async function selectUnreadUserMessageByUserID(userId) {
+    const query = `SELECT MessageID, MessageHungarian, MessageEnglish FROM usermessage WHERE IsViewed = 0 AND UserID = ?;`;
+    const [result] = await pool.execute(query, [userId]);
+    return result
+}
 //!Export
 module.exports = {
     Login,
@@ -867,5 +895,10 @@ module.exports = {
     AdminGetFlightCreateContextEn,
     AdminGetLatestKnownAircraftLeg,
     AdminHasFlightOverlap,
-    AdminCreateFlight
+    AdminCreateFlight,
+    createUserMessage,
+    selectUserIDByReservationFlightID,
+    selectFlightByID,
+    setUserMessageIsViewedTrueByMessageId,
+    selectUnreadUserMessageByUserID
 };
