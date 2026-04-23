@@ -1,9 +1,8 @@
-import { getNavbar, getFooter, getLocale, getIndex, getPlannerPassengersPopover } from "./locale.js";
+import { getNavbar, getFooter, getLocale, getIndex} from "./locale.js";
 import { plannerInit } from "./planner.js";
 import { modalInit } from "./modal.js";
 import { plannerResizer } from "./plannerresizer.js";
 import { initCheapestFlights, errorPageGenerator } from "./toolbox.js";
-import { indexResizer } from "./indexresizer.js";
 
 
 $(async function () {

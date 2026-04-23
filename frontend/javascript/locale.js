@@ -50,6 +50,7 @@ export async function getPlanner(lang) {
         
     });
 
+    return getplanner
 }
 
 export async function getFooter(lang) {
@@ -58,7 +59,9 @@ export async function getFooter(lang) {
     let $company_infos_footer = $("#company_infos_footer");
     $company_infos_footer.text(getfooter.company_infos);
     $company_infos_footer.prop("href", `/${lang}/rolunk`);
-    $("#magazine_footer").text(getfooter.magazine);
+    let $magazine_footer = $("#magazine_footer");
+    $magazine_footer.text(getfooter.magazine);
+    $magazine_footer.prop("href", `/${lang}/magazin`);
     $("#title_services_footer").text(getfooter.title_services);
     let $loyalty_program_footer = $("#loyalty_program_footer");
     $loyalty_program_footer.text(getfooter.loyalty_program);
@@ -143,4 +146,8 @@ export async function getAdmin(lang) {
     $("#create_flight_reset").text(getadmin.button.delete_form)
 
     return getadmin;
+}
+
+export async function getMagazine(lang) {
+    return (await (await fetch("/api/getmagazine", { method: "GET", headers: { "Accept-Language": lang } })).json()).magazine;
 }

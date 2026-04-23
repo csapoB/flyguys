@@ -40,7 +40,13 @@
         "return_label": "Return",
         "passengers_label": "Passengers",
         "search_flights_button": "Start Booking",
-        "passengers_input": "1 adult, 0 children"
+        "passengers_input": "1 adult, 0 children",
+        "error": {
+            "missing_origin": "Please, add origin!",
+            "missing_destination": "Please, add destination!",
+            "missing_departure": "Please, add departure!",
+            "missing_return": "Please, add return!"
+        }
     },
     "planner_passengers_popover": {
         "adults_inc_dec": "Adults",
@@ -181,9 +187,10 @@
         "no_seats_selected": "No seats have been selected!",
         "reservation_successful": "Reservation successful! You will be redirected in 5 seconds.",
         "error": {
-            "not_logged_in": "You have to be logged in to book a flight.",
-            "no_adults": "When booking, there has to be at least 1 adult.",
-            "already_booked_seat": "Booking failed! The seat is already booked."
+            "not_logged_in": "You have to be logged in to book a flight!",
+            "no_adults": "When booking, there has to be at least 1 adult!",
+            "already_booked_seat": "Booking failed! The seat is already booked!",
+            "no_flightid": "No flightId!"
         }
     },
     "profile": {
@@ -211,11 +218,13 @@
         },
         "title": "Profile",
         "bookings": "Bookings",
+        "cancelled_flights_bookings": "Cancelled Flights Bookings",
         "active_bookings": "Active bookings",
         "previous_bookings": "Previous bookings",
         "choose_flight": "Choose a flight!",
         "no_active_bookings": "It seems like you have no active bookings.",
         "no_previous_bookings": "It seems like you have no previous bookings.",
+        "no_cancelled_flights_bookings": "It seems like you have no bookings for cancelled flights.",
         "no_bookings": "It seems like you have not travelled with us.",
         "select_all_for_cancellation": "Select all for cancellation",
         "cancel_selected": "Cancel selected",
@@ -395,5 +404,45 @@
             "flight_cancelled_successfully": "Flight cancelled successfully!",
             "flight_was_already_cancelled": "Flight has already been cancelled!"
         }
+    },
+    "magazine": {
+        "title": "FlyGuys Magazine",
+        "subtitle": "Choose from premium products during your travel!",
+        "product": {
+            "name": {
+                "hugo_boss_perfume": "Hugo Boss Perfume 60ml",
+                "phone_case_iphone_17_pro_max": "Phone case",
+                "popcorn": "Popcorn",
+                "coca_cola": "Coca Cola",
+                "noise_canceling_airpods": "Noise canceling airpods",
+                "flyguys_keychain": "FlyGuys keychain",
+                "rolex_watch": "Rolex watch",
+                "sandwich": "Sandwich",
+                "fridge_magnet": "Fridge magnet"
+            },
+            "caption": {
+                "hugo_boss_perfume": "Premium perfume, it can last more than 24 hours",
+                "phone_case_iphone_17_pro_max": "Iphone 17 pro max phone case",
+                "popcorn": "tasty snack",
+                "coca_cola": "Original taste",
+                "noise_canceling_airpods": "Cancel your surrondings and focus on your inner toughts!",
+                "flyguys_keychain": "Upgrade your key ring!",
+                "rolex_watch": "Make your apperance to an upper level!",
+                "sandwich": "tasty chicken sandwich",
+                "fridge_magnet": "Bring a piece of memory from the visited country!"
+            },
+            "price": {
+                "hugo_boss_perfume": 29990,
+                "phone_case_iphone_17_pro_max": 15670,
+                "popcorn": 1250,
+                "coca_cola": 990,
+                "noise_canceling_airpods": 29990,
+                "flyguys_keychain": 1670,
+                "rolex_watch": 626500,
+                "sandwich": 990,
+                "fridge_magnet": 3500
+            }
+        },
+        "currency": "€"
     }
 }

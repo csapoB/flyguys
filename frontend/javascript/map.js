@@ -204,15 +204,16 @@ async function initMapMarkers(api, input_name, markers_array, map, language, cus
 
     let $marker = $(marker);
 
-    let contentString = $('<div>', {
-      html: `<h2>${pins[i].City}</h2><p>(${pins[i].AirportCode})</p>`,
-      class: 'pin-info'
+    let $contentString = $('<div>', {
+      html: `<img src="../css/images/${pins[i].AirportCode}.png" class="img-fluid mb-2">`,
+      class: "d-flex align-items-center flex-column"
     });
 
+    $contentString.append(`<div class="pin-info"><h2>${pins[i].City}</h2><p>(${pins[i].AirportCode})</p></div>`)
 
     let btn = $('<button>', {
       text: i18n_values.choose_button,
-      class: 'pin-btn',
+      class: 'pin-btn w-50 mb-3',
       on: {
         "click": () => {
           $(`#${input_name}_input`).trigger("marker:click", [pins[i].AirportCode]);
@@ -221,12 +222,12 @@ async function initMapMarkers(api, input_name, markers_array, map, language, cus
       }
     });
 
-    contentString.append(btn);
+    $contentString.append(btn);
 
     let marker_popover = new bootstrap.Popover(marker, {
       html: true, // A popover ne csak szöveget de HTML kódot is tudjon tárolni
       container: "#map",
-      content: contentString,
+      content: $contentString,
       placement: "top",
       trigger: "manual" // A popover mikor jelenjen meg. "manual": a fejlesztő írja meg hozzá a szabályrendszert
     });
@@ -317,7 +318,11 @@ function markerPopoverManualTrigger(markers_array, $marker, popover_obj) {
         (bootstrap.Popover.getInstance(markers_array[i][0])).hide();
 
       }
+      
       popover_obj.show();
+      //console.log($(popover_obj.tip).find(".popover-body").first())
+      $(popover_obj.tip).find(".popover-body").addClass("marker_popover_body")
+
       popover_div = document.getElementById(popover_obj.tip.id); // Az popover_div id-ja minden megjelenésnél újragenerálódik => más lesz, mint az előző
       popover_div.tabIndex = -1; // A tabindex beállítása azért szükséges, hogy az elemet (popover_div) a böngésző focusable-nek tekintse
       popover_div.addEventListener("blur", (event) => {
@@ -335,18 +340,6 @@ function markerPopoverManualTrigger(markers_array, $marker, popover_obj) {
       });
     }
   });
-
-  /*$marker.on("blur.popover", function (event) {
-    console.log(2)
-
-    if (event.relatedTarget == null) { // Ha az elem amire kattintottunk nem focusable, akkor lesz null az event.relatedTarget értéke
-      popover_obj.hide();
-    } else {
-      if (event.relatedTarget.id != popover_div.id) { // Ha nem a popover_divbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
-        popover_obj.hide();
-      }
-    }
-  });*/
 
 
 }

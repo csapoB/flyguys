@@ -145,15 +145,18 @@ router.get('/flightsofuser', async (request, response) => {
         if (LoggedInCheck(request)) {
             let active_flights;
             let previous_flights;
+            let cancelled_flights;
             if (request.get("Accept-Language") == "hu") {
                 active_flights = await database.selectActiveFlightsByUserIdHun(request.session.user.id);
                 previous_flights = await database.selectPreviousFlightsByUserIdHun(request.session.user.id);
+                cancelled_flights = await database.selectNotCancelledBookingsCancelledFlightsByUserIdHun(request.session.user.id)
             } else {
                 active_flights = await database.selectActiveFlightsByUserIdEn(request.session.user.id);
                 previous_flights = await database.selectPreviousFlightsByUserIdEn(request.session.user.id);
+                cancelled_flights = await database.selectNotCancelledBookingsCancelledFlightsByUserIdEn(request.session.user.id)
             }
             response.status(200).json({
-                flights: { active_flights, previous_flights }
+                flights: { active_flights, previous_flights, cancelled_flights }
             });
         } else {
 
@@ -461,6 +464,40 @@ router.get('/previousreservations', async (request, response) => {
     }
 });
 
+router.get('/cancelledflightsreservations', async (request, response) => {
+    try {
+
+        if (LoggedInCheck(request)) {
+            if (request.query.flight_id == undefined) {
+
+                response.status(400).json({
+                    message: request.t("errors.missing_url_parameter", { returnObjects: true })
+                });
+            } else {
+                const previous_reservations = await database.selectFlightCancelledReservationsByUserIdAndFlightId(request.session.user.id, request.query.flight_id);
+
+                response.status(200).json({
+                    reservations: previous_reservations
+                });
+            }
+
+
+        } else {
+
+            response.status(401).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        }
+
+
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
 router.get('/geterrors', (request, response) => {
     try {
 
@@ -634,6 +671,21 @@ router.get('/getprofile', (request, response) => {
 
         response.status(200).json({
             profile: request.t("profile", { returnObjects: true })
+        });
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+
+router.get('/getmagazine', (request, response) => {
+    try {
+
+        response.status(200).json({
+            magazine: request.t("magazine", { returnObjects: true })
         });
     } catch (error) {
         console.error(error)
@@ -1024,7 +1076,9 @@ router.get('/helyfoglalas', async (request, response) => {
         else {
             let id = request.query.id;
             if (!id) {
-                throw new Error("Nincs járat id")
+                response.status(400).json({
+                    error: request.t("seat_chooser.error.no_flightid", { returnObjects: true })
+                });
             }
             await database.updateLoyaltyStatus(request.session.user.id);
             const helyek = await database.selectAvailableSeatsOnFlight(id, request.session.user.id);

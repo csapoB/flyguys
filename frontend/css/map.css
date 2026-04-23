@@ -21,3 +21,6 @@
     background-color: #c82333;
 }
 
+.marker_popover_body{
+    padding: 0px !important;
+}

@@ -4,15 +4,19 @@ import { errorPageGenerator, initI18n, initFlights } from "./toolbox.js";
 
 $(async function () {
 
+    let $flights_frame = $("#flights_frame");
+    let $flights_to = $("#flights_to");
+    let language;
+    let geterrors;
     try {
 
-        let language = await initI18n("flights");
+        language = await initI18n("flights");
 
         await getFooter(language);
 
         let getflights = await getFlights(language);
 
-        let geterrors = (await (await fetch("/api/geterrors", { method: "GET", headers: { "Accept-Language": language } })).json()).errors;
+        geterrors = (await (await fetch("/api/geterrors", { method: "GET", headers: { "Accept-Language": language } })).json()).errors;
         $(document).prop('title', `${getflights.title}`);
 
         const params = new URLSearchParams(window.location.search);
@@ -23,9 +27,7 @@ $(async function () {
         const return_ = params.get("return");
         const adults = params.get("adults");
         const children = params.get("children");
-
-        //let $flights_frame = $("#flights_frame");
-        let $flights_to = $("#flights_to");
+        
         if (origin == null || destination == null || departure == null || return_ == null || adults == null || children == null) {
 
             errorPageGenerator($flights_to, geterrors.bad_url_parameter);

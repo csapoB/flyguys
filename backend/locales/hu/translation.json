@@ -40,7 +40,13 @@
         "return_label": "Visszaút",
         "passengers_label": "Utasok",
         "search_flights_button": "Foglalás",
-        "passengers_input": "1 felnőtt, 0 gyermek"
+        "passengers_input": "1 felnőtt, 0 gyermek",
+        "error": {
+            "missing_origin": "Kérjük, adja meg az indulási helyet!",
+            "missing_destination": "Kérjük, adja meg az érkezési helyet!",
+            "missing_departure": "Kérjük, adja meg az indulás dátumát!",
+            "missing_return": "Kérjük, adja meg a visszaút dátumát!"
+        }
     },
     "planner_passengers_popover": {
         "adults_inc_dec": "Felnőttek",
@@ -67,20 +73,19 @@
         "server_error": "Sajnos, hiba történt a szerverben. Kérjük, próbálja meg újra később!",
         "login_needed_get": "Hozzáférés megtagadva. Az adatok megtekintéséhez előbb be kell jelenetkeznie!",
         "login_needed_post": "Parancs megtagadva. Az adatok módosításához előbb be kell jelenetkeznie!",
-        "login_needed_delete" : "Parancs megtagadva. Az adatok törléséhez előbb be kell jelenetkeznie!",
+        "login_needed_delete": "Parancs megtagadva. Az adatok törléséhez előbb be kell jelenetkeznie!",
         "missing_data": "A szükséges adatok hiányznak!",
         "end_point_not_working": "Ez a végpont nem működik!",
         "no_active_session": "Nincs aktív session!",
         "missing_url_parameter": "Hiányzó URL paraméter!",
         "wrong_data_type": "Rossz adatípus lett elküldve!"
-        
     },
     "modal": {
         "title": {
             "login": "Bejelentkezés",
             "registration": "Regisztráció",
             "edit_profile": "Profil szerkesztése",
-            "delete_profile" : "Profil törlése",
+            "delete_profile": "Profil törlése",
             "verify_password": "Jelszó ellenőrzése",
             "cancel_bookings": "Foglalások lemondása",
             "flight_cancelled": "Járat törölve"
@@ -119,7 +124,7 @@
             "profile_updated_successfully": "Profiladatok sikeresen frissítve!",
             "profile_deleted_successfully": "A profil törlése sikeres! 5 másodperc múlva átirányítunk.",
             "password_verified": "Jelszó ellenőrizve!",
-            "bookings_have_been_cancelled_successfully" : "A kijelölt foglalások törlése sikeres!",
+            "bookings_have_been_cancelled_successfully": "A kijelölt foglalások törlése sikeres!",
             "message_acknowledged": "Az üzenet el lett olvasva!"
         },
         "button": {
@@ -181,9 +186,10 @@
         "no_seats_selected": "Nincs kiválasztott hely!",
         "reservation_successful": "Sikeres foglalás! 5 másodperc múlva átirányítunk.",
         "error": {
-            "not_logged_in": "A foglaláshoz be kell jelentkeznie.",
-            "no_adults": "A foglalásnál legalább 1 felnőtt utasnak lennie kell.",
-            "already_booked_seat": "A foglalás meghiusult! Az ülőhelyet már korábban lefoglalták."
+            "not_logged_in": "A foglaláshoz be kell jelentkeznie!",
+            "no_adults": "A foglalásnál legalább 1 felnőtt utasnak lennie kell!",
+            "already_booked_seat": "A foglalás meghiusult! Az ülőhelyet már korábban lefoglalták!",
+            "no_flightid": "Nincs flightId!"
         }
     },
     "profile": {
@@ -195,15 +201,15 @@
             "adult": "felnőtt",
             "child": "gyermek"
         },
-        "profile_data" : {
+        "profile_data": {
             "name": "Név",
             "rank": {
                 "title": "Rang",
-                "no_rank" : "Nincs rang",
+                "no_rank": "Nincs rang",
                 "bronze": "Bronz",
-                "silver" : "Ezüst",
+                "silver": "Ezüst",
                 "gold": "Arany",
-                "platinum" : "Platina",
+                "platinum": "Platina",
                 "diamond": "Gyémánt"
             },
             "email": "Email cím",
@@ -211,16 +217,18 @@
         },
         "title": "Profil",
         "bookings": "Foglalások",
+        "cancelled_flights_bookings": "Törölt járatok foglalásai",
         "active_bookings": "Aktív foglalások",
         "previous_bookings": "Korábbi foglalások",
         "choose_flight": "Válasszon járatot!",
         "no_active_bookings": "Úgy tűnik nincs egy aktív foglalásod sem.",
         "no_previous_bookings": "Úgy tűnik nincsenek korábbi foglalásaid.",
+        "no_cancelled_flights_bookings": "Úgy tűnik nincsenek foglalásaid törölt járatokra.",
         "no_bookings": "Úgy tűnik még nem utaztál velünk.",
         "select_all_for_cancellation": "Összes kijelölése lemondásra",
         "cancel_selected": "Kijelöltek lemondása",
-        "edit_profile" : "Profil szerkesztése",
-        "delete_profile" : "Profil törlése",
+        "edit_profile": "Profil szerkesztése",
+        "delete_profile": "Profil törlése",
         "error": {
             "user_not_found": "A felhasználható nem található meg ay adatbázisban!"
         }
@@ -394,5 +402,45 @@
             "flight_cancelled_successfully": "Sikeres járat törlés!",
             "flight_was_already_cancelled": "A járat már törölve volt!"
         }
+    },
+    "magazine": {
+        "title": "FlyGuys Magazin",
+        "subtitle": "Válassz prémium termékek közül utazásod alatt!",
+        "product": {
+            "name": {
+                "hugo_boss_perfume": "Hugo Boss Parfüm 60ml",
+                "phone_case_iphone_17_pro_max": "Telefontok",
+                "popcorn": "Popcorn",
+                "coca_cola": "Coca Cola",
+                "noise_canceling_airpods": "Zajszűrős füllhalgató",
+                "flyguys_keychain": "FlyGuys kulcstartó",
+                "rolex_watch": "Rolex karóra",
+                "sandwich": "Szendvics",
+                "fridge_magnet": "Hűtőmágnes"
+            },
+            "caption": {
+                "hugo_boss_perfume": "Prémium márkás parfüm, akár 24 órán keresztül is tartós",
+                "phone_case_iphone_17_pro_max": "Iphone 17 pro max telefontok",
+                "popcorn": "finom nasi",
+                "coca_cola": "Eredeti íz",
+                "noise_canceling_airpods": "Zárd ki a környezeted és hallgasd a saját gondolataid!",
+                "flyguys_keychain": "Dobd fel a kulcs csomódat!",
+                "rolex_watch": "Emeld új szintre a megjelenésed!",
+                "sandwich": "ízletes csirkés szendvics",
+                "fridge_magnet": "Vigyél magaddal egy emléket a látogatott országból!"
+            },
+            "price": {
+                "hugo_boss_perfume": 29990,
+                "phone_case_iphone_17_pro_max": 15670,
+                "popcorn": 1250,
+                "coca_cola": 990,
+                "noise_canceling_airpods": 29990,
+                "flyguys_keychain": 1670,
+                "rolex_watch": 626500,
+                "sandwich": 990,
+                "fridge_magnet": 3500
+            }
+        },
+        "currency": "Ft"
     }
 }

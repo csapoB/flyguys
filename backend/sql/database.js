@@ -128,13 +128,26 @@ async function selectTop4CheapestOneWayFlightsHun(userId) {
 
 
 async function selectActiveFlightsByUserIdEn(userId) {
-    const query = `SELECT DISTINCT flights_with_flight_time_en.FlightID, flights_with_flight_time_en.DepartureAirport, flights_with_flight_time_en.DepartureCity, flights_with_flight_time_en.ArrivalAirport, flights_with_flight_time_en.ArrivalCity, DATE(flights_with_flight_time_en.DepartureDateTime) AS "DepartureDate", TIME_FORMAT(TIME(flights_with_flight_time_en.DepartureDateTime), '%H:%i') AS "DepartureTime", TIME_FORMAT(TIME(flights_with_flight_time_en.ArrivalDateTime), '%H:%i') AS "ArrivalTime" FROM flights_with_flight_time_en INNER JOIN not_cancelled_reservations ON flights_with_flight_time_en.FlightID = not_cancelled_reservations.FlightID WHERE flights_with_flight_time_en.DepartureDateTime > NOW() AND not_cancelled_reservations.PassengerID = ?;`;
+    const query = `SELECT DISTINCT flights_with_flight_time_en.FlightID, flights_with_flight_time_en.DepartureAirport, flights_with_flight_time_en.DepartureCity, flights_with_flight_time_en.ArrivalAirport, flights_with_flight_time_en.ArrivalCity, DATE(flights_with_flight_time_en.DepartureDateTime) AS "DepartureDate", TIME_FORMAT(TIME(flights_with_flight_time_en.DepartureDateTime), '%H:%i') AS "DepartureTime", TIME_FORMAT(TIME(flights_with_flight_time_en.ArrivalDateTime), '%H:%i') AS "ArrivalTime" FROM flights_with_flight_time_en INNER JOIN not_cancelled_reservations ON flights_with_flight_time_en.FlightID = not_cancelled_reservations.FlightID WHERE flights_with_flight_time_en.DepartureDateTime > NOW() AND flights_with_flight_time_en.IsCancelled = 0 AND not_cancelled_reservations.PassengerID = ?;`;
     const [rows] = await pool.execute(query, [`${userId}`]);
 
     return rows;
 }
 async function selectActiveFlightsByUserIdHun(userId) {
-    const query = `SELECT DISTINCT flights_with_flight_time_hun.FlightID, flights_with_flight_time_hun.DepartureAirport, flights_with_flight_time_hun.DepartureCity, flights_with_flight_time_hun.ArrivalAirport, flights_with_flight_time_hun.ArrivalCity, DATE(flights_with_flight_time_hun.DepartureDateTime) AS "DepartureDate", TIME_FORMAT(TIME(flights_with_flight_time_hun.DepartureDateTime), '%H:%i') AS "DepartureTime", TIME_FORMAT(TIME(flights_with_flight_time_hun.ArrivalDateTime), '%H:%i') AS "ArrivalTime" FROM flights_with_flight_time_hun INNER JOIN not_cancelled_reservations ON flights_with_flight_time_hun.FlightID = not_cancelled_reservations.FlightID WHERE flights_with_flight_time_hun.DepartureDateTime > NOW() AND not_cancelled_reservations.PassengerID = ?;`;
+    const query = `SELECT DISTINCT flights_with_flight_time_hun.FlightID, flights_with_flight_time_hun.DepartureAirport, flights_with_flight_time_hun.DepartureCity, flights_with_flight_time_hun.ArrivalAirport, flights_with_flight_time_hun.ArrivalCity, DATE(flights_with_flight_time_hun.DepartureDateTime) AS "DepartureDate", TIME_FORMAT(TIME(flights_with_flight_time_hun.DepartureDateTime), '%H:%i') AS "DepartureTime", TIME_FORMAT(TIME(flights_with_flight_time_hun.ArrivalDateTime), '%H:%i') AS "ArrivalTime" FROM flights_with_flight_time_hun INNER JOIN not_cancelled_reservations ON flights_with_flight_time_hun.FlightID = not_cancelled_reservations.FlightID WHERE flights_with_flight_time_hun.DepartureDateTime > NOW() AND flights_with_flight_time_hun.IsCancelled = 0 AND not_cancelled_reservations.PassengerID = ?;`;
+    const [rows] = await pool.execute(query, [`${userId}`]);
+
+    return rows;
+}
+
+async function selectNotCancelledBookingsCancelledFlightsByUserIdEn(userId) {
+    const query = `SELECT DISTINCT flights_with_flight_time_en.FlightID, flights_with_flight_time_en.DepartureAirport, flights_with_flight_time_en.DepartureCity, flights_with_flight_time_en.ArrivalAirport, flights_with_flight_time_en.ArrivalCity, DATE(flights_with_flight_time_en.DepartureDateTime) AS "DepartureDate", TIME_FORMAT(TIME(flights_with_flight_time_en.DepartureDateTime), '%H:%i') AS "DepartureTime", TIME_FORMAT(TIME(flights_with_flight_time_en.ArrivalDateTime), '%H:%i') AS "ArrivalTime" FROM flights_with_flight_time_en INNER JOIN not_cancelled_reservations ON flights_with_flight_time_en.FlightID = not_cancelled_reservations.FlightID WHERE flights_with_flight_time_en.IsCancelled = 1 AND not_cancelled_reservations.PassengerID = ?;`;
+    const [rows] = await pool.execute(query, [`${userId}`]);
+
+    return rows;
+}
+async function selectNotCancelledBookingsCancelledFlightsByUserIdHun(userId) {
+    const query = `SELECT DISTINCT flights_with_flight_time_hun.FlightID, flights_with_flight_time_hun.DepartureAirport, flights_with_flight_time_hun.DepartureCity, flights_with_flight_time_hun.ArrivalAirport, flights_with_flight_time_hun.ArrivalCity, DATE(flights_with_flight_time_hun.DepartureDateTime) AS "DepartureDate", TIME_FORMAT(TIME(flights_with_flight_time_hun.DepartureDateTime), '%H:%i') AS "DepartureTime", TIME_FORMAT(TIME(flights_with_flight_time_hun.ArrivalDateTime), '%H:%i') AS "ArrivalTime" FROM flights_with_flight_time_hun INNER JOIN not_cancelled_reservations ON flights_with_flight_time_hun.FlightID = not_cancelled_reservations.FlightID WHERE flights_with_flight_time_hun.IsCancelled = 1 AND not_cancelled_reservations.PassengerID = ?;`;
     const [rows] = await pool.execute(query, [`${userId}`]);
 
     return rows;
@@ -210,6 +223,12 @@ async function selectActiveReservationsByUserIdAndFlightId(userId, flightId) {
 
 async function selectPreviousReservationsByUserIdAndFlightId(userId, flightId) {
     const query = 'SELECT not_cancelled_reservations.RowID, not_cancelled_reservations.ColumnID, fareclass.FareClassName, not_cancelled_reservations.IsAdult FROM not_cancelled_reservations INNER JOIN flight ON not_cancelled_reservations.FlightID = flight.FlightID INNER JOIN fareclass ON fareclass.FareClassID = not_cancelled_reservations.FareClassID WHERE flight.DepartureDateTime < NOW() AND flight.IsCancelled = 0 AND not_cancelled_reservations.PassengerID = ? AND not_cancelled_reservations.FlightID = ? ORDER BY not_cancelled_reservations.RowID ASC, not_cancelled_reservations.ColumnID;';
+    const [rows] = await pool.execute(query, [userId, flightId]);
+    return rows;
+}
+
+async function selectFlightCancelledReservationsByUserIdAndFlightId(userId, flightId) {
+    const query = 'SELECT not_cancelled_reservations.RowID, not_cancelled_reservations.ColumnID, fareclass.FareClassName, not_cancelled_reservations.IsAdult FROM not_cancelled_reservations INNER JOIN flight ON not_cancelled_reservations.FlightID = flight.FlightID INNER JOIN fareclass ON fareclass.FareClassID = not_cancelled_reservations.FareClassID WHERE flight.IsCancelled = 1 AND not_cancelled_reservations.PassengerID = ? AND not_cancelled_reservations.FlightID = ? ORDER BY not_cancelled_reservations.RowID ASC, not_cancelled_reservations.ColumnID;';
     const [rows] = await pool.execute(query, [userId, flightId]);
     return rows;
 }
@@ -826,7 +845,7 @@ async function selectUserIDByReservationFlightID(flightId) {
 }
 
 async function selectFlightByID(flightId) {
-    const query = `SELECT flight.DepartureAirport, origin_city.Hungarian AS "DepartureCityHungarian", origin_city.English AS "DepartureCityEnglish", flight.ArrivalAirport, destination_city.Hungarian AS "ArrivalCityHungarian", destination_city.English AS "ArrivalCityEnglish", CONCAT(YEAR(flight.DepartureDateTime), ".", (CASE WHEN MONTH(flight.DepartureDateTime) < 10 THEN CONCAT("0", MONTH(flight.DepartureDateTime)) ELSE MONTH(flight.DepartureDateTime) END), ".", (CASE WHEN DAY(flight.DepartureDateTime) < 10 THEN CONCAT("0", DAY(flight.DepartureDateTime)) ELSE DAY(flight.DepartureDateTime) END), ".", " ", TIME_FORMAT(TIME(flight.DepartureDateTime), '%H:%i')) AS "DepartureDateTimeHungarian", CONCAT(TIME_FORMAT(TIME(flight.DepartureDateTime), '%H:%i'), " ", (CASE WHEN DAY(flight.DepartureDateTime) < 10 THEN CONCAT("0", DAY(flight.DepartureDateTime)) ELSE DAY(flight.DepartureDateTime) END), "/", (CASE WHEN MONTH(flight.DepartureDateTime) < 10 THEN CONCAT("0", MONTH(flight.DepartureDateTime)) ELSE MONTH(flight.DepartureDateTime) END), "/", YEAR(flight.DepartureDateTime)) AS "DepartureDateTimeEnglish" FROM flight INNER JOIN airport origin ON flight.DepartureAirport = origin.AirportCode INNER JOIN airport destination ON flight.ArrivalAirport = destination.AirportCode INNER JOIN city origin_city ON origin.CityID = origin_city.CityID INNER JOIN city destination_city ON destination.CityID = destination_city.CityID WHERE flight.FlightID = ?;`;
+    const query = `SELECT flight.DepartureAirport, origin_city.Hungarian AS "DepartureCityHungarian", origin_city.English AS "DepartureCityEnglish", flight.ArrivalAirport, destination_city.Hungarian AS "ArrivalCityHungarian", destination_city.English AS "ArrivalCityEnglish", CONCAT(YEAR(flight.DepartureDateTime), ".", (CASE WHEN MONTH(flight.DepartureDateTime) < 10 THEN CONCAT("0", MONTH(flight.DepartureDateTime)) ELSE MONTH(flight.DepartureDateTime) END), ".", (CASE WHEN DAY(flight.DepartureDateTime) < 10 THEN CONCAT("0", DAY(flight.DepartureDateTime)) ELSE DAY(flight.DepartureDateTime) END), ".", " ", TIME_FORMAT(TIME(flight.DepartureDateTime), '%H:%i')) AS "DepartureDateTimeHungarian", CONCAT((CASE WHEN DAY(flight.DepartureDateTime) < 10 THEN CONCAT("0", DAY(flight.DepartureDateTime)) ELSE DAY(flight.DepartureDateTime) END), "/", (CASE WHEN MONTH(flight.DepartureDateTime) < 10 THEN CONCAT("0", MONTH(flight.DepartureDateTime)) ELSE MONTH(flight.DepartureDateTime) END), "/", YEAR(flight.DepartureDateTime), " , ", TIME_FORMAT(TIME(flight.DepartureDateTime), '%H:%i')) AS "DepartureDateTimeEnglish" FROM flight INNER JOIN airport origin ON flight.DepartureAirport = origin.AirportCode INNER JOIN airport destination ON flight.ArrivalAirport = destination.AirportCode INNER JOIN city origin_city ON origin.CityID = origin_city.CityID INNER JOIN city destination_city ON destination.CityID = destination_city.CityID WHERE flight.FlightID = ?;`;
     const [result] = await pool.execute(query, [flightId]);
     return result
 }
@@ -900,5 +919,8 @@ module.exports = {
     selectUserIDByReservationFlightID,
     selectFlightByID,
     setUserMessageIsViewedTrueByMessageId,
-    selectUnreadUserMessageByUserID
+    selectUnreadUserMessageByUserID,
+    selectNotCancelledBookingsCancelledFlightsByUserIdHun,
+    selectNotCancelledBookingsCancelledFlightsByUserIdEn,
+    selectFlightCancelledReservationsByUserIdAndFlightId
 };

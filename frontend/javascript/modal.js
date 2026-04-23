@@ -443,7 +443,7 @@ function regis_modal(i18n_values) {
         "type": "text",
         "placeholder": `${i18n_values.field.birth_date}`
     });
-    $birth_date.datepicker({ changeYear: true, changeMonth: true });
+    $birth_date.datepicker({ changeYear: true, changeMonth: true, yearRange: "-120:-18", minDate: "-120y", maxDate: "-18y" });
 
     let $e_mail = $("<input/>", {
         "id": "new_usr_email",
@@ -726,7 +726,7 @@ export async function initEditProfileModal(profile_data, current_language, i18n_
         "type": "text",
         "placeholder": `${getmodal.field.birth_date}`
     });
-    $birth_date.datepicker({ changeYear: true, changeMonth: true });
+    $birth_date.datepicker({ changeYear: true, changeMonth: true, yearRange: "-120:-18", minDate: "-120y", maxDate: "-18y" });
 
     let $e_mail = $("<input/>", {
         "id": "edit_usr_email",

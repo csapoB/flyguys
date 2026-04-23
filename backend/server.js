@@ -75,6 +75,14 @@ router.get('/magazin', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/magazin.html'));
 });
 
+router.get('/hu/magazin', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/magazin.html'));
+});
+
+router.get('/en/magazin', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/magazin.html'));
+});
+
 router.get('/helyfoglalas', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/helyfoglalas.html'));
 });

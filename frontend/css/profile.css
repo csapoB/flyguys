@@ -23,7 +23,7 @@
     margin-top: 2rem;
 }
 
-#aktivFoglalasok, #korabbiFoglalasok{
+#aktivFoglalasok, #korabbiFoglalasok, #toroltJaratokFoglalasok{
     background-color: #ffffff;
     border-radius: 20px;
     border: solid 1px #DC3545;
@@ -81,7 +81,7 @@
         flex-direction: column;
     }
 
-    #aktivFoglalasok, #korabbiFoglalasok{
+    #aktivFoglalasok, #korabbiFoglalasok, #toroltJaratokFoglalasok{
         margin-bottom: 2rem;
     }
 }
