@@ -3,16 +3,17 @@ import { initHusegprogram, initI18n, errorPageGenerator } from "./toolbox.js";
 
 $(async function () {
 
-    let language = await initI18n("husegprogram");
+    let language;
 
-    await getFooter(language);
-
-    let getloyaltyprogram = await getLoyaltyProgram(language);
-    $(document).prop('title', `${getloyaltyprogram.title}`);
-
-    
     try {
+        
+        language = await initI18n("husegprogram");
+        await getFooter(language);
+
+        let getloyaltyprogram = await getLoyaltyProgram(language);
+        $(document).prop('title', `${getloyaltyprogram.title}`);
         await initHusegprogram(language, getloyaltyprogram);
+        
     } catch (error) {
         let $frame = $("#frame")
         $frame.html("");

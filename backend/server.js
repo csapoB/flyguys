@@ -20,7 +20,7 @@ app.set('trust proxy', 1); //?Middleware Proxy
 //!Session beállítása:
 app.use(
     session({
-        secret: 'titkos_kulcs', //?Ezt generálni kell a későbbiekben
+        secret: 'gDZBo41C3KZQe0vWDdBRZGt3l4EQG5RrW1cI2iJ2aM0BfkbglC0SHRAhammalq6U', //?Ezt generálni kell a későbbiekben
         resave: false,
         saveUninitialized: true
     })
@@ -109,6 +109,10 @@ router.get('/en/profil', (request, response) => {
 
 router.get('/hu/profil', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/profile.html'));
+});
+
+router.get('/admin', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/admin.html'));
 });
 
 router.get('/hu/admin', (request, response) => {

@@ -1,146 +1,122 @@
 document.addEventListener("DOMContentLoaded", function(){
-    document.getElementById("box").appendChild(general(tesztadatok))
-})
+    const box = document.getElementById("box");
 
-let tesztadatok = 
-    [
-        {
-            "nev": "Hugo Boss Parfüm 60ml",
-            "leiras": "Prémium márkás parfüm akár 24 órán keresztül is tartós",
-            "kep": "https://fimgs.net/mdimg/secundar/o.51094.jpg",
-            "ar": 29990
-        },
-        {
-            "nev": "Telefontok",
-            "leiras": "Iphone 17 pro max telefontok",
-            "kep": "https://siaifon.com/userfiles/productlargeimages/product_36270.jpg",
-            "ar": 15670
-        },
-        {
-            "nev": "Ropi",
-            "leiras": "finom nasi",
-            "kep": "https://tse1.mm.bing.net/th/id/OIP.xsMFcVwVNQGUjTAumGFkUwHaHa?cb=ucfimg2&ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3",
-            "ar": 1250
-        },
-        {
-            "nev": "Coca Cola",
-            "leiras": "Eredeti íz",
-            "kep": "https://images.heb.com/is/image/HEBGrocery/000862949",
-            "ar": 990
-        },
-        {
-            "nev": "Hugo Boss Parfüm 60ml",
-            "leiras": "Prémium márkás parfüm akár 24 órán keresztül is tartós",
-            "kep": "https://fimgs.net/mdimg/secundar/o.51094.jpg",
-            "ar": 29990
-        },
-        {
-            "nev": "Telefontok",
-            "leiras": "Iphone 17 pro max telefontok",
-            "kep": "https://siaifon.com/userfiles/productlargeimages/product_36270.jpg",
-            "ar": 15670
-        },
-        {
-            "nev": "Ropi",
-            "leiras": "finom nasi",
-            "kep": "https://tse1.mm.bing.net/th/id/OIP.xsMFcVwVNQGUjTAumGFkUwHaHa?cb=ucfimg2&ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3",
-            "ar": 1250
-        },
-        {
-            "nev": "Coca Cola",
-            "leiras": "Eredeti íz",
-            "kep": "https://images.heb.com/is/image/HEBGrocery/000862949",
-            "ar": 990
-        }
-    ]
+    const cim = document.createElement("div");
+    cim.classList.add("magazin-cim");
+    cim.innerHTML = `
+        <h1>FlyGuys Magazin</h1>
+        <p class="subtitle">Válassz prémium termékek közül utazásod alatt</p>
+    `;
+    box.appendChild(cim);
 
-function general(adatok){
-    let keret = document.createElement("div");
+    const grid = document.createElement("div");
+    grid.classList.add("magazin-grid");
 
-    let i = 0;
-    let sorok = 0;
+    const sor = document.createElement("div");
+    sor.classList.add("row", "g-4");
+    grid.appendChild(sor);
 
-    while(i<adatok.length){
-        let sor = document.createElement("div");
-        sor.classList.add('row', 'g-4', 'mb-4');
+    tesztadatok.forEach(function(termek) {
+        sor.appendChild(keszitsKartyat(termek));
+    });
 
-        let elemekszama;
-        let elemekmerete;
+    box.appendChild(grid);
+});
 
-        if (sorok %2==0) {
-            elemekszama = 3;
-            elemekmerete = 'col-md-4';
-        }
-        else{
-            elemekszama = 2;
-            elemekmerete = 'col-md-6';
-        }
-
-        for (let j = 0; j < elemekszama && i<adatok.length; j++) {
-            let elem = document.createElement('div');
-            elem.classList.add('col-12', elemekmerete);
-
-            let kartya = document.createElement('div');
-            kartya.classList.add('card', 'h-100');
-            kartya.style.borderColor = "#A4161A";
-
-            let flexkeret = document.createElement('div');
-            flexkeret.classList.add('d-flex', 'flex-column', 'flex-md-row');
-
-            let kepkeret = document.createElement('div');
-            if (elemekszama==2) {
-                kepkeret.classList.add('col-12', 'col-md-6', 'flex-shrink-0');
-            }
-            else{
-                kepkeret.classList.add('col-12', 'col-md-4', 'flex-shrink-0');
-            }
-
-            let kep = document.createElement('img');
-            kep.src = adatok[i].kep;
-            kep.classList.add('card-img-left');
-
-            kepkeret.appendChild(kep);
-            flexkeret.appendChild(kepkeret);
-            
-            let szovegkeret = document.createElement('div');
-            if (elemekszama==2) {
-                szovegkeret.classList.add('col-12', 'col-md-6');
-            }
-            else{
-                szovegkeret.classList.add('col-12', 'col-md-8');
-            }
-
-            let szovegdoboz = document.createElement('div');
-            szovegdoboz.classList.add('card-body', 'd-flex', 'flex-column', 'h-100');
-
-            let neve = document.createElement('h3');
-            neve.classList.add('card-title');
-            neve.innerHTML=adatok[i].nev;
-            neve.style.color = "#660708";
-
-            let leirasa = document.createElement('p');
-            leirasa.classList.add('card-text');
-            leirasa.innerHTML=adatok[i].leiras;
-
-            let ara = document.createElement('h4');
-            ara.classList.add('mt-auto');
-            ara.innerHTML=adatok[i].ar + " Ft";
-            ara.style.color = "#0b090a";
-
-            szovegdoboz.appendChild(neve);
-            szovegdoboz.appendChild(leirasa);
-            szovegdoboz.appendChild(ara);
-            szovegkeret.appendChild(szovegdoboz);
-            flexkeret.appendChild(szovegkeret);
-            kartya.appendChild(flexkeret);
-
-            elem.appendChild(kartya);
-
-            sor.appendChild(elem);
-            i++;
-        }
-        keret.appendChild(sor);
-        sorok++;
+let tesztadatok = [
+    {
+        "nev": "Hugo Boss Parfüm 60ml",
+        "leiras": "Prémium márkás parfüm akár 24 órán keresztül is tartós",
+        "kep": "https://www.embarkperfumes.com/cdn/shop/articles/Untitled_design_84.jpg?v=1764662860",
+        "ar": 29990
+    },
+    {
+        "nev": "Telefontok",
+        "leiras": "Iphone 17 pro max telefontok",
+        "kep": "https://black-gifts.com/cdn/shop/articles/5-best-black-artist-phone-cases-to-rep-your-style-418175_800x.webp?v=1764065748",
+        "ar": 15670
+    },
+    {
+        "nev": "Popcorn",
+        "leiras": "finom nasi",
+        "kep": "https://cdn.apartmenttherapy.info/image/upload/f_auto,q_auto:eco,c_fill,g_auto,w_800,h_400/tk%2Fphoto%2F2025%2F12-2025%2F2025-12-furikake-popcorn%2Ffurikake-popcorn-332",
+        "ar": 1250
+    },
+    {
+        "nev": "Coca Cola",
+        "leiras": "Eredeti íz",
+        "kep": "https://assets.superhivemarket.com/store/product/153344/image/xlarge-7d055f9090cbd76e9b0066810f54a7f2.png",
+        "ar": 990
+    },
+    {
+        "nev": "zajszűrős füllhalgató",
+        "leiras": "Zárd ki a környezeted és hallgasd a saját gondolataid",
+        "kep": "https://images.yourstory.com/cs/2/70651a302d6d11e9aa979329348d4c3e/Image87zr-1591971382780.jpg?fm=png&auto=format&blur=500",
+        "ar": 29990
+    },
+    {
+        "nev": "FlyGuys kulcstartó",
+        "leiras": "Dobd fel a kulcs csomódat",
+        "kep": "css/images/flyguys_kulcstarto.png",
+        "ar": 15670
+    },
+    {
+        "nev": "Rolex karóra",
+        "leiras": "Emeld új szintre a megjelenésed",
+        "kep": "https://emirateswoman.com/wp-content/uploads/2019/07/rolex-watch.jpg",
+        "ar": 6265000
+    },
+    {
+        "nev": "Szendvics",
+        "leiras": "Ízletes csirkés szendvics",
+        "kep": "https://www.longos.com/media/800x999/PeamealBaconAndCheddarSandwiches_Recipe_1280x640.jpg",
+        "ar": 990
+    },
+    {
+        "nev": "hűtőmágnes",
+        "leiras": "Vigyél magaddal egy emléket a látogatott országból",
+        "kep": "https://thumbs.dreamstime.com/b/usa-magnets-new-york-san-francisco-yellow-background-travel-destination-america-181020807.jpg",
+        "ar": 3500
     }
-    return keret;
+];
+
+function keszitsKartyat(termek) {
+    const col = document.createElement("div");
+    col.classList.add("col-12", "col-sm-6", "col-lg-4");
+
+    const kartya = document.createElement("div");
+    kartya.classList.add("mag-card", "d-flex", "flex-column");
+
+    const kepKeret = document.createElement("div");
+    kepKeret.classList.add("mag-card-img");
+
+    const kep = document.createElement("img");
+    kep.src = termek.kep;
+    kep.alt = termek.nev;
+    kepKeret.appendChild(kep);
+
+    const body = document.createElement("div");
+    body.classList.add("mag-card-body", "d-flex", "flex-column", "flex-grow-1");
+
+    const nev = document.createElement("h3");
+    nev.classList.add("mag-card-title");
+    nev.textContent = termek.nev;
+
+    const leiras = document.createElement("p");
+    leiras.classList.add("mag-card-desc");
+    leiras.textContent = termek.leiras;
+
+    const ar = document.createElement("p");
+    ar.classList.add("mag-card-price");
+    ar.textContent = termek.ar.toLocaleString("hu-HU") + " Ft";
+
+    body.appendChild(nev);
+    body.appendChild(leiras);
+    body.appendChild(ar);
+
+    kartya.appendChild(kepKeret);
+    kartya.appendChild(body);
+    col.appendChild(kartya);
+
+    return col;
 }
