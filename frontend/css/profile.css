@@ -23,7 +23,7 @@
     margin-top: 2rem;
 }
 
-#aktivFoglalasok, #korabbiFoglalasok{
+#aktivFoglalasok, #korabbiFoglalasok, #toroltJaratokFoglalasok{
     background-color: #ffffff;
     border-radius: 20px;
     border: solid 1px #DC3545;
@@ -70,46 +70,18 @@
   height: 100vh;
   background-color: var(--bs-backdrop-bg);
 }
-/*th{
-    border-bottom: 1px solid black;
-    padding-bottom: 5px;
+.ui-datepicker-year option:hover{
+    background-color: #DC3545 !important;
 }
-
-table{
-    width: 100%;
-    border-collapse: collapse;
-    border-spacing: 0;
+.ui-datepicker-month option:hover{
+    background-color: #DC3545 !important;
 }
-
-#editProfileBtn{
-    background-color: #DC3545;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#editProfileBtn:hover{
-    background-color: #A4161A;
-}
-
-
-
-tbody tr:nth-child(odd) {
-    background-color: rgb(243, 243, 243);
-}
-
-tbody tr:nth-child(even) {
-    background-color: #d5d5d5;
-}
-*/
 @media (max-width: 767px) {
     #r2{
         flex-direction: column;
     }
 
-    #aktivFoglalasok, #korabbiFoglalasok{
+    #aktivFoglalasok, #korabbiFoglalasok, #toroltJaratokFoglalasok{
         margin-bottom: 2rem;
     }
 }

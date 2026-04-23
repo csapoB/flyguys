@@ -1,31 +1,61 @@
-import { getNavbar } from "./locale.js";
-import { getLocale } from "./locale.js";
-import { getFooter } from "./locale.js";
-import { getMap } from "./locale.js";
+import { getFooter, getMap } from "./locale.js";
 import { plannerMapInit } from "./plannermap.js";
 import { plannerResizer } from "./plannerresizer.js";
-import { initI18n } from "./toolbox.js";
+import { initI18n, errorPageGenerator } from "./toolbox.js";
 
 $(async function () {
 
-  let language = await initI18n("map");
+  let language;
 
-  (g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })({
-    key: "AIzaSyCGmwlN95_KmdNN5xAq2VO7qJCWSrNkuaA",
-    v: "weekly",
-    language: language
-  });
+  try {
 
-  let getmap = await getMap(language);
-  $(document).prop('title', `${getmap.title}`);
+    language = await initI18n("map");
 
-  await initMap(language, getmap);
+    let getmap = await getMap(language);
 
-  await plannerMapInit(language);
+    let $map_frame = $("#map_frame");
+    let $map = $("<div>", {
+      "id": "map",
+      "class" : "container mb-2 border border-2 border-danger rounded w-100"
+    });
+    $map_frame.append($map);
 
-  plannerResizer();
+    try {
+      (g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })({
+        key: "AIzaSyCGmwlN95_KmdNN5xAq2VO7qJCWSrNkuaA",
+        v: "weekly",
+        language: language
+      });
 
-  await getFooter(language);
+      await initMap(language, getmap);
+
+      $map.css("width", "60vw");
+      $map.css("height", "60vh");
+
+    } catch (error) {
+      $map_frame.addClass("d-flex justify-content-center")
+      $map.removeClass("w-100")
+      $map.addClass("row p-2");
+      console.error(error);
+      errorPageGenerator($map, getmap.error.map_not_loaded);
+    }
+
+    $(document).prop('title', `${getmap.title}`);
+
+    await plannerMapInit(language);
+
+    plannerResizer();
+
+    await getFooter(language);
+
+  } catch (error) {
+    let $keret = $("#keret");
+    if ($keret.children().length == 2) {
+      $keret.children().eq(1).remove();
+    }
+    console.error(error);
+    errorPageGenerator($keret, (await (await fetch("/api/geterrors", { method: "GET", headers: { "Accept-Language": language } })).json()).errors.client_error);
+  }
 
 });
 
@@ -79,7 +109,7 @@ async function initMap(language, i18n_values) {
     }
     deleteMarkersWithException(origin_markers, origin_markers[i][0]);
     origin_markers[i][0].setMap(map);
-    if (arrivalAirport != ""){
+    if (arrivalAirport != "") {
 
       let j = 0;
       while (destination_markers[j][0].dataset.code != arrivalAirport) {
@@ -149,9 +179,9 @@ async function initMap(language, i18n_values) {
   });
 
   // /api/availabledepartureairportsfiltered
-  initMapMarkers("/api/availabledepartureairportsfiltered", "origin", origin_markers, map, language, {glyphColor: '#FFFFFF', borderColor: '#dc3545', background: '#dc3545' }, i18n_values);
-  initMapMarkers("/api/availablearrivalairportsfiltered", "destination", destination_markers, null, language, {glyphColor: '#dc3545', borderColor: '#dc3545', background: '#D1D1D1' }, i18n_values);
-  
+  initMapMarkers("/api/availabledepartureairportsfiltered", "origin", origin_markers, map, language, { glyphColor: '#FFFFFF', borderColor: '#dc3545', background: '#dc3545' }, i18n_values);
+  initMapMarkers("/api/availablearrivalairportsfiltered", "destination", destination_markers, null, language, { glyphColor: '#dc3545', borderColor: '#dc3545', background: '#D1D1D1' }, i18n_values);
+
 }
 
 async function initMapMarkers(api, input_name, markers_array, map, language, custom_pin_obj, i18n_values) {
@@ -174,15 +204,16 @@ async function initMapMarkers(api, input_name, markers_array, map, language, cus
 
     let $marker = $(marker);
 
-    let contentString = $('<div>', {
-      html: `<h2>${pins[i].City}</h2><p>(${pins[i].AirportCode})</p>`,
-      class: 'pin-info'
+    let $contentString = $('<div>', {
+      html: `<img src="../css/images/${pins[i].AirportCode}.png" class="img-fluid mb-2">`,
+      class: "d-flex align-items-center flex-column"
     });
 
+    $contentString.append(`<div class="pin-info"><h2>${pins[i].City}</h2><p>(${pins[i].AirportCode})</p></div>`)
 
     let btn = $('<button>', {
       text: i18n_values.choose_button,
-      class: 'pin-btn',
+      class: 'pin-btn w-50 mb-3',
       on: {
         "click": () => {
           $(`#${input_name}_input`).trigger("marker:click", [pins[i].AirportCode]);
@@ -191,12 +222,12 @@ async function initMapMarkers(api, input_name, markers_array, map, language, cus
       }
     });
 
-    contentString.append(btn);
+    $contentString.append(btn);
 
     let marker_popover = new bootstrap.Popover(marker, {
       html: true, // A popover ne csak szöveget de HTML kódot is tudjon tárolni
       container: "#map",
-      content: contentString,
+      content: $contentString,
       placement: "top",
       trigger: "manual" // A popover mikor jelenjen meg. "manual": a fejlesztő írja meg hozzá a szabályrendszert
     });
@@ -287,7 +318,11 @@ function markerPopoverManualTrigger(markers_array, $marker, popover_obj) {
         (bootstrap.Popover.getInstance(markers_array[i][0])).hide();
 
       }
+      
       popover_obj.show();
+      //console.log($(popover_obj.tip).find(".popover-body").first())
+      $(popover_obj.tip).find(".popover-body").addClass("marker_popover_body")
+
       popover_div = document.getElementById(popover_obj.tip.id); // Az popover_div id-ja minden megjelenésnél újragenerálódik => más lesz, mint az előző
       popover_div.tabIndex = -1; // A tabindex beállítása azért szükséges, hogy az elemet (popover_div) a böngésző focusable-nek tekintse
       popover_div.addEventListener("blur", (event) => {
@@ -305,18 +340,6 @@ function markerPopoverManualTrigger(markers_array, $marker, popover_obj) {
       });
     }
   });
-
-  /*$marker.on("blur.popover", function (event) {
-    console.log(2)
-
-    if (event.relatedTarget == null) { // Ha az elem amire kattintottunk nem focusable, akkor lesz null az event.relatedTarget értéke
-      popover_obj.hide();
-    } else {
-      if (event.relatedTarget.id != popover_div.id) { // Ha nem a popover_divbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
-        popover_obj.hide();
-      }
-    }
-  });*/
 
 
 }

@@ -9,6 +9,7 @@ const multer = require('multer'); //?npm install multer
 const path = require('path');
 const session = require('express-session');
 const { default: i18next } = require('i18next');
+const { error } = require('console');
 
 const storage = multer.diskStorage({
     destination: (request, file, callback) => {
@@ -41,7 +42,7 @@ router.get('/airports', async (request, response) => {
 router.get('/LoginCheck', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            return response.status(401).json({
+            response.status(400).json({
                 allapot: false
             })
         }
@@ -62,7 +63,7 @@ router.get('/LoginCheck', async (request, response) => {
 router.get('/AdminCheck', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            return response.status(401).json({
+            response.status(401).json({
                 admin: false
             })
         }
@@ -141,18 +142,21 @@ router.get('/availablearrivalairportsfiltered', async (request, response) => {
 router.get('/flightsofuser', async (request, response) => {
     try {
 
-        if (request.session && request.session.user && request.session.user.id) {
+        if (LoggedInCheck(request)) {
             let active_flights;
             let previous_flights;
+            let cancelled_flights;
             if (request.get("Accept-Language") == "hu") {
                 active_flights = await database.selectActiveFlightsByUserIdHun(request.session.user.id);
                 previous_flights = await database.selectPreviousFlightsByUserIdHun(request.session.user.id);
+                cancelled_flights = await database.selectNotCancelledBookingsCancelledFlightsByUserIdHun(request.session.user.id)
             } else {
                 active_flights = await database.selectActiveFlightsByUserIdEn(request.session.user.id);
                 previous_flights = await database.selectPreviousFlightsByUserIdEn(request.session.user.id);
+                cancelled_flights = await database.selectNotCancelledBookingsCancelledFlightsByUserIdEn(request.session.user.id)
             }
             response.status(200).json({
-                flights: { active_flights, previous_flights }
+                flights: { active_flights, previous_flights, cancelled_flights }
             });
         } else {
 
@@ -288,6 +292,7 @@ router.get('/hu/flights', async (request, response) => {
 
             let data;
             if (LoggedInCheck(request)) {
+                await database.updateLoyaltyStatus(request.session.user.id);
                 data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), request.session.user.id);
             } else {
                 data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL");
@@ -325,6 +330,7 @@ router.get('/en/flights', async (request, response) => {
                 current_eur_exch_rate = 0.00259;
             }
             if (LoggedInCheck(request)) {
+                await database.updateLoyaltyStatus(request.session.user.id);
                 data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), request.session.user.id);
             } else {
                 data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL");
@@ -367,6 +373,7 @@ router.get('/cheapestflights', async (request, response) => {
             }
 
             if (LoggedInCheck(request)) {
+                await database.updateLoyaltyStatus(request.session.user.id);
                 one_way = await database.selectTop4CheapestOneWayFlightsEn(request.session.user.id);
             } else {
                 one_way = await database.selectTop4CheapestOneWayFlightsEn("NULL");
@@ -391,7 +398,7 @@ router.get('/cheapestflights', async (request, response) => {
 router.get('/activereservations', async (request, response) => {
     try {
 
-        if (request.session && request.session.user && request.session.user.id) {
+        if (LoggedInCheck(request)) {
 
             if (request.query.flight_id == undefined) {
 
@@ -426,8 +433,7 @@ router.get('/activereservations', async (request, response) => {
 router.get('/previousreservations', async (request, response) => {
     try {
 
-        if (request.session && request.session.user && request.session.user.id) {
-
+        if (LoggedInCheck(request)) {
             if (request.query.flight_id == undefined) {
 
                 response.status(400).json({
@@ -435,6 +441,40 @@ router.get('/previousreservations', async (request, response) => {
                 });
             } else {
                 const previous_reservations = await database.selectPreviousReservationsByUserIdAndFlightId(request.session.user.id, request.query.flight_id);
+
+                response.status(200).json({
+                    reservations: previous_reservations
+                });
+            }
+
+
+        } else {
+
+            response.status(401).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        }
+
+
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.get('/cancelledflightsreservations', async (request, response) => {
+    try {
+
+        if (LoggedInCheck(request)) {
+            if (request.query.flight_id == undefined) {
+
+                response.status(400).json({
+                    message: request.t("errors.missing_url_parameter", { returnObjects: true })
+                });
+            } else {
+                const previous_reservations = await database.selectFlightCancelledReservationsByUserIdAndFlightId(request.session.user.id, request.query.flight_id);
 
                 response.status(200).json({
                     reservations: previous_reservations
@@ -640,11 +680,40 @@ router.get('/getprofile', (request, response) => {
     }
 });
 
+
+router.get('/getmagazine', (request, response) => {
+    try {
+
+        response.status(200).json({
+            magazine: request.t("magazine", { returnObjects: true })
+        });
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
 router.get('/getloyaltyprogram', (request, response) => {
     try {
 
         response.status(200).json({
             loyalty_program: request.t("loyalty_program", { returnObjects: true })
+        });
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.get('/getadmin', (request, response) => {
+    try {
+
+        response.status(200).json({
+            admin: request.t("admin", { returnObjects: true })
         });
     } catch (error) {
         console.error(error)
@@ -671,22 +740,29 @@ router.post('/login', async (request, response) => {
     try {
         const { email, password } = request.body
         if (email && password) {
-            const login = await database.Login(email, password);
-            if (!login) {
+            if (!isValidEmail(email)) {
                 response.status(400).json({
-                    error: request.t("modal.error.wrong_email_or_password", { returnObjects: true })
+                    error: request.t("modal.error.invalid_email", { returnObjects: true })
                 });
             }
             else {
-                request.session.user = {
-                    id: login.UserID,
-                    role: login.AdminStatus,
-                    timestamp: Date.now()
-                };
-                response.status(201).json({
-                    message: request.t("modal.success.login_successful", { returnObjects: true }),
-                    admin: login.AdminStatus === 1
-                });
+                const login = await database.Login(email, password);
+                if (!login) {
+                    response.status(400).json({
+                        error: request.t("modal.error.wrong_email_or_password", { returnObjects: true })
+                    });
+                }
+                else {
+                    request.session.user = {
+                        id: login.UserID,
+                        role: login.AdminStatus,
+                        timestamp: Date.now()
+                    };
+                    response.status(201).json({
+                        message: request.t("modal.success.login_successful", { returnObjects: true }),
+                        admin: login.AdminStatus === 1
+                    });
+                }
             }
         }
         else {
@@ -706,23 +782,30 @@ router.post('/register', async (request, response) => {
     try {
         const { nev, email, jelszo, szuldatum } = request.body
         if (!nev || !email || !jelszo || !szuldatum) {
-            return response.status(400).json({
+            response.status(400).json({
                 error: request.t("errors.missing_data", { returnObjects: true })
             });
         }
         else {
-            const saltRounds = 10;
-            const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
-            const register = await database.Register(nev, email, hashedPassword, szuldatum);
-            if (!register) {
-                return response.status(400).json({
-                    error: request.t("modal.error.registration_unsuccessful", { returnObjects: true })
+            if (!isValidEmail(email)) {
+                response.status(400).json({
+                    error: request.t("modal.error.invalid_email", { returnObjects: true })
                 });
             }
             else {
-                response.status(200).json({
-                    message: request.t("modal.success.registration_successful", { returnObjects: true }),
-                });
+                const saltRounds = 10;
+                const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
+                const register = await database.Register(nev, email, hashedPassword, szuldatum);
+                if (!register) {
+                    response.status(400).json({
+                        error: request.t("modal.error.registration_unsuccessful", { returnObjects: true })
+                    });
+                }
+                else {
+                    response.status(200).json({
+                        message: request.t("modal.success.registration_successful", { returnObjects: true }),
+                    });
+                }
             }
         }
     } catch (error) {
@@ -737,20 +820,24 @@ router.post('/register', async (request, response) => {
 router.post('/logout', async (request, response) => {
     try {
         if (!request.session) {
-            return response.status(400).json({
+            response.status(400).json({
                 message: request.t("errors.no_active_session", { returnObjects: true })
             });
-        }
-        request.session.destroy(err => {
-            if (err) {
-                console.error('Session destroy error:', err);
-                return response.status(500).json({ error: request.t("modal.error.logout_unsuccessful", { returnObjects: true }) })
-            }
-            response.clearCookie('connect.sid');
-            return response.status(200).json({
-                message: request.t("modal.success.logout_successful", { returnObjects: true })
+        } else {
+            request.session.destroy(err => {
+                if (err) {
+                    console.error('Session destroy error:', err);
+                    response.status(500).json({ error: request.t("modal.error.logout_unsuccessful", { returnObjects: true }) })
+                } else {
+                    response.clearCookie('connect.sid');
+                    response.status(200).json({
+                        message: request.t("modal.success.logout_successful", { returnObjects: true })
+                    });
+                }
+
             })
-        })
+        }
+
     } catch (error) {
         console.error(error)
         response.status(500).json({
@@ -762,11 +849,12 @@ router.post('/logout', async (request, response) => {
 router.get('/husegprogram', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            return response.status(401).json({
+            response.status(401).json({
                 error: request.t("errors.login_needed_get", { returnObjects: true })
             })
         }
         else {
+            await database.updateLoyaltyStatus(request.session.user.id);
             const user = await database.Husegprogram(request.session.user.id);
             response.status(200).json({
                 result: user
@@ -782,10 +870,17 @@ router.get('/husegprogram', async (request, response) => {
 
 router.get('/profil', async (request, response) => {
     try {
-        const user = await database.Profil(request.session.user.id);
-        response.status(200).json({
-            result: user
-        })
+        if (LoggedInCheck(request)) {
+            await database.updateLoyaltyStatus(request.session.user.id);
+            const user = await database.Profil(request.session.user.id);
+            response.status(200).json({
+                result: user
+            });
+        } else {
+            response.status(401).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        }
 
     } catch (error) {
         console.error(error)
@@ -798,33 +893,37 @@ router.get('/profil', async (request, response) => {
 router.post('/verifypassword', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            return response.status(401).json({
+            response.status(401).json({
                 error: request.t("errors.login_needed_post", { returnObjects: true })
             });
-        }
-
-        const { password } = request.body;
-
-        const user = await database.getUserById(request.session.user.id);
-
-        if (!user) {
-            return response.status(400).json({
-                message: request.t("profile.error.user_not_found", { returnObjects: true })
-            });
-        }
-
-        if (!(await bcrypt.compare(password, user[0].UserPassword)) || !password) {
-            response.status(400).json({
-                error: request.t("modal.error.wrong_password", { returnObjects: true }),
-                verified: false
-            });
-
         } else {
-            response.status(200).json({
-                message: request.t("modal.success.password_verified", { returnObjects: true }),
-                verified: true
-            });
+
+            const { password } = request.body;
+
+            const user = await database.getUserById(request.session.user.id);
+
+            if (!user) {
+                response.status(400).json({
+                    message: request.t("profile.error.user_not_found", { returnObjects: true })
+                });
+            } else {
+
+                if (!(await bcrypt.compare(password, user[0].UserPassword)) || !password) {
+                    response.status(400).json({
+                        error: request.t("modal.error.wrong_password", { returnObjects: true }),
+                        verified: false
+                    });
+
+                } else {
+
+                    response.status(200).json({
+                        message: request.t("modal.success.password_verified", { returnObjects: true }),
+                        verified: true
+                    });
+                }
+            }
         }
+
     } catch (error) {
         console.log(error);
         response.status(500).json({
@@ -873,6 +972,48 @@ router.put('/updateprofile', async (request, response) => {
     }
 });
 
+router.put('/deleteprofile', async (request, response) => {
+    try {
+        if (!LoggedInCheck(request)) {
+            response.status(401).json({
+                error: request.t("errors.login_needed_delete", { returnObjects: true })
+            });
+        } else {
+
+            const user = await database.getUserById(request.session.user.id);
+
+            if (!user) {
+                response.status(400).json({
+                    error: request.t("profile.error.user_not_found", { returnObjects: true })
+                });
+            } else {
+                await database.deleteUserProfile(request.session.user.id);
+                await database.cancelAllReservationsOfUser(request.session.user.id);
+                request.session.destroy(err => {
+                    if (err) {
+                        console.error('Session destroy error:', err);
+                        response.status(500).json({ error: request.t("modal.error.logout_unsuccessful", { returnObjects: true }) })
+                    } else {
+                        response.clearCookie('connect.sid');
+                        response.status(200).json({
+                            message: request.t("modal.success.profile_deleted_successfully", { returnObjects: true })
+                        });
+                    }
+
+                })
+            }
+
+
+        }
+
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
 router.put('/cancelreservations', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
@@ -888,10 +1029,18 @@ router.put('/cancelreservations', async (request, response) => {
                     error: request.t("errors.missing_data", { returnObjects: true })
                 });
             } else {
-                await database.cancelReservations(reservations);
-                response.status(200).json({
-                    message: request.t("modal.success.bookings_have_been_cancelled_successfully", { returnObjects: true })
-                });
+
+                if (await database.cancelReservationCheckForRemainingOnlyChildren(reservations, request.session.user.id)) {
+                    response.status(400).json({
+                        error: request.t("modal.error.cancel_bookings_no_adults", { returnObjects: true })
+                    });
+                } else {
+                    await database.cancelReservations(reservations, request.session.user.id);
+                    response.status(200).json({
+                        message: request.t("modal.success.bookings_have_been_cancelled_successfully", { returnObjects: true })
+                    });
+                }
+
             }
         }
 
@@ -930,6 +1079,10 @@ function ToSqlDateTime(dateObject) {
     return `${dateObject.getFullYear()}-${pad(dateObject.getMonth() + 1)}-${pad(dateObject.getDate())} ${pad(dateObject.getHours())}:${pad(dateObject.getMinutes())}:${pad(dateObject.getSeconds())}`;
 }
 
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 
 router.get('/helyfoglalas', async (request, response) => {
     try {
@@ -941,8 +1094,11 @@ router.get('/helyfoglalas', async (request, response) => {
         else {
             let id = request.query.id;
             if (!id) {
-                throw new Error("Nincs járat id")
+                response.status(400).json({
+                    error: request.t("seat_chooser.error.no_flightid", { returnObjects: true })
+                });
             }
+            await database.updateLoyaltyStatus(request.session.user.id);
             const helyek = await database.selectAvailableSeatsOnFlight(id, request.session.user.id);
 
             if (request.get("Accept-Language") == "en") {
@@ -979,19 +1135,30 @@ router.post('/helyfoglalas', async (request, response) => {
             const { flightID, rowID, columnID, isAdult } = request.body;
             const parsedIsAdult = Number(isAdult);
             if (!Number.isInteger(parsedIsAdult) || (parsedIsAdult !== 0 && parsedIsAdult !== 1)) {
-                throw new Error("Hibás az isAdult")
+                response.status(400).json({
+                    error: request.t("seat_chooser.error.no_adults", { returnObjects: true })
+                });
             }
 
             if (!flightID || !rowID || !columnID) {
-                throw new Error(request.t("missing_data"))
+                response.status(400).json({
+                    error: request.t("errors.missing_data", { returnObjects: true })
+                });
+
+            } else {
+                const siker = await database.SeatReservation(request.session.user.id, flightID, rowID, columnID, parsedIsAdult);
+                if (!siker) {
+                    response.status(400).json({
+                        error: request.t("seat_chooser.error.already_booked_seat", { returnObjects: true })
+                    });
+                } else {
+                    response.status(200).json({
+                        siker: siker
+                    });
+                }
             }
-            const siker = await database.SeatReservation(request.session.user.id, flightID, rowID, columnID, parsedIsAdult);
-            if (!siker) {
-                throw new Error("Ez a hely már foglalva van")
-            }
-            response.status(200).json({
-                siker: siker
-            })
+
+
         }
     } catch (error) {
         console.error(error)
@@ -1004,17 +1171,20 @@ router.post('/helyfoglalas', async (request, response) => {
 router.get('/AdminGetUsers', async (request, response) => {
     try {
         if (!EnsureAdminSession(request)) {
-            throw new Error("Nem vagy bejelentkezve!")
+            response.status(400).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        } else {
+            const adatvissza = await database.AdminGetUsers();
+            response.status(200).json({
+                adat: adatvissza
+            });
         }
 
-        const adatvissza = await database.AdminGetUsers();
-        response.status(200).json({
-            adat: adatvissza
-        });
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -1022,22 +1192,29 @@ router.get('/AdminGetUsers', async (request, response) => {
 router.get('/AdminSearchUsers', async (request, response) => {
     try {
         if (!EnsureAdminSession(request)) {
-            throw new Error("Nem vagy bejelentkezve!")
+            response.status(400).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+
+        } else {
+
+            if (typeof request.query.email !== 'string') {
+                response.status(400).json({
+                    error: request.t("admin.error.wrong_email", { returnObjects: true })
+                });
+            } else {
+                const email = request.query.email.trim();
+                const adatvissza = await database.AdminSearchUsers(email);
+                response.status(200).json({
+                    adat: adatvissza
+                });
+            }
         }
 
-        if (typeof request.query.email !== 'string') {
-            throw new Error("Hibás email")
-        }
-
-        const email = request.query.email.trim();
-        const adatvissza = await database.AdminSearchUsers(email);
-        response.status(200).json({
-            adat: adatvissza
-        });
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -1045,23 +1222,45 @@ router.get('/AdminSearchUsers', async (request, response) => {
 router.get('/AdminGetUserReservations', async (request, response) => {
     try {
         if (!EnsureAdminSession(request)) {
-            throw new Error("Nem vagy bejelentkezve!")
+            response.status(400).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        } else {
+            const rawUserID = request.query.userID ?? request.query.userId;
+            const userID = Number.parseInt(rawUserID, 10);
+            if (!Number.isInteger(userID) || userID <= 0) {
+                response.status(400).json({
+                    error: request.t("admin.error.wrong_userid", { returnObjects: true })
+                });
+            } else {
+
+                let adatvissza;
+
+                if (request.get("Accept-Language") == "hu") {
+                    adatvissza = await database.AdminGetUserReservationsHun(userID);
+                } else {
+                    let current_eur_exch_rate;
+
+                    try {
+                        current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+                    } catch {
+                        current_eur_exch_rate = 0.00259;
+                    }
+
+                    adatvissza = await database.AdminGetUserReservationsEn(userID);
+                    adatvissza.map(x => x.Price = Math.round(x.Price * current_eur_exch_rate));
+                }
+
+                response.status(200).json({
+                    adat: adatvissza
+                });
+            }
         }
 
-        const rawUserID = request.query.userID ?? request.query.userId;
-        const userID = Number.parseInt(rawUserID, 10);
-        if (!Number.isInteger(userID) || userID <= 0) {
-            throw new Error("Hibás userID")
-        }
-
-        const adatvissza = await database.AdminGetUserReservations(userID);
-        response.status(200).json({
-            adat: adatvissza
-        });
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -1069,23 +1268,45 @@ router.get('/AdminGetUserReservations', async (request, response) => {
 router.get('/AdminGetUserFlights', async (request, response) => {
     try {
         if (!EnsureAdminSession(request)) {
-            throw new Error("Nem vagy bejelentkezve!");
+            response.status(400).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        } else {
+            const rawUserID = request.query.userID ?? request.query.userId;
+            const userID = Number.parseInt(rawUserID, 10);
+            if (!Number.isInteger(userID) || userID <= 0) {
+                response.status(400).json({
+                    error: request.t("admin.error.wrong_userid", { returnObjects: true })
+                });
+            } else {
+
+                let adatvissza;
+
+                if (request.get("Accept-Language") == "hu") {
+                    adatvissza = await database.AdminGetUserFlightsHun(userID);
+                } else {
+                    let current_eur_exch_rate;
+
+                    try {
+                        current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+                    } catch {
+                        current_eur_exch_rate = 0.00259;
+                    }
+
+                    adatvissza = await database.AdminGetUserFlightsEn(userID);
+                    adatvissza.map(x => x.TotalPrice = Math.round(x.TotalPrice * current_eur_exch_rate));
+                }
+
+                response.status(200).json({
+                    adat: adatvissza
+                });
+            }
         }
 
-        const rawUserID = request.query.userID ?? request.query.userId;
-        const userID = Number.parseInt(rawUserID, 10);
-        if (!Number.isInteger(userID) || userID <= 0) {
-            throw new Error("Hibás userID")
-        }
-
-        const adatvissza = await database.AdminGetUserFlights(userID);
-        response.status(200).json({
-            adat: adatvissza
-        });
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -1093,31 +1314,55 @@ router.get('/AdminGetUserFlights', async (request, response) => {
 router.get('/AdminGetUserFlightSeats', async (request, response) => {
     try {
         if (!EnsureAdminSession(request)) {
-            throw new Error("Nem vagy bejelentkezve!");
+            response.status(400).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        } else {
+            const rawUserID = request.query.userID ?? request.query.userId;
+            const userID = Number.parseInt(rawUserID, 10);
+
+            if (!Number.isInteger(userID) || userID <= 0) {
+                response.status(400).json({
+                    error: request.t("admin.error.wrong_userid", { returnObjects: true })
+                });
+            } else {
+                const rawFlightID = request.query.flightID ?? request.query.flightId;
+                const flightID = Number.parseInt(rawFlightID, 10);
+
+                if (!Number.isInteger(flightID) || flightID <= 0) {
+                    response.status(400).json({
+                        error: request.t("admin.error.wrong_flightid", { returnObjects: true })
+                    });
+                } else {
+
+                    let adatvissza;
+                    if (request.get("Accept-Language") == "hu") {
+                        adatvissza = await database.AdminGetUserFlightSeatsHun(userID, flightID);
+                    } else {
+
+                        let current_eur_exch_rate;
+
+                        try {
+                            current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+                        } catch {
+                            current_eur_exch_rate = 0.00259;
+                        }
+
+                        adatvissza = await database.AdminGetUserFlightSeatsEn(userID, flightID);
+                        adatvissza.map(x => x.Price = Math.round(x.Price * current_eur_exch_rate));
+
+                    }
+                    response.status(200).json({
+                        adat: adatvissza
+                    });
+                }
+            }
         }
 
-        const rawUserID = request.query.userID ?? request.query.userId;
-        const rawFlightID = request.query.flightID ?? request.query.flightId;
-
-        const userID = Number.parseInt(rawUserID, 10);
-        const flightID = Number.parseInt(rawFlightID, 10);
-
-        if (!Number.isInteger(userID) || userID <= 0) {
-            throw new Error("Hibás userID")
-        }
-
-        if (!Number.isInteger(flightID) || flightID <= 0) {
-            throw new Error("Hibás flightID")
-        }
-
-        const adatvissza = await database.AdminGetUserFlightSeats(userID, flightID);
-        response.status(200).json({
-            adat: adatvissza
-        });
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -1125,17 +1370,36 @@ router.get('/AdminGetUserFlightSeats', async (request, response) => {
 router.get('/AdminGetFlights', async (request, response) => {
     try {
         if (!EnsureAdminSession(request)) {
-            throw new Error("nem vagy bejelentkezve");
+            response.status(400).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        } else {
+            let adatvissza;
+            if (request.get("Accept-Language") == "hu") {
+                adatvissza = await database.AdminGetFlightsHun();
+            } else {
+                let current_eur_exch_rate;
+
+                try {
+                    current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+                } catch {
+                    current_eur_exch_rate = 0.00259;
+                }
+
+                adatvissza = await database.AdminGetFlightsEn();
+                adatvissza.map(x => x.BasePriceInHUF = Math.round(x.BasePriceInHUF * current_eur_exch_rate));
+
+            }
+
+            response.status(200).json({
+                adat: adatvissza
+            });
         }
 
-        const adatvissza = await database.AdminGetFlights();
-        response.status(200).json({
-            adat: adatvissza
-        });
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -1143,35 +1407,49 @@ router.get('/AdminGetFlights', async (request, response) => {
 router.post('/AdminCancelFlight', async (request, response) => {
     try {
         if (!EnsureAdminSession(request)) {
-            throw new Error("nem vagy bejelentkezve");
+            response.status(400).json({
+                error: request.t("errors.login_needed_post", { returnObjects: true })
+            });
+        } else {
+            const rawFlightID = request.body.flightID ?? request.body.flightId;
+            const flightID = Number.parseInt(rawFlightID, 10);
+
+            if (!Number.isInteger(flightID) || flightID <= 0) {
+                response.status(400).json({
+                    error: request.t("admin.error.wrong_flightid", { returnObjects: true })
+                });
+            } else {
+                const existingFlight = await database.AdminGetFlightById(flightID);
+                if (!existingFlight) {
+                    response.status(400).json({
+                        error: request.t("admin.error.flight_not_exist", { returnObjects: true })
+                    });
+                } else {
+                    let message = request.t("admin.success.flight_cancelled_successfully", { returnObjects: true });
+                    if (existingFlight.IsCancelled === 1 || existingFlight.IsCancelled === true) {
+                        message = request.t("admin.success.flight_was_already_cancelled", { returnObjects: true });
+                    }
+                    else {
+                        await database.AdminCancelFlight(flightID);
+                        let flight_data = await database.selectFlightByID(flightID);
+                        let user_ids = await database.selectUserIDByReservationFlightID(flightID);
+
+                        for (let i = 0; i < user_ids.length; i++) {
+                            await database.createUserMessage(user_ids[i].PassengerID, `A&${flight_data[0].DepartureCityHungarian} (${flight_data[0].DepartureAirport})&${flight_data[0].ArrivalCityHungarian} (${flight_data[0].ArrivalAirport})&${flight_data[0].DepartureDateTimeHungarian}&járat sajnos törlésre került.&A foglalásból származó hűségpontok nem kerülnek levonásra.`, `The&${flight_data[0].DepartureCityEnglish} (${flight_data[0].DepartureAirport})&${flight_data[0].ArrivalCityEnglish} (${flight_data[0].ArrivalAirport})&${flight_data[0].DepartureDateTimeEnglish}&flight has been cancelled.&The loyalty scores will not be deleted.`)
+
+                        }
+                    }
+                    response.status(200).json({
+                        message
+                    });
+                }
+            }
         }
 
-        const rawFlightID = request.body.flightID ?? request.body.flightId;
-        const flightID = Number.parseInt(rawFlightID, 10);
-
-        if (!Number.isInteger(flightID) || flightID <= 0) {
-            throw new Error("Hibás flightID");
-        }
-
-        const existingFlight = await database.AdminGetFlightById(flightID);
-        if (!existingFlight) {
-            throw new Error("Nem létező járat");
-        }
-
-        let message = "A járat törölve lett";
-        if (existingFlight.IsCancelled === 1 || existingFlight.IsCancelled === true) {
-            message = 'A járat már törölve van';
-        }
-        else {
-            await database.AdminCancelFlight(flightID);
-        }
-        response.status(200).json({
-            message
-        });
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -1179,17 +1457,27 @@ router.post('/AdminCancelFlight', async (request, response) => {
 router.get('/AdminGetFlightCreateContext', async (request, response) => {
     try {
         if (!EnsureAdminSession(request, response)) {
-            throw new Error("nem vagy bejelentkezve");
+            response.status(400).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        } else {
+            let adatvissza;
+            if (request.get("Accept-Language") == "hu") {
+                adatvissza = await database.AdminGetFlightCreateContextHun();
+            } else {
+                adatvissza = await database.AdminGetFlightCreateContextEn();
+            }
+
+            response.status(200).json({
+                adat: adatvissza
+            });
         }
 
-        const adatvissza = await database.AdminGetFlightCreateContext();
-        response.status(200).json({
-            adat: adatvissza
-        });
+
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });
@@ -1197,117 +1485,200 @@ router.get('/AdminGetFlightCreateContext', async (request, response) => {
 router.post('/AdminCreateFlight', async (request, response) => {
     try {
         if (!EnsureAdminSession(request, response)) {
-            throw new Error("nem vagy bejelentkezve");
-        }
-
-        const {
-            departureAirport,
-            arrivalAirport,
-            departureDateTime,
-            arrivalDateTime,
-            aircraftID,
-            basePriceInHUF
-        } = request.body;
-
-        if (!departureAirport || !arrivalAirport || !departureDateTime || !arrivalDateTime || aircraftID === undefined || basePriceInHUF === undefined) {
-            return response.status(400).json({
-                message: 'Hiányzó adatok'
+            response.status(400).json({
+                error: request.t("errors.login_needed_post", { returnObjects: true })
             });
-        }
+        } else {
 
-        const normalizedDepartureAirport = `${departureAirport}`.trim().toUpperCase();
-        const normalizedArrivalAirport = `${arrivalAirport}`.trim().toUpperCase();
-        const parsedAircraftID = Number.parseInt(aircraftID, 10);
-        const parsedBasePrice = Number.parseInt(basePriceInHUF, 10);
+            const {
+                departureAirport,
+                arrivalAirport,
+                departureDateTime,
+                arrivalDateTime,
+                aircraftID,
+                basePriceInHUF
+            } = request.body;
 
-        if (normalizedDepartureAirport.length === 0 || normalizedArrivalAirport.length === 0) {
-            return response.status(400).json({
-                message: 'Hibás reptér kód'
-            });
-        }
+            console.log(request.body);
 
-        if (normalizedDepartureAirport === normalizedArrivalAirport) {
-            return response.status(400).json({
-                message: 'Az induló és érkező reptér nem lehet ugyanaz'
-            });
-        }
-
-        if (!Number.isInteger(parsedAircraftID) || parsedAircraftID <= 0) {
-            return response.status(400).json({
-                message: 'Hibás aircraftID'
-            });
-        }
-
-        if (!Number.isInteger(parsedBasePrice) || parsedBasePrice <= 0) {
-            return response.status(400).json({
-                message: 'Hibás alapár'
-            });
-        }
-
-        const parsedDepartureDate = new Date(departureDateTime);
-        const parsedArrivalDate = new Date(arrivalDateTime);
-
-        if (Number.isNaN(parsedDepartureDate.getTime()) || Number.isNaN(parsedArrivalDate.getTime())) {
-            return response.status(400).json({
-                message: 'Hibás dátum formátum'
-            });
-        }
-
-        if (parsedArrivalDate <= parsedDepartureDate) {
-            return response.status(400).json({
-                message: 'Az érkezés időpontja később kell legyen, mint az indulás'
-            });
-        }
-
-        const latestKnownLeg = await database.AdminGetLatestKnownAircraftLeg(parsedAircraftID);
-        if (!latestKnownLeg) {
-            return response.status(400).json({
-                message: 'Nem létező repülő'
-            });
-        }
-
-        if (latestKnownLeg.LastArrivalAirport) {
-            if (`${latestKnownLeg.LastArrivalAirport}`.toUpperCase() !== normalizedDepartureAirport) {
+            if (!departureAirport || !arrivalAirport || !departureDateTime || !arrivalDateTime || aircraftID === undefined || basePriceInHUF === undefined) {
                 return response.status(400).json({
-                    message: `A repülő csak innen indulhat: ${latestKnownLeg.LastArrivalAirport}`
+                    error: request.t("errors.missing_data", { returnObjects: true })
                 });
             }
 
-            const latestArrivalDate = new Date(latestKnownLeg.LastArrivalDateTime);
-            if (!Number.isNaN(latestArrivalDate.getTime()) && parsedDepartureDate <= latestArrivalDate) {
+            const normalizedDepartureAirport = `${departureAirport}`.trim().toUpperCase();
+            const normalizedArrivalAirport = `${arrivalAirport}`.trim().toUpperCase();
+            const parsedAircraftID = Number.parseInt(aircraftID, 10);
+            const parsedBasePrice = Number.parseInt(basePriceInHUF, 10);
+
+            if (normalizedDepartureAirport.length === 0 || normalizedArrivalAirport.length === 0) {
                 return response.status(400).json({
-                    message: 'Az indulásnak későbbinek kell lennie, mint az utolsó érkezés'
+                    error: request.t("admin.error.wrong_airport_code", { returnObjects: true })
                 });
             }
-        }
 
-        const sqlDepartureDateTime = ToSqlDateTime(parsedDepartureDate);
-        const sqlArrivalDateTime = ToSqlDateTime(parsedArrivalDate);
-        const hasOverlap = await database.AdminHasFlightOverlap(parsedAircraftID, sqlDepartureDateTime, sqlArrivalDateTime);
+            if (normalizedDepartureAirport === normalizedArrivalAirport) {
+                return response.status(400).json({
+                    error: request.t("admin.error.same_origin_and_destination", { returnObjects: true })
+                });
+            }
 
-        if (hasOverlap) {
-            return response.status(400).json({
-                message: 'A repülő időben ütköző járattal mar foglalt'
+            if (!Number.isInteger(parsedAircraftID) || parsedAircraftID <= 0) {
+                return response.status(400).json({
+                    error: request.t("admin.error.wrong_aircraftid", { returnObjects: true })
+                });
+            }
+
+            if (!Number.isInteger(parsedBasePrice) || parsedBasePrice <= 0) {
+                return response.status(400).json({
+                    error: request.t("admin.error.wrong_base_price", { returnObjects: true })
+                });
+            }
+
+            const parsedDepartureDate = new Date(departureDateTime);
+            const parsedArrivalDate = new Date(arrivalDateTime);
+
+            if (Number.isNaN(parsedDepartureDate.getTime()) || Number.isNaN(parsedArrivalDate.getTime())) {
+                return response.status(400).json({
+                    error: request.t("admin.error.wrong_date_format", { returnObjects: true })
+                });
+            }
+
+            if (parsedArrivalDate <= parsedDepartureDate) {
+                return response.status(400).json({
+                    error: request.t("admin.error.arrival_before_departure", { returnObjects: true })
+                });
+            }
+
+            const latestKnownLeg = await database.AdminGetLatestKnownAircraftLeg(parsedAircraftID);
+            if (!latestKnownLeg) {
+                return response.status(400).json({
+                    error: request.t("admin.error.aircraft_not_exist", { returnObjects: true })
+                });
+            }
+
+            if (latestKnownLeg.LastArrivalAirport) {
+                if (`${latestKnownLeg.LastArrivalAirport}`.toUpperCase() !== normalizedDepartureAirport) {
+                    return response.status(400).json({
+                        error: request.t("admin.error.aircraft_must_take_off_here", { returnObjects: true }) + latestKnownLeg.LastArrivalAirport
+                    });
+                }
+
+                const latestArrivalDate = new Date(latestKnownLeg.LastArrivalDateTime);
+                if (!Number.isNaN(latestArrivalDate.getTime()) && parsedDepartureDate <= latestArrivalDate) {
+                    return response.status(400).json({
+                        error: request.t("admin.error.new_departure_before_old_departure", { returnObjects: true })
+                    });
+                }
+            }
+
+            const sqlDepartureDateTime = ToSqlDateTime(parsedDepartureDate);
+            const sqlArrivalDateTime = ToSqlDateTime(parsedArrivalDate);
+            const hasOverlap = await database.AdminHasFlightOverlap(parsedAircraftID, sqlDepartureDateTime, sqlArrivalDateTime);
+
+            if (hasOverlap) {
+                return response.status(400).json({
+                    error: request.t("admin.error.time_overlap", { returnObjects: true })
+                });
+            }
+
+            let eredmeny;
+            if (request.get("Accept-Language") == "hu") {
+                eredmeny = await database.AdminCreateFlight(
+                    normalizedDepartureAirport,
+                    normalizedArrivalAirport,
+                    sqlDepartureDateTime,
+                    sqlArrivalDateTime,
+                    parsedAircraftID,
+                    parsedBasePrice
+                );
+            } else {
+                let current_huf_exch_rate;
+
+                try {
+                    current_huf_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=EUR&symbols=HUF", { method: "GET" })).json()).rates.HUF;
+                } catch {
+                    current_huf_exch_rate = 385;
+                }
+
+                eredmeny = await database.AdminCreateFlight(
+                    normalizedDepartureAirport,
+                    normalizedArrivalAirport,
+                    sqlDepartureDateTime,
+                    sqlArrivalDateTime,
+                    parsedAircraftID,
+                    Math.round(parsedBasePrice * current_huf_exch_rate)
+                );
+            }
+
+
+            response.status(201).json({
+                message: request.t("admin.success.flight_created_successfully", { returnObjects: true }),
+                flightID: eredmeny.insertId
             });
         }
 
-        const eredmeny = await database.AdminCreateFlight(
-            normalizedDepartureAirport,
-            normalizedArrivalAirport,
-            sqlDepartureDateTime,
-            sqlArrivalDateTime,
-            parsedAircraftID,
-            parsedBasePrice
-        );
-
-        response.status(201).json({
-            message: 'A járat sikeresen létrehozva',
-            flightID: eredmeny.insertId
-        });
     } catch (error) {
-        console.log(error);
+        console.error(error)
         response.status(500).json({
-            message: error.message
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.get('/unreadmessages', async (request, response) => {
+    try {
+        if (!LoggedInCheck(request)) {
+            response.status(401).json({
+                error: request.t("errors.login_needed_get", { returnObjects: true })
+            });
+        }
+        else {
+            response.status(200).json({
+                messages: await database.selectUnreadUserMessageByUserID(request.session.user.id)
+            });
+        }
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
+        });
+    }
+});
+
+router.put('/messageread', async (request, response) => {
+    try {
+        if (!LoggedInCheck(request)) {
+            response.status(401).json({
+                error: request.t("errors.login_needed_post", { returnObjects: true })
+            });
+        }
+        else {
+            let message_id = request.body.message_id;
+
+            if (!message_id) {
+                response.status(400).json({
+                    error: request.t("errors.missing_data", { returnObjects: true })
+                });
+            } else {
+                if (parseInt(message_id) == NaN) {
+                    response.status(400).json({
+                        error: request.t("errors.wrong_data_type", { returnObjects: true })
+                    });
+                } else {
+                    await database.setUserMessageIsViewedTrueByMessageId(message_id);
+                    response.status(200).json({
+                        message: request.t("modal.success.message_acknowledged", { returnObjects: true })
+                    });
+                }
+            }
+
+        }
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({
+            error: request.t("errors.server_error", { returnObjects: true })
         });
     }
 });

@@ -20,7 +20,7 @@ app.set('trust proxy', 1); //?Middleware Proxy
 //!Session beállítása:
 app.use(
     session({
-        secret: 'titkos_kulcs', //?Ezt generálni kell a későbbiekben
+        secret: 'gDZBo41C3KZQe0vWDdBRZGt3l4EQG5RrW1cI2iJ2aM0BfkbglC0SHRAhammalq6U', //?Ezt generálni kell a későbbiekben
         resave: false,
         saveUninitialized: true
     })
@@ -72,6 +72,14 @@ router.get('/hu/map', (request, response) => {
 });
 
 router.get('/magazin', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/magazin.html'));
+});
+
+router.get('/hu/magazin', (request, response) => {
+    response.sendFile(path.join(__dirname, '../frontend/html/magazin.html'));
+});
+
+router.get('/en/magazin', (request, response) => {
     response.sendFile(path.join(__dirname, '../frontend/html/magazin.html'));
 });
 

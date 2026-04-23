@@ -40,7 +40,13 @@
         "return_label": "Return",
         "passengers_label": "Passengers",
         "search_flights_button": "Start Booking",
-        "passengers_input": "1 adult, 0 children"
+        "passengers_input": "1 adult, 0 children",
+        "error": {
+            "missing_origin": "Please, add origin!",
+            "missing_destination": "Please, add destination!",
+            "missing_departure": "Please, add departure!",
+            "missing_return": "Please, add return!"
+        }
     },
     "planner_passengers_popover": {
         "adults_inc_dec": "Adults",
@@ -66,19 +72,23 @@
         "client_error": "Unfortunately, an error occured in the client site. Please, try again later!",
         "server_error": "Unfortunately, an error occured in the server. Please, try again later!",
         "login_needed_get": "Access denied. You need to log in to access data!",
-        "login_needed_post": "Access denied. You need to log in to modify data!",
+        "login_needed_post": "Action denied. You need to log in to modify data!",
+        "login_needed_delete": "Action denied. You need to log in to delete data!",
         "missing_data": "Required data are missing!",
         "end_point_not_working": "This end point doesn't work!",
         "no_active_session": "No active session!",
-        "missing_url_parameter": "Missing URL parameter!"
+        "missing_url_parameter": "Missing URL parameter!",
+        "wrong_data_type": "Wrong data type sent!"
     },
     "modal": {
         "title": {
             "login": "Login",
             "registration": "Registration",
             "edit_profile": "Edit Profile",
+            "delete_profile": "Delete Profile",
             "verify_password": "Verify Password",
-            "cancel_bookings": "Cancel Bookings"
+            "cancel_bookings": "Cancel Bookings",
+            "flight_cancelled": "Flight Cancelled"
         },
         "field": {
             "email": "E-mail",
@@ -101,8 +111,11 @@
             "server_error_during_password_verification": "A server error occured during password verification. Please, try again later!",
             "missing_fields": "Please, fill out all fields!",
             "profile_update_failed": "Profile update failed!",
+            "profile_deletion_failed": "Profile deletion failed!",
             "server_error_during_profile_update": "A server error occured during profile update. Please, try again later!",
-            "wrong_email_or_password": "Wrong email or password!"
+            "wrong_email_or_password": "Wrong email or password!",
+            "cancel_bookings_no_adults": "When cancelling bookings, there has to be at least 1 adult remaining beside children!",
+            "invalid_email": "Please enter a valid email address!"
         },
         "success": {
             "login_successful": "Login successful!",
@@ -110,16 +123,22 @@
             "registration_successful": "Registration successful!",
             "password_verified_for_profile_edit": "Password verified! You can now edit your profile.",
             "profile_updated_successfully": "Profile updated successfully!",
+            "profile_deleted_successfully": "Profile deleted successfully! You will be redirected in 5 seconds.",
             "password_verified": "Password verified!",
-            "bookings_have_been_cancelled_successfully": "Selected bookings have been cancelled successfully!"
+            "bookings_have_been_cancelled_successfully": "Selected bookings have been cancelled successfully!",
+            "message_acknowledged": "Message acknowledged successfully!"
         },
         "button": {
             "save": "Save Changes",
-            "verification": "Verification"
+            "verification": "Verification",
+            "yes": "Yes",
+            "no": "No",
+            "ok": "OK"
         },
         "caption": {
             "no_account": "Don't have an account? Sign up here:",
-            "cancel_selected_reservations": "The bookings below will be cancelled:"
+            "cancel_selected_reservations": "The bookings below will be cancelled:",
+            "delete_profile": "Are you sure you want to delete your profile?"
         }
     },
     "map": {
@@ -166,9 +185,12 @@
         "booking": "Booking",
         "selected_seats": "Selected seats",
         "no_seats_selected": "No seats have been selected!",
-        "errors": {
-            "not_logged_in": "You have to be logged in to book a flight.",
-            "no_adults": "When booking, there has to be at least 1 adult."
+        "reservation_successful": "Reservation successful! You will be redirected in 5 seconds.",
+        "error": {
+            "not_logged_in": "You have to be logged in to book a flight!",
+            "no_adults": "When booking, there has to be at least 1 adult!",
+            "already_booked_seat": "Booking failed! The seat is already booked!",
+            "no_flightid": "No flightId!"
         }
     },
     "profile": {
@@ -184,7 +206,7 @@
             "name": "Name",
             "rank": {
                 "title": "Rank",
-                "no_rank" : "No rank",
+                "no_rank": "No rank",
                 "bronze": "Bronze",
                 "silver": "Silver",
                 "gold": "Gold",
@@ -194,16 +216,20 @@
             "email": "Email",
             "birth_date": "Birth date"
         },
+        "title": "Profile",
         "bookings": "Bookings",
+        "cancelled_flights_bookings": "Cancelled Flights Bookings",
         "active_bookings": "Active bookings",
         "previous_bookings": "Previous bookings",
         "choose_flight": "Choose a flight!",
         "no_active_bookings": "It seems like you have no active bookings.",
         "no_previous_bookings": "It seems like you have no previous bookings.",
+        "no_cancelled_flights_bookings": "It seems like you have no bookings for cancelled flights.",
         "no_bookings": "It seems like you have not travelled with us.",
         "select_all_for_cancellation": "Select all for cancellation",
         "cancel_selected": "Cancel selected",
         "edit_profile": "Edit profile",
+        "delete_profile": "Delete profile",
         "save_changes": "Save Changes",
         "error": {
             "user_not_found": "User not found in the database!"
@@ -240,5 +266,184 @@
             "range": "Number of your flights: 36+",
             "discount": "10% discount on bookings"
         }
+    },
+    "admin": {
+        "currency": "€",
+        "title": {
+            "users": "Users",
+            "flights": "Flights",
+            "bookings": "Bookings",
+            "flight_control": "Flight Control",
+            "create_new_flight": "Create New Flight",
+            "aircraft": "Aircraft",
+            "origin_airport": "Origin Airport",
+            "destination_airport": "Destination Airport",
+            "departure_date": "Departure Date",
+            "arrival_date": "Arrival Date",
+            "base_price": "Base Price (€)"
+        },
+        "button": {
+            "users": "Users",
+            "delete": "Delete",
+            "flights": "Flights",
+            "create_flight": "Create Flight",
+            "delete_flight": "Delete Flight",
+            "delete_form": "Delete Form",
+            "update": "Update",
+            "deleted_already": "Deleted Already"
+        },
+        "caption": {
+            "select_line_to_see_bookings": "Select a line to see bookings!",
+            "no_bookings_of_user": "The selected user has no bookings.",
+            "select_user_from_tabel": "Select a user from the tabel!",
+            "flight_control": "List of flights",
+            "create_flight": "Choose an aircraft, origin and destination airport, departure and arrival time, and a base price!",
+            "loading_flights": "Loading flights...",
+            "click_on_flight_to_see_details": "Click on flight to see details!",
+            "loading_seats_details": "Loading seat details...",
+            "no_bookings_for_flight": "There is no bookings for this flight.",
+            "want_to_delete_flight_question": "Are you sure you want to delete this flight?",
+            "last_know_arrival_of_aircraft": "Last known arrival of aircraft:",
+            "new_take_off_restriction": "New take off must be at least 30 minutes after the last one.",
+            "selected_aircraft_has_no_previous_flights": "The selected aircraft has no previous flights. For origin airport you can choose any.",
+            "no_flights": "There is no flights",
+            "choose_aircraft": "Choose an aircraft...",
+            "choose_origin_airport": "Choose origin airport...",
+            "choose_destination_airport": "Choose destination airport...",
+            "search_by_email": "Search by e-mail"
+        },
+        "tabel": {
+            "users": {
+                "header": {
+                    "name": "Name",
+                    "email": "E-Mail",
+                    "bookings": "Bookings",
+                    "rank": "Rank",
+                    "created_at": "Created At",
+                    "flight": "Flight",
+                    "passenger_type": "Passenger Type",
+                    "fare_class": "Fare Class",
+                    "origin_departure": "Origin / Destination",
+                    "status": "Status",
+                    "open": "Open",
+                    "sum_price": "Sum Price",
+                    "seat": "Seat",
+                    "price": "Price"
+                },
+                "body": {
+                    "passenger_type": {
+                        "adult": "Adult",
+                        "child": "Child"
+                    },
+                    "status": {
+                        "active": "Active",
+                        "not_ative": "Not-Active",
+                        "flight_deleted": "Flight Deleted",
+                        "cancelled": "Cancelled"
+                    },
+                    "rank": {
+                        "bronze": "Bronze",
+                        "silver": "Silver",
+                        "gold": "Gold",
+                        "platinum": "Platinum",
+                        "diamond": "Diamond"
+                    },
+                    "no_users": "There are no users in the database.",
+                    "quantity": "Quantity"
+                }
+            },
+            "flights": {
+                "header": {
+                    "id": "FlightID",
+                    "aircraft": "Aircraft",
+                    "route": "Route",
+                    "departure": "Departure",
+                    "arrival": "Arrival",
+                    "base_price": "Base Price",
+                    "bookings": "Bookings",
+                    "status": "Status",
+                    "action": "Action"
+                },
+                "body": {
+                    "status": {
+                        "active": "Active",
+                        "not_ative": "Not-Active",
+                        "deleted": "Deleted",
+                        "cancelled": "Cancelled",
+                        "mixed": "Mixed",
+                        "flight_deleted": "Flight Deleted",
+                        "completed": "Completed"
+                    }
+                }
+            }
+        },
+        "error": {
+            "wrong_email": "Wrong e-mail!",
+            "wrong_userid": "Wrong userID!",
+            "wrong_flightid": "Wrong flightID!",
+            "flight_not_exist": "Flight not exist!",
+            "wrong_airport_code": "Wrong airport code!",
+            "same_origin_and_destination": "The origin and destination airport can't be the same!",
+            "wrong_aircraftid": "Wrong aircraftID",
+            "wrong_base_price": "Wrong Base Price!",
+            "wrong_date_format": "Wrong date format!",
+            "arrival_before_departure": "Arrival date can't be before departure date!",
+            "aircraft_not_exist": "Aircraft doesn't exist!",
+            "aircraft_must_take_off_here": "Aircraft must take off here: ",
+            "new_departure_before_old_departure": "The new departure date must be after the previous departure date!",
+            "time_overlap": "Departure and arrival date overlap!",
+            "loading_flight_control": "The flight control data coudn't be loaded!",
+            "new_take_off_just_after_previous_take_off": "New take off has to be at least 30 minutes after previous take off!",
+            "choose_valid_aircraft": "Choose a valid a aircraft!",
+            "choose_origin_and_destination_airport": "Choose an origin and a destination airport!",
+            "origin_equals_destination": "Origin airport equals destination airport!",
+            "choose_valid_dates": "Choose valid dates!",
+            "base_price_must_be_positive_integer": "Base price must be positive integer!"
+        },
+        "success": {
+            "flight_created_successfully": "Flight created successfully!",
+            "flight_cancelled_successfully": "Flight cancelled successfully!",
+            "flight_was_already_cancelled": "Flight has already been cancelled!"
+        }
+    },
+    "magazine": {
+        "title": "FlyGuys Magazine",
+        "subtitle": "Choose from premium products during your travel!",
+        "product": {
+            "name": {
+                "hugo_boss_perfume": "Hugo Boss Perfume 60ml",
+                "phone_case_iphone_17_pro_max": "Phone case",
+                "popcorn": "Popcorn",
+                "coca_cola": "Coca Cola",
+                "noise_canceling_airpods": "Noise canceling airpods",
+                "flyguys_keychain": "FlyGuys keychain",
+                "rolex_watch": "Rolex watch",
+                "sandwich": "Sandwich",
+                "fridge_magnet": "Fridge magnet"
+            },
+            "caption": {
+                "hugo_boss_perfume": "Premium perfume, it can last more than 24 hours",
+                "phone_case_iphone_17_pro_max": "Iphone 17 pro max phone case",
+                "popcorn": "tasty snack",
+                "coca_cola": "Original taste",
+                "noise_canceling_airpods": "Cancel your surrondings and focus on your inner toughts!",
+                "flyguys_keychain": "Upgrade your key ring!",
+                "rolex_watch": "Make your apperance to an upper level!",
+                "sandwich": "tasty chicken sandwich",
+                "fridge_magnet": "Bring a piece of memory from the visited country!"
+            },
+            "price": {
+                "hugo_boss_perfume": 29990,
+                "phone_case_iphone_17_pro_max": 15670,
+                "popcorn": 1250,
+                "coca_cola": 990,
+                "noise_canceling_airpods": 29990,
+                "flyguys_keychain": 1670,
+                "rolex_watch": 626500,
+                "sandwich": 990,
+                "fridge_magnet": 3500
+            }
+        },
+        "currency": "€"
     }
 }

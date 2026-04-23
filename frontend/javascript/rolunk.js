@@ -1,15 +1,21 @@
-import { getLocale, getNavbar, getFooter, getAboutUs } from "./locale.js";
-import { modalInit } from "./modal.js";
+import { getFooter, getAboutUs } from "./locale.js";
 import { initI18n } from "./toolbox.js";
 
 $(async function () {
 
-    let language = await initI18n("rolunk");
+    let language;
 
-    await getFooter(language);
-    let getaboutus = await getAboutUs(language);
-    $(document).prop('title', `${getaboutus.title}`);
-    contentFeltolt(getaboutus);
+    try {
+        language = await initI18n("rolunk");
+        await getFooter(language);
+        let getaboutus = await getAboutUs(language);
+        $(document).prop('title', `${getaboutus.title}`);
+        contentFeltolt(getaboutus);
+    } catch (error) {
+        let $content = $("#content");
+        $content.html("");
+        errorPageGenerator($content, (await (await fetch("/api/geterrors", { method: "GET", headers: { "Accept-Language": language } })).json()).errors.client_error);
+    }
 });
 
 function contentFeltolt(i18n_values) {

@@ -1,11 +1,11 @@
 import { getPlanner } from "./locale.js";
-import { popoverManualTrigger, dateFormatter} from "./toolbox.js";
+import { popoverManualTrigger, dateFormatter, generateToast } from "./toolbox.js";
 import { inputDisabler, passengers_popoverInit, inputSwitcher, airportSelector, returnEnabler, turnOff, airportSwapperEnabler } from "./planner.js";
 
 
 export async function plannerMapInit(current_language) {
 
-    await getPlanner(current_language);
+    let getplanner = await getPlanner(current_language);
 
     ///////// INIT /////////
 
@@ -20,6 +20,9 @@ export async function plannerMapInit(current_language) {
 
     // Datepickerek
     let $departure = $("#departure_input");
+    $departure.on("click", function () {
+        $("body").append($("#ui-datepicker-div"));
+    });
     let available_departure_dates = (await (await fetch("/api/availabledeparturedatesfiltered", { method: "GET" })).json()).departuredates
     let $departure_datepicker = $departure.datepicker({
         beforeShowDay: function (d) {
@@ -86,6 +89,9 @@ export async function plannerMapInit(current_language) {
     });
 
     let $return = $("#return_input");
+    $return.on("click", function () {
+        $("body").append($("#ui-datepicker-div"));
+    });
     let available_return_dates = [];
     let $return_datepicker = $return.datepicker({
         beforeShowDay: function (d) {
@@ -134,11 +140,14 @@ export async function plannerMapInit(current_language) {
     inputSwitcher($return);
     // Egyirányú, vagy oda-vissza gomb
     let $switcher_departure_return = $("#switcher_departure_return");
+    $switcher_departure_return.data("set_to_return", false);
     turnOff($switcher_departure_return)
     $switcher_departure_return.on("click", async function () {
         if (!$return.prop("disabled")) {
 
             $switcher_departure_return.html("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-arrow-right\" viewBox=\"0 0 16 16\"><path fill-rule=\"evenodd\" d=\"M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8\"/></svg>");
+
+            $switcher_departure_return.data("set_to_return", false);
 
             inputSwitcher($return);
             if ($return.prev().length != 0) {
@@ -154,8 +163,9 @@ export async function plannerMapInit(current_language) {
 
             $switcher_departure_return.html("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-arrow-left-right\" viewBox=\"0 0 16 16\"> <path fill-rule=\"evenodd\" d=\"M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5\" /></svg>");
 
-            inputSwitcher($return);
+            $switcher_departure_return.data("set_to_return", true);
 
+            inputSwitcher($return);
 
             origin[1].setContent({ ".popover-body": await airports_popover_contentGenerator(origin[0], "origin_popover", origin[1], (await (await fetch(`/api/${`availablearrivalairportsfiltered?departureAirport=${destination[0].data("code_of_selected_airport")}`}`, { method: "GET", headers: { "Accept-Language": current_language } })).json())) });
 
@@ -189,7 +199,6 @@ export async function plannerMapInit(current_language) {
 
     // Utasok popover
     let passengers = await passengers_popoverInit("passengers_input", "passengers_popover");
-    popoverManualTrigger(passengers[0], passengers[1]);
 
 
     $("#search_flights").on("click", function (e) {
@@ -204,10 +213,27 @@ export async function plannerMapInit(current_language) {
         fd.set("adults", passengers[0].data("num_of_adults"));
         fd.set("children", passengers[0].data("num_of_children"));
 
-        const searchParams = new URLSearchParams(fd);
-        const queryString = searchParams.toString();
+        if (fd.get("origin") === "" || fd.get("destination") === "" || fd.get("departure") === "" || ($("#switcher_departure_return").data("set_to_return") && fd.get("return") === "")) {
 
-        window.location.href = `/${current_language}/flights?${queryString}`;
+            if (fd.get("origin") === "") {
+                generateToast(getplanner.error.missing_origin, "danger");
+            }
+            if (fd.get("destination") === "") {
+                generateToast(getplanner.error.missing_destination, "danger");
+            }
+            if (fd.get("departure") === "") {
+                generateToast(getplanner.error.missing_departure, "danger");
+            }
+            if (($("#switcher_departure_return").data("set_to_return") && fd.get("return") === "")) {
+                generateToast(getplanner.error.missing_return, "danger");
+            }
+
+        } else {
+            const searchParams = new URLSearchParams(fd);
+            const queryString = searchParams.toString();
+
+            window.location.href = `/${current_language}/flights?${queryString}`;
+        }
 
 
     });
