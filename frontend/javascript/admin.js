@@ -118,6 +118,7 @@ async function switchAdminMode(mode, language, i18n_values) {
     if (mode === 'users' || mode === 'flights') {
         renderModePanels(mode);
         if (mode === 'users') {
+            $('#tabla').empty();
             const searchEmail = $('#user_email_search').val().trim();
             await loadUsers(searchEmail, i18n_values);
             renderIdleReservationsState(i18n_values);
@@ -609,6 +610,7 @@ async function renderAdminFlightsManagementTable(validFlights, i18n_values) {
         for (const flight of validFlights) {
             const flightId = Number.parseInt(flight.FlightID, 10);
             const isCancelled = toBool(flight.IsCancelled);
+            const isPast = !isCancelled && new Date(flight.DepartureDateTime) < new Date();
 
             const rawReservationCount = Number.parseInt(flight.ReservationCount, 10);
             let reservationCount = 0;
@@ -632,6 +634,9 @@ async function renderAdminFlightsManagementTable(validFlights, i18n_values) {
             if (isCancelled) {
                 statusLabel = i18n_values.tabel.flights.body.status.cancelled;
                 statusClass = 'status-flight-cancelled';
+            } else if (isPast) {
+                statusLabel = i18n_values.tabel.flights.body.status.completed;
+                statusClass = 'status-completed';
             }
 
             let cancelButtonText = i18n_values.button.delete_flight;
@@ -642,6 +647,9 @@ async function renderAdminFlightsManagementTable(validFlights, i18n_values) {
             const routeText = `${flight.DepartureAirport} (${flight.DepartureCity}) → ${flight.ArrivalAirport} (${flight.ArrivalCity})`;
 
             const $row = $('<tr></tr>');
+            if (isPast) {
+                $row.addClass('flight-past');
+            }
             $row.append($('<td></td>', { text: flightId, 'data-label': headers[0] }));
             $row.append($('<td></td>', { text: aircraftText, 'data-label': headers[1] }));
             $row.append($('<td></td>', { text: routeText, 'data-label': headers[2] }));
@@ -661,7 +669,7 @@ async function renderAdminFlightsManagementTable(validFlights, i18n_values) {
                         class: 'btn btn-sm btn-outline-danger admin-action-btn cancel-flight-btn',
                         'data-flight-id': flightId,
                         text: cancelButtonText,
-                        disabled: isCancelled
+                        disabled: isCancelled || isPast
                     })
                 )
             );

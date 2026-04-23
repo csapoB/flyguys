@@ -362,7 +362,8 @@
                         "deleted": "Deleted",
                         "cancelled": "Cancelled",
                         "mixed": "Mixed",
-                        "flight_deleted": "Flight Deleted"
+                        "flight_deleted": "Flight Deleted",
+                        "completed": "Completed"
                     }
                 }
             }
