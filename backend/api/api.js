@@ -688,22 +688,29 @@ router.post('/login', async (request, response) => {
     try {
         const { email, password } = request.body
         if (email && password) {
-            const login = await database.Login(email, password);
-            if (!login) {
+            if (!isValidEmail(email)) {
                 response.status(400).json({
-                    error: request.t("modal.error.wrong_email_or_password", { returnObjects: true })
+                    error: request.t("modal.error.invalid_email", { returnObjects: true })
                 });
             }
             else {
-                request.session.user = {
-                    id: login.UserID,
-                    role: login.AdminStatus,
-                    timestamp: Date.now()
-                };
-                response.status(201).json({
-                    message: request.t("modal.success.login_successful", { returnObjects: true }),
-                    admin: login.AdminStatus === 1
-                });
+                const login = await database.Login(email, password);
+                if (!login) {
+                    response.status(400).json({
+                        error: request.t("modal.error.wrong_email_or_password", { returnObjects: true })
+                    });
+                }
+                else {
+                    request.session.user = {
+                        id: login.UserID,
+                        role: login.AdminStatus,
+                        timestamp: Date.now()
+                    };
+                    response.status(201).json({
+                        message: request.t("modal.success.login_successful", { returnObjects: true }),
+                        admin: login.AdminStatus === 1
+                    });
+                }
             }
         }
         else {
@@ -723,23 +730,30 @@ router.post('/register', async (request, response) => {
     try {
         const { nev, email, jelszo, szuldatum } = request.body
         if (!nev || !email || !jelszo || !szuldatum) {
-            return response.status(400).json({
+            response.status(400).json({
                 error: request.t("errors.missing_data", { returnObjects: true })
             });
         }
         else {
-            const saltRounds = 10;
-            const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
-            const register = await database.Register(nev, email, hashedPassword, szuldatum);
-            if (!register) {
-                return response.status(400).json({
-                    error: request.t("modal.error.registration_unsuccessful", { returnObjects: true })
+            if (!isValidEmail(email)) {
+                response.status(400).json({
+                    error: request.t("modal.error.invalid_email", { returnObjects: true })
                 });
             }
             else {
-                response.status(200).json({
-                    message: request.t("modal.success.registration_successful", { returnObjects: true }),
-                });
+                const saltRounds = 10;
+                const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
+                const register = await database.Register(nev, email, hashedPassword, szuldatum);
+                if (!register) {
+                    response.status(400).json({
+                        error: request.t("modal.error.registration_unsuccessful", { returnObjects: true })
+                    });
+                }
+                else {
+                    response.status(200).json({
+                        message: request.t("modal.success.registration_successful", { returnObjects: true }),
+                    });
+                }
             }
         }
     } catch (error) {
@@ -1011,6 +1025,10 @@ function EnsureAdminSession(request) {
 function ToSqlDateTime(dateObject) {
     const pad = (value) => `${value}`.padStart(2, '0');
     return `${dateObject.getFullYear()}-${pad(dateObject.getMonth() + 1)}-${pad(dateObject.getDate())} ${pad(dateObject.getHours())}:${pad(dateObject.getMinutes())}:${pad(dateObject.getSeconds())}`;
+}
+
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 
