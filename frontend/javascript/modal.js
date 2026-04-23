@@ -49,6 +49,21 @@ export async function modalInit(current_language, end_point) {
                             $("#admin_button").show();
                         } else {
                             $("#profile_button").show();
+                            let response = await fetch("/api/unreadmessages", { method: "GET" });
+
+                            switch (response.status) {
+                                case 200:
+                                    let messages = (await response.json()).messages;
+                                    if (messages.length > 0) {
+                                        await initFlightCancelledModal(current_language, { "text": ((current_language == "hu") ? messages[0].MessageHungarian : messages[0].MessageEnglish), "id": messages[0].MessageID }, messages);
+                                    }
+                                    break;
+
+                                default:
+                                    generateToast((await response.json()).error, "danger")
+                                    break;
+                            }
+
                         }
                         $("#login_button").hide();
                         $("#logout_button").show();
@@ -334,6 +349,7 @@ export async function login_modal(current_language) {
     });
 
     let $see_passw_button = $("<button>", {
+        "type": "button",
         "id": "passw_button",
         "class": "btn btn-outline-secondary",
         "html": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-eye-fill\" viewBox=\"0 0 16 16\"> <path d=\"M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0\"/><path d=\"M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7\"/></svg>",
@@ -427,7 +443,7 @@ function regis_modal(i18n_values) {
         "type": "text",
         "placeholder": `${i18n_values.field.birth_date}`
     });
-    $birth_date.datepicker({ changeYear: true, changeMonth: true, yearRange: "-120:-14" });
+    $birth_date.datepicker({ changeYear: true, changeMonth: true });
 
     let $e_mail = $("<input/>", {
         "id": "new_usr_email",
@@ -448,6 +464,7 @@ function regis_modal(i18n_values) {
     });
 
     let $see_passw_button = $("<button>", {
+        "type": "button",
         "id": "passw_button",
         "class": "btn btn-outline-secondary",
         "html": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-eye-fill\" viewBox=\"0 0 16 16\"> <path d=\"M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0\"/><path d=\"M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7\"/></svg>",
@@ -643,7 +660,6 @@ export async function initEditProfileModal(profile_data, current_language, i18n_
 
                 let name_obj = nameDeFormatter(profile_data.UserName, current_language);
 
-                console.log(name_obj)
                 $("#edit_first_name").val(name_obj.last_name);
                 $("#edit_last_name").val(name_obj.first_name);
 
@@ -710,7 +726,7 @@ export async function initEditProfileModal(profile_data, current_language, i18n_
         "type": "text",
         "placeholder": `${getmodal.field.birth_date}`
     });
-    $birth_date.datepicker({ changeYear: true, changeMonth: true, yearRange: "-120:-14" });
+    $birth_date.datepicker({ changeYear: true, changeMonth: true });
 
     let $e_mail = $("<input/>", {
         "id": "edit_usr_email",
@@ -731,6 +747,7 @@ export async function initEditProfileModal(profile_data, current_language, i18n_
     });
 
     let $see_passw_button = $("<button>", {
+        "type": "button",
         "id": "passw_button",
         "class": "btn btn-outline-secondary",
         "html": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-eye-fill\" viewBox=\"0 0 16 16\"> <path d=\"M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0\"/><path d=\"M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7\"/></svg>",
@@ -970,6 +987,7 @@ function initPasswordVerificationModal(id_num, i18n_values) {
     });
 
     let $see_passw_button = $("<button>", {
+        "type": "button",
         "id": "passw_button",
         "class": "btn btn-outline-secondary",
         "html": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-eye-fill\" viewBox=\"0 0 16 16\"> <path d=\"M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0\"/><path d=\"M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7\"/></svg>",
@@ -994,4 +1012,82 @@ function initPasswordVerificationModal(id_num, i18n_values) {
     $modal_body.append($input_group_for_passw);
 
     $modal_footer.append($verification_button);
+}
+
+async function initFlightCancelledModal(current_language, message, upcoming_messages) {
+
+    let modal_element = document.getElementById("omenModal");
+    let modal = bootstrap.Modal.getOrCreateInstance(modal_element);
+
+    let getmodal = await getModal(current_language);
+
+    init_modal_content_template("omenModal_content", "omen");
+
+    let $modal_header = $("#omenModal_header");
+    let $modal_body = $("#omenModal_body");
+    let $modal_footer = $("#omenModal_footer");
+
+    let $title = $("<h1>", {
+        "id": "omenMonadLabel",
+        "class": "text-danger modal-title fs-2",
+        "text": `${getmodal.title.flight_cancelled}`
+    });
+
+    let $close_button = $("<button>", {
+        "class": "btn-close",
+        "type": "button",
+        "aria-label": "Close",
+        "data-bs-dismiss": "modal"
+    });
+
+    let message_spliced = message.text.split("&")
+
+    let $div = $("<div>", {
+        "class": "mb-0",
+        "html": `<p class="fs-4"><span>${message_spliced[0]} </span><span class="text-danger">${message_spliced[1]} </span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/></svg><span class="text-danger"> ${message_spliced[2]} </span><span>( <span><svg fill="#dc3545" version=\"1.1" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 371.656 371.656\" xml:space=\"preserve\"><g><g><g><path d=\"M37.833,212.348c-0.01,0.006-0.021,0.01-0.032,0.017c-4.027,2.093-5.776,6.929-4.015,11.114     c1.766,4.199,6.465,6.33,10.787,4.892l121.85-40.541l-22.784,37.207c-1.655,2.703-1.305,6.178,0.856,8.497     c2.161,2.318,5.603,2.912,8.417,1.449l23.894-12.416c0.686-0.356,1.309-0.823,1.844-1.383l70.785-73.941l87.358-45.582     c33.085-17.835,29.252-31.545,27.29-35.321c-1.521-2.928-4.922-6.854-12.479-8.93c-7.665-2.106-18.021-1.938-31.653,0.514     c-4.551,0.818-7.063,0.749-9.723,0.676c-9.351-0.256-15.694,0.371-47.188,16.736L90.788,164.851l-66.8-34.668     c-2.519-1.307-5.516-1.306-8.035,0.004l-11.256,5.85c-2.317,1.204-3.972,3.383-4.51,5.938c-0.538,2.556,0.098,5.218,1.732,7.253     l46.364,57.749L37.833,212.348z"/><path d="M355.052,282.501H28.948c-9.17,0-16.604,7.436-16.604,16.604s7.434,16.604,16.604,16.604h326.104     c9.17,0,16.604-7.434,16.604-16.604C371.655,289.934,364.222,282.501,355.052,282.501z\"/></g></g></g></svg> </span>${message_spliced[3]} ) </span><span>${message_spliced[4]} </span></p><p class="fs-4">${message_spliced[5]}</p>`
+    });
+
+    let $ok_button = $("<button>", {
+        "class": "btn btn-danger w-50 mb-2",
+        "type": "button",
+        "text": `${getmodal.button.ok}`,
+        on: {
+            "click": async function () {
+                let response = await fetch("/api/messageread", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message_id: message.id }) });
+
+                if (response.status == 200) {
+
+                    modal.hide();
+                    await waitForModalHide(modal_element);
+                    if (upcoming_messages.length > 1) {
+                        let upcoming_messages_ = upcoming_messages.slice(1)
+                        await initFlightCancelledModal(current_language, { "text": ((current_language == "hu") ? upcoming_messages_[0].MessageHungarian : upcoming_messages_[0].MessageEnglish), "id": upcoming_messages_[0].MessageID }, upcoming_messages_);
+                    }
+
+                } else {
+                    generateToast((await response.json()).error, "danger")
+                }
+            }
+        }
+    });
+
+    $modal_header.append($title);
+    $modal_header.append($close_button);
+
+    $modal_body.append($div);
+
+    $modal_footer.append($ok_button);
+
+    modal.show();
+
+}
+
+function waitForModalHide(modalElement) {
+    return new Promise((resolve) => {
+        modalElement.addEventListener('hidden.bs.modal', function handler() {
+            // Remove the listener so it doesn't fire multiple times later
+            modalElement.removeEventListener('hidden.bs.modal', handler);
+            resolve();
+        }, { once: true });
+    });
 }

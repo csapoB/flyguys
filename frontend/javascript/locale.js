@@ -101,7 +101,9 @@ export async function getMap(lang) {
 }
 
 export async function getSeatChooser(lang) {
-    return (await (await fetch("/api/getseatchooser", { method: "GET", headers: { "Accept-Language": lang } })).json()).seat_chooser;
+    let getseat_chooser = (await (await fetch("/api/getseatchooser", { method: "GET", headers: { "Accept-Language": lang } })).json()).seat_chooser;
+    $("#lefoglal").val(getseat_chooser.booking);
+    return getseat_chooser;
 }
 export async function getProfile(lang) {
     return (await (await fetch("/api/getprofile", { method: "GET", headers: { "Accept-Language": lang } })).json()).profile;
@@ -130,8 +132,8 @@ export async function getAdmin(lang) {
     $("#admin_mode_flights .flight-create-card .admin-subtitle").text(getadmin.caption.create_flight);
     $("#create_aircraft_id_label").text(getadmin.title.aircraft);
     $("#create_aircraft_id option").text(getadmin.caption.choose_aircraft);
-    $("#create_departure_airport").text(getadmin.title.origin_airport);
-    $("#create_departure_airport_label").text(getadmin.caption.choose_origin_airport);
+    $("#create_departure_airport").text(getadmin.caption.choose_origin_airport);
+    $("#create_departure_airport_label").text(getadmin.title.origin_airport);
     $("#create_arrival_airport_label").text(getadmin.title.destination_airport);
     $("#create_arrival_airport").text(getadmin.caption.choose_destination_airport);
     $("#create_departure_datetime_label").text(getadmin.title.departure_date);

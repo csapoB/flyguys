@@ -422,10 +422,10 @@ function getFlightStatus(flight, activeCount, cancelledCount, reservationCount, 
 
     let result = { label: i18n_values.tabel.flights.body.status.mixed, className: 'status-mixed' };
     if (flightCancelled) {
-        result = { label: i18n_values.tabel.flights.body.status._flight_deleted, className: 'status-flight-cancelled' };
+        result = { label: i18n_values.tabel.flights.body.status.flight_deleted, className: 'status-flight-cancelled' };
     } else {
         if (groupStatus === 'torolt' || (total > 0 && cancelled === total)) {
-            result = { label: i18n_values.tabel.flights.body.status.deleted, className: 'status-cancelled' };
+            result = { label: i18n_values.tabel.flights.body.status.cancelled, className: 'status-cancelled' };
         } else {
             if (groupStatus === 'aktiv' || active === total) {
                 result = { label: i18n_values.tabel.flights.body.status.active, className: 'status-active' };
@@ -630,7 +630,7 @@ function renderAdminFlightsManagementTable(validFlights, i18n_values) {
             let statusLabel = i18n_values.tabel.flights.body.status.active;
             let statusClass = 'status-active';
             if (isCancelled) {
-                statusLabel = i18n_values.tabel.flights.body.status.deleted;
+                statusLabel = i18n_values.tabel.flights.body.status.cancelled;
                 statusClass = 'status-flight-cancelled';
             }
 

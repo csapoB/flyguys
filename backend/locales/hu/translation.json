@@ -71,7 +71,8 @@
         "missing_data": "A szükséges adatok hiányznak!",
         "end_point_not_working": "Ez a végpont nem működik!",
         "no_active_session": "Nincs aktív session!",
-        "missing_url_parameter": "Hiányzó URL paraméter!"
+        "missing_url_parameter": "Hiányzó URL paraméter!",
+        "wrong_data_type": "Rossz adatípus lett elküldve!"
         
     },
     "modal": {
@@ -81,7 +82,8 @@
             "edit_profile": "Profil szerkesztése",
             "delete_profile" : "Profil törlése",
             "verify_password": "Jelszó ellenőrzése",
-            "cancel_bookings": "Foglalások lemondása"
+            "cancel_bookings": "Foglalások lemondása",
+            "flight_cancelled": "Járat törölve"
         },
         "field": {
             "email": "E-mail",
@@ -117,13 +119,15 @@
             "profile_updated_successfully": "Profiladatok sikeresen frissítve!",
             "profile_deleted_successfully": "A profil törlése sikeres! 5 másodperc múlva átirányítunk.",
             "password_verified": "Jelszó ellenőrizve!",
-            "bookings_have_been_cancelled_successfully" : "A kijelölt foglalások törlése sikeres!"
+            "bookings_have_been_cancelled_successfully" : "A kijelölt foglalások törlése sikeres!",
+            "message_acknowledged": "Az üzenet el lett olvasva!"
         },
         "button": {
             "save": "Módosítások mentése",
             "verification": "Ellenőrzés",
             "yes": "Igen",
-            "no": "Nem"
+            "no": "Nem",
+            "ok": "Rendben"
         },
         "caption": {
             "no_account": "Nincs még fiókod? Hozz létre egyet!",
@@ -356,6 +360,7 @@
                         "not_ative": "Nem aktív",
                         "deleted": "Törölt",
                         "mixed": "Vegyes",
+                        "cancelled": "Lemondva",
                         "flight_deleted": "Járat törölve"
                     }
                 }
