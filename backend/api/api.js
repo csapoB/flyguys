@@ -42,7 +42,7 @@ router.get('/airports', async (request, response) => {
 router.get('/LoginCheck', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
-            response.status(401).json({
+            response.status(400).json({
                 allapot: false
             })
         }
