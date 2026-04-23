@@ -1,5 +1,5 @@
 import { getAdmin } from "./locale.js";
-import { initI18n, generateToast, errorPageGenerator } from "./toolbox.js";
+import { initI18n, generateToast, errorPageGenerator} from "./toolbox.js";
 
 $(async function () {
 
@@ -186,7 +186,7 @@ async function handleUserSearch(searchEmail, i18n_values) {
     }
 }
 
-function renderUsersTable(users, i18n_values) {
+async function renderUsersTable(users, i18n_values) {
     const headers = [i18n_values.tabel.users.header.name, i18n_values.tabel.users.header.email, i18n_values.tabel.users.header.bookings, i18n_values.tabel.users.header.rank, i18n_values.tabel.users.header.created_at];
     const $table = $('#tabla');
     $table.empty();
@@ -221,7 +221,7 @@ function renderUsersTable(users, i18n_values) {
             $row.append($('<td></td>', { text: user.UserEmail, 'data-label': headers[1] }));
             $row.append($('<td></td>', { text: user.NumberOfFlights, 'data-label': headers[2] }));
             $row.append($('<td></td>', { text: user.LoyaltyStatusName, 'data-label': headers[3] }));
-            $row.append($('<td></td>', { text: formatDateTime(user.CreatedAt), 'data-label': headers[4] }));
+            $row.append($('<td></td>', { text: formatDateTime(user.CreatedAt, await initI18n()), 'data-label': headers[4] }));
             $tbody.append($row);
         }
     }
@@ -288,7 +288,7 @@ function renderReservationError(message) {
 
 // --- Foglalások táblázat ---
 
-function renderFlightsTable(flights, userId, i18n_values) {
+async function renderFlightsTable(flights, userId, i18n_values) {
     let validFlights = [];
     if (Array.isArray(flights)) {
         validFlights = flights.filter(f => {
@@ -316,7 +316,7 @@ function renderFlightsTable(flights, userId, i18n_values) {
             const reservationCount = flight.ReservationCount;
 
             const routeLabel = `${flight.DepartureAirport} (${flight.DepartureCity}) → ${flight.ArrivalAirport} (${flight.ArrivalCity})`;
-            const timeLabel = `${formatDateTime(flight.DepartureDateTime)} – ${formatDateTime(flight.ArrivalDateTime)}`;
+            const timeLabel = `${formatDateTime(flight.DepartureDateTime, await initI18n())} – ${formatDateTime(flight.ArrivalDateTime, await initI18n())}`;
             const countLabel = `${i18n_values.tabel.users.body.quantity} : ${reservationCount} (${i18n_values.tabel.users.body.status.active}: ${activeCount}, ${i18n_values.tabel.users.body.status.cancelled}: ${cancelledCount})`;
             const status = getFlightStatus(flight, activeCount, cancelledCount, reservationCount, i18n_values);
 
@@ -593,7 +593,7 @@ function renderAdminFlightsTableLoading(i18n_values) {
     $('#admin_flights_table').html(`<div class="loading-state">${i18n_values.caption.loading_flights}</div>`);
 }
 
-function renderAdminFlightsManagementTable(validFlights, i18n_values) {
+async function renderAdminFlightsManagementTable(validFlights, i18n_values) {
     if (!validFlights.length) {
         $('#admin_flights_table').html(`<div class="empty-state">${i18n_values.caption.loading_flights}</div>`);
     } else {
@@ -645,8 +645,8 @@ function renderAdminFlightsManagementTable(validFlights, i18n_values) {
             $row.append($('<td></td>', { text: flightId, 'data-label': headers[0] }));
             $row.append($('<td></td>', { text: aircraftText, 'data-label': headers[1] }));
             $row.append($('<td></td>', { text: routeText, 'data-label': headers[2] }));
-            $row.append($('<td></td>', { text: formatDateTime(flight.DepartureDateTime), 'data-label': headers[3] }));
-            $row.append($('<td></td>', { text: formatDateTime(flight.ArrivalDateTime), 'data-label': headers[4] }));
+            $row.append($('<td></td>', { text: formatDateTime(flight.DepartureDateTime, await initI18n()), 'data-label': headers[3] }));
+            $row.append($('<td></td>', { text: formatDateTime(flight.ArrivalDateTime, await initI18n()), 'data-label': headers[4] }));
             $row.append($('<td></td>', { text: formatPrice(flight.BasePriceInHUF, i18n_values), 'data-label': headers[5] }));
             $row.append($('<td></td>', { text: `${i18n_values.tabel.users.body.quantity}: ${reservationCount} (${i18n_values.tabel.flights.body.status.active}: ${activeReservationCount})`, 'data-label': headers[6] }));
             $row.append(
@@ -743,7 +743,7 @@ function getSelectedAircraftContext() {
     return result;
 }
 
-function applyAircraftConstraint(i18n_values) {
+async function applyAircraftConstraint(i18n_values) {
     const selectedAircraft = getSelectedAircraftContext();
     const $departureAirport = $('#create_departure_airport');
     const $departureDateTime = $('#create_departure_datetime');
@@ -766,7 +766,7 @@ function applyAircraftConstraint(i18n_values) {
             if (!currentDeparture || new Date(currentDeparture) < new Date(minDepartureValue)) {
                 $departureDateTime.val(minDepartureValue);
             }
-            $hint.text(`${i18n_values.caption.last_know_arrival_of_aircraft} ${requiredAirport}, ${formatDateTime(selectedAircraft.LastArrivalDateTime)}. ${i18n_values.caption.new_take_off_restriction}`);
+            $hint.text(`${i18n_values.caption.last_know_arrival_of_aircraft} ${requiredAirport}, ${formatDateTime(selectedAircraft.LastArrivalDateTime, await initI18n())}. ${i18n_values.caption.new_take_off_restriction}`);
         } else {
             $departureAirport.prop('disabled', false);
             $departureDateTime.attr('min', '');
@@ -883,14 +883,15 @@ function toBool(value) {
     return value === true || value === 1 || value === '1';
 }
 
-function formatDateTime(value) {
+function formatDateTime(value, language) {
     let result = '';
     if (value) {
         const parsedDate = new Date(value);
         if (Number.isNaN(parsedDate.getTime())) {
             result = String(value);
         } else {
-            result = parsedDate.toLocaleString('hu-HU', {
+            const locale = language === 'en' ? 'en-GB' : 'hu-HU';
+            result = parsedDate.toLocaleString(locale, {
                 year: 'numeric',
                 month: '2-digit',
                 day: '2-digit',
