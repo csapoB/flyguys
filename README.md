@@ -40,10 +40,16 @@
 3. Telepítsd a függőségeket a backend mappába a következő parancs segítségével, amennyiben nincs node_modules mappa a backend mappában:<br>
    `npm install`<br>
 
-4. Backend indítása fejlesztés alatt: _(Fájlok szerkesztésének az esetén újraindul a szerver.)_<br>
+4. Telepítsd a modulokat<br>
+   `npm install bcrypt`
+   `npm install i18next`
+   <br>
+
+
+5. Backend indítása fejlesztés alatt: _(Fájlok szerkesztésének az esetén újraindul a szerver.)_<br>
    `npm run dev`<br>
 
-5. Backend indítása élesben: _(Fájlok szerkesztésének az esetén nem indul újra a szerver.)_<br>
+6. Backend indítása élesben: _(Fájlok szerkesztésének az esetén nem indul újra a szerver.)_<br>
    `npm run start`<br>
 
 ## NPM hiba esetén<br>
