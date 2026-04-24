@@ -372,7 +372,8 @@
                         "deleted": "Törölt",
                         "mixed": "Vegyes",
                         "cancelled": "Lemondva",
-                        "flight_deleted": "Járat törölve"
+                        "flight_deleted": "Járat törölve",
+                        "completed": "Lezárt"
                     }
                 }
             }

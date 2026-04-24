@@ -363,6 +363,27 @@ body {
     background: #e9f7ef;
 }
 
+.status-completed {
+    color: #084298;
+    background: #9ec5fe;
+    border: 1px solid #6ea8fe;
+    font-weight: 800;
+}
+
+.flight-past {
+    background: #dbeafe !important;
+    box-shadow: inset 5px 0 0 #2563eb;
+}
+
+.flight-past:hover {
+    background: #bfdbfe !important;
+}
+
+.flight-past .cancel-flight-btn {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
 .type-badge {
     color: #5f4a45;
     background: #eee7e4;

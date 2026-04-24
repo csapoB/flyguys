@@ -770,7 +770,7 @@ async function AdminHasFlightOverlap(aircraftId, departureDateTime, arrivalDateT
     `;
     const [rows] = await pool.execute(query, [aircraftId, departureDateTime, arrivalDateTime]);
     const overlapCount = Number.parseInt(rows[0].OverlapCount, 10);
-    return Number.isInteger(overlapCount) && overlapCount > 0;
+    return overlapCount > 0;
 }
 
 async function AdminCreateFlight(departureAirport, arrivalAirport, departureDateTime, arrivalDateTime, aircraftId, basePriceInHUF){
