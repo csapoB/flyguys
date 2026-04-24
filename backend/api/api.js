@@ -3,6 +3,15 @@ const router = express.Router();
 const database = require('../sql/database.js');
 const fs = require('fs/promises');
 const bcrypt = require('bcryptjs'); //?npm install bcrypt
+const nodemailer = require('nodemailer'); //?npm install nodemailer
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'flyguys.noreply@gmail.com',
+        pass: 'vooa clfx myki jopf'
+    }
+});
 
 //!Multer
 const multer = require('multer'); //?npm install multer
@@ -1086,10 +1095,23 @@ router.put('/cancelreservations', async (request, response) => {
                         error: request.t("modal.error.cancel_bookings_no_adults", { returnObjects: true })
                     });
                 } else {
+                    const cancellableDetails = await database.selectCancellableReservationDetails(reservations, request.session.user.id);
                     await database.cancelReservations(reservations, request.session.user.id);
                     response.status(200).json({
                         message: request.t("modal.success.bookings_have_been_cancelled_successfully", { returnObjects: true })
                     });
+                    if (cancellableDetails.length > 0) {
+                        const user = await database.getUserById(request.session.user.id);
+
+                        const lang = request.get("Accept-Language") === "hu" ? "hu" : "en";
+                        await sendEmailSafe({
+                            from: 'flyguys.noreply@gmail.com',
+                            to: user[0].UserEmail,
+                            subject: lang === "hu" ? "Foglalás lemondva – FlyGuys" : "Booking Cancelled – FlyGuys",
+                            html: buildCancellationEmailHtml(cancellableDetails, lang)
+                        });
+
+                    }
                 }
 
             }
@@ -1102,6 +1124,112 @@ router.put('/cancelreservations', async (request, response) => {
         });
     }
 });
+
+async function sendEmailSafe(mailOptions) {
+    try {
+        const info = await transporter.sendMail(mailOptions);
+    } catch (err) {
+        console.error(`E-mail küldési hiba (${mailOptions.to}):`, err.message);
+    }
+}
+
+function formatDateTimeHun(dateStr) {
+    const d = new Date(dateStr);
+    const pad = v => `${v}`.padStart(2, '0');
+    return `${d.getFullYear()}. ${pad(d.getMonth() + 1)}. ${pad(d.getDate())}. ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function formatDateTimeEn(dateStr) {
+    const d = new Date(dateStr);
+    const pad = v => `${v}`.padStart(2, '0');
+    return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}, ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function emailWrapper(content) {
+    return `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#fff7f4;font-family:Arial,sans-serif;color:#201b19;">
+<div style="max-width:600px;margin:24px auto;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #e9d8d3;">
+  <div style="background:#A4161A;padding:24px;text-align:center;">
+    <span style="color:#fff;font-size:28px;font-weight:bold;">&#9992; FlyGuys</span>
+  </div>
+  <div style="padding:28px;">${content}</div>
+  <div style="background:#fff7f4;padding:14px;text-align:center;font-size:12px;color:#705f5b;">
+    &copy; FlyGuys &bull; flyguys.noreply@gmail.com
+  </div>
+</div></body></html>`;
+}
+
+function buildBookingEmailHtml(details, rowID, columnID, lang) {
+    const isHun = lang === 'hu';
+    const row = `
+      <tr style="background:#fff7f4;"><td style="padding:10px 14px;border:1px solid #e9d8d3;font-weight:bold;width:40%">${isHun ? 'Útvonal' : 'Route'}</td>
+        <td style="padding:10px 14px;border:1px solid #e9d8d3;">${isHun ? details.DepartureCityHun : details.DepartureCityEn} (${details.DepartureAirport}) &rarr; ${isHun ? details.ArrivalCityHun : details.ArrivalCityEn} (${details.ArrivalAirport})</td></tr>
+      <tr><td style="padding:10px 14px;border:1px solid #e9d8d3;font-weight:bold;">${isHun ? 'Indulás' : 'Departure'}</td>
+        <td style="padding:10px 14px;border:1px solid #e9d8d3;">${isHun ? formatDateTimeHun(details.DepartureDateTime) : formatDateTimeEn(details.DepartureDateTime)}</td></tr>
+      <tr style="background:#fff7f4;"><td style="padding:10px 14px;border:1px solid #e9d8d3;font-weight:bold;">${isHun ? 'Érkezés' : 'Arrival'}</td>
+        <td style="padding:10px 14px;border:1px solid #e9d8d3;">${isHun ? formatDateTimeHun(details.ArrivalDateTime) : formatDateTimeEn(details.ArrivalDateTime)}</td></tr>
+      <tr><td style="padding:10px 14px;border:1px solid #e9d8d3;font-weight:bold;">${isHun ? 'Ülőhely' : 'Seat'}</td>
+        <td style="padding:10px 14px;border:1px solid #e9d8d3;">${rowID}${columnID} &mdash; ${details.FareClassName}</td></tr>
+      <tr style="background:#fff7f4;"><td style="padding:10px 14px;border:1px solid #e9d8d3;font-weight:bold;">${isHun ? 'Ár' : 'Price'}</td>
+        <td style="padding:10px 14px;border:1px solid #e9d8d3;">${Number(details.PriceInHUF).toLocaleString('hu-HU')} Ft</td></tr>`;
+    const content = isHun
+        ? `<h2 style="color:#A4161A;margin-top:0;">Foglalás visszaigazolva &#10003;</h2>
+           <p>Foglalásod sikeresen rögzítettük. Az alábbiakban találod a részleteket:</p>
+           <table style="width:100%;border-collapse:collapse;margin:16px 0;">${row}</table>
+           <p style="color:#705f5b;">Köszönjük, hogy a FlyGuys-t választottad!</p>`
+        : `<h2 style="color:#A4161A;margin-top:0;">Booking Confirmed &#10003;</h2>
+           <p>Your booking has been successfully confirmed. Here are the details:</p>
+           <table style="width:100%;border-collapse:collapse;margin:16px 0;">${row}</table>
+           <p style="color:#705f5b;">Thank you for choosing FlyGuys!</p>`;
+    return emailWrapper(content);
+}
+
+function buildCancellationEmailHtml(reservations, lang) {
+    const isHun = lang === 'hu';
+    const rows = reservations.map((r) => {
+        return `<tr>
+          <td style="padding:10px 14px;border:1px solid #e9d8d3;">${isHun ? r.DepartureCityHun : r.DepartureCityEn} (${r.DepartureAirport}) &rarr; ${isHun ? r.ArrivalCityHun : r.ArrivalCityEn} (${r.ArrivalAirport})</td>
+          <td style="padding:10px 14px;border:1px solid #e9d8d3;">${isHun ? formatDateTimeHun(r.DepartureDateTime) : formatDateTimeEn(r.DepartureDateTime)}</td>
+          <td style="padding:10px 14px;border:1px solid #e9d8d3;">${r.RowID}${r.ColumnID} &mdash; ${r.FareClassName}</td>
+        </tr>`;
+    }).join('');
+    const header = `<tr style="background:#A4161A;color:#fff;">
+      <th style="padding:10px 14px;text-align:left;">${isHun ? 'Útvonal' : 'Route'}</th>
+      <th style="padding:10px 14px;text-align:left;">${isHun ? 'Indulás' : 'Departure'}</th>
+      <th style="padding:10px 14px;text-align:left;">${isHun ? 'Ülőhely' : 'Seat'}</th>
+    </tr>`;
+    const content = isHun
+        ? `<h2 style="color:#660708;margin-top:0;">Foglalás lemondva</h2>
+           <p>Az alábbi foglalás(ok) sikeresen lemondásra kerültek:</p>
+           <table style="width:100%;border-collapse:collapse;margin:16px 0;">${header}${rows}</table>
+           <p style="color:#705f5b;">Ha kérdésed van, vedd fel velünk a kapcsolatot.</p>`
+        : `<h2 style="color:#660708;margin-top:0;">Booking Cancelled</h2>
+           <p>The following booking(s) have been successfully cancelled:</p>
+           <table style="width:100%;border-collapse:collapse;margin:16px 0;">${header}${rows}</table>
+           <p style="color:#705f5b;">If you have any questions, please contact us.</p>`;
+    return emailWrapper(content);
+}
+
+function buildFlightCancelledEmailHtml(flightData) {
+    const content = `
+      <h2 style="color:#660708;margin-top:0;">Járat törölve / Flight Cancelled</h2>
+      <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+        <tr style="background:#fff7f4;">
+          <td style="padding:10px 14px;border:1px solid #e9d8d3;font-weight:bold;width:40%">Útvonal</td>
+          <td style="padding:10px 14px;border:1px solid #e9d8d3;">
+            ${flightData.DepartureCityHungarian} (${flightData.DepartureAirport}) &rarr; ${flightData.ArrivalCityHungarian} (${flightData.ArrivalAirport})<br>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:10px 14px;border:1px solid #e9d8d3;font-weight:bold;">Indulás</td>
+          <td style="padding:10px 14px;border:1px solid #e9d8d3;">
+            ${flightData.DepartureDateTimeHungarian}
+          </td>
+        </tr>
+      </table>
+      <p style="color:#705f5b;">Sajnáljuk az okozott kellemetlenséget. A hűségpontok nem kerülnek levonásra.<br>
+      We apologize for the inconvenience. Your loyalty points will not be deducted.</p>`;
+    return emailWrapper(content);
+}
 
 function LoggedInCheck(request) {
     let vissza = false;
@@ -1215,6 +1343,19 @@ router.post('/helyfoglalas', async (request, response) => {
                     response.status(200).json({
                         siker: siker
                     });
+                    const user = await database.getUserById(request.session.user.id);
+                    if (user && user[0] && user[0].UserEmail) {
+                        const bookingDetails = await database.selectBookingDetails(flightID, rowID, columnID, request.session.user.id);
+                        if (bookingDetails) {
+                            const lang = request.get("Accept-Language") === "hu" ? "hu" : "en";
+                            sendEmailSafe({
+                                from: 'flyguys.noreply@gmail.com',
+                                to: user[0].UserEmail,
+                                subject: lang === "hu" ? "Foglalás visszaigazolása – FlyGuys" : "Booking Confirmation – FlyGuys",
+                                html: buildBookingEmailHtml(bookingDetails, rowID, columnID, lang)
+                            });
+                        }
+                    }
                 }
             }
 
@@ -1495,8 +1636,16 @@ router.post('/AdminCancelFlight', async (request, response) => {
                         let user_ids = await database.selectUserIDByReservationFlightID(flightID);
 
                         for (let i = 0; i < user_ids.length; i++) {
-                            await database.createUserMessage(user_ids[i].PassengerID, `A&${flight_data[0].DepartureCityHungarian} (${flight_data[0].DepartureAirport})&${flight_data[0].ArrivalCityHungarian} (${flight_data[0].ArrivalAirport})&${flight_data[0].DepartureDateTimeHungarian}&járat sajnos törlésre került.&A foglalásból származó hűségpontok nem kerülnek levonásra.`, `The&${flight_data[0].DepartureCityEnglish} (${flight_data[0].DepartureAirport})&${flight_data[0].ArrivalCityEnglish} (${flight_data[0].ArrivalAirport})&${flight_data[0].DepartureDateTimeEnglish}&flight has been cancelled.&The loyalty scores will not be deleted.`)
-
+                            await database.createUserMessage(user_ids[i].PassengerID, `A&${flight_data[0].DepartureCityHungarian} (${flight_data[0].DepartureAirport})&${flight_data[0].ArrivalCityHungarian} (${flight_data[0].ArrivalAirport})&${flight_data[0].DepartureDateTimeHungarian}&járat sajnos törlésre került.&A foglalásból származó hűségpontok nem kerülnek levonásra.`, `The&${flight_data[0].DepartureCityEnglish} (${flight_data[0].DepartureAirport})&${flight_data[0].ArrivalCityEnglish} (${flight_data[0].ArrivalAirport})&${flight_data[0].DepartureDateTimeEnglish}&flight has been cancelled.&The loyalty scores will not be deleted.`);
+                            const passenger = await database.getUserById(user_ids[i].PassengerID);
+                            if (passenger && passenger[0] && passenger[0].UserEmail) {
+                                await sendEmailSafe({
+                                    from: 'flyguys.noreply@gmail.com',
+                                    to: passenger[0].UserEmail,
+                                    subject: "Járat törölve / Flight Cancelled – FlyGuys",
+                                    html: buildFlightCancelledEmailHtml(flight_data[0])
+                                });
+                            }
                         }
                     }
                     response.status(200).json({
