@@ -78,6 +78,36 @@ body {
   padding-bottom: 300px;
 }
 
+@media (max-height: 1080px) {
+  body {
+    padding-bottom: 10px !important;
+  }
+  footer {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: auto !important;
+    z-index: auto !important;
+  }
+  main.flex-grow-1 {
+    overflow-y: auto !important;
+    max-height: none !important;
+  }
+  main.flex-grow-1 > .container-fluid {
+    flex: none !important;
+    min-height: auto !important;
+  }
+  #row2 {
+    flex: none !important;
+    min-height: auto !important;
+  }
+  .bg {
+    overflow-y: visible !important;
+    padding-bottom: 0 !important;
+  }
+}
+
 @media only screen and (max-width: 992px) {
   body {
     padding-bottom: 0;
