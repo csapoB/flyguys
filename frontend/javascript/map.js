@@ -22,7 +22,7 @@ $(async function () {
 
     try {
       (g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })({
-        key: "AIzaSyCGmwlN95_KmdNN5xAq2VO7qJCWSrNkuaA",
+        key: "API_KEY",
         v: "weekly",
         language: language
       });
@@ -72,7 +72,7 @@ async function initMap(language, i18n_values) {
   let map = new Map(document.getElementById("map"), {
     center: { lat: 47.31577891543344, lng: 19.98946307432514 },
     zoom: 5,
-    mapId: '339ffbadd5c5008584bb6746',
+    mapId: '339ffbadd5c50085b5c8ffb2',
     disableDefaultUI: true
   });
 
