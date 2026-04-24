@@ -8,7 +8,7 @@
     justify-content: center;
 }
 
-.pin-btn {
+#pin-btn {
     padding: 5px 12px;
     background-color: #dc3545;
     color: white;

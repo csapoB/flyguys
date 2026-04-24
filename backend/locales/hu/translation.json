@@ -114,7 +114,10 @@
             "server_error_during_profile_update": "A profiladatok frissítésekor szerverhiba lépett fel. Kérjük próbálkozzon újra később!",
             "wrong_email_or_password": "Rossz email vagy jelszó!",
             "cancel_bookings_no_adults": "A foglalások lemondásánál, 1 felnőttnek maradnia kell a gyerekek mellett!",
-            "invalid_email": "Kérjük, adjon meg érvényes e-mail címet!"
+            "invalid_email": "Kérjük, adjon meg érvényes e-mail címet!",
+            "invalid_birth_date_format": "Hibás a születési dátum formátuma!",
+            "invalid_birth_date": "Legalább 18 évesnek kell lenned ahhoz, hogy regisztrálj!",
+            "email_already_registered": "Ez az e-mail már foglalt. Kérjük, használjon egy másikat!"
         },
         "success": {
             "login_successful": "Sikeres bejelentkezés!",
