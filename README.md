@@ -87,6 +87,9 @@ Nyisd meg a böngésződben a **http://localhost:3000** címet.
 `express-session`<br>
 `multer`<br>
 `mysql2`<br>
+`bcrypt`<br>
+`nodemailer`<br>
+`i18next`<br>
 
 ## nodemon.json felépítése:<br>
 

@@ -862,18 +862,72 @@ async function selectUnreadUserMessageByUserID(userId) {
     return result
 }
 
-async function checkEmailInDatabase(userEmail) {
-    const query = "SELECT UserEmail FROM useraccount WHERE UserEmail LIKE ? "
-    const [result] = await pool.execute(query, [userEmail]);
-
-    return result.length > 0;
+async function selectBookingDetails(flightId, rowId, columnId, userId) {
+    const query = `
+        SELECT
+            flight.DepartureAirport,
+            dep_city.Hungarian AS DepartureCityHun,
+            dep_city.English AS DepartureCityEn,
+            flight.ArrivalAirport,
+            arr_city.Hungarian AS ArrivalCityHun,
+            arr_city.English AS ArrivalCityEn,
+            flight.DepartureDateTime,
+            flight.ArrivalDateTime,
+            fareclass.FareClassName,
+            ROUND(flight.BasePriceInHUF * fareclass.Multiplier * ((100 - ls.DiscountInPercentage) / 100)) AS PriceInHUF
+        FROM flight
+        INNER JOIN aircraft ON flight.AircraftID = aircraft.AircraftID
+        INNER JOIN seat ON seat.AircraftModelID = aircraft.AircraftModelID AND seat.RowID = ? AND seat.ColumnID = ?
+        INNER JOIN fareclass ON fareclass.FareClassID = seat.FareClassID
+        INNER JOIN airport dep_ap ON dep_ap.AirportCode = flight.DepartureAirport
+        INNER JOIN city dep_city ON dep_city.CityID = dep_ap.CityID
+        INNER JOIN airport arr_ap ON arr_ap.AirportCode = flight.ArrivalAirport
+        INNER JOIN city arr_city ON arr_city.CityID = arr_ap.CityID
+        INNER JOIN useraccount ON useraccount.UserID = ?
+        INNER JOIN loyaltystatus ls ON ls.LoyaltyStatusID = useraccount.LoyaltyStatusID
+        WHERE flight.FlightID = ?;
+    `;
+    const [rows] = await pool.execute(query, [rowId, columnId, userId, flightId]);
+    return rows[0] || null;
 }
-async function checkEmailOfUser(userId, userEmail) {
-    const query = "SELECT UserID, UserEmail FROM useraccount WHERE UserEmail LIKE ? "
-    const [result] = await pool.execute(query, [userEmail]);
 
-    return result[0].UserID == userId;
+async function selectCancellableReservationDetails(reservationIds, userId) {
+    const formatted = reservationIds.map(x => parseInt(x));
+    const query = `
+        SELECT
+            r.ReservationID,
+            r.RowID,
+            r.ColumnID,
+            r.IsAdult,
+            r.FlightID,
+            flight.DepartureAirport,
+            dep_city.Hungarian AS DepartureCityHun,
+            dep_city.English AS DepartureCityEn,
+            flight.ArrivalAirport,
+            arr_city.Hungarian AS ArrivalCityHun,
+            arr_city.English AS ArrivalCityEn,
+            flight.DepartureDateTime,
+            flight.ArrivalDateTime,
+            fareclass.FareClassName
+        FROM reservation r
+        INNER JOIN flight ON r.FlightID = flight.FlightID
+        INNER JOIN aircraft ON flight.AircraftID = aircraft.AircraftID
+        INNER JOIN seat ON seat.AircraftModelID = aircraft.AircraftModelID
+            AND seat.RowID = r.RowID AND seat.ColumnID = r.ColumnID
+        INNER JOIN fareclass ON fareclass.FareClassID = seat.FareClassID
+        INNER JOIN airport dep_ap ON dep_ap.AirportCode = flight.DepartureAirport
+        INNER JOIN city dep_city ON dep_city.CityID = dep_ap.CityID
+        INNER JOIN airport arr_ap ON arr_ap.AirportCode = flight.ArrivalAirport
+        INNER JOIN city arr_city ON arr_city.CityID = arr_ap.CityID
+        WHERE r.ReservationID IN (?) AND r.PassengerID = ?
+            AND r.IsCancelled = 0
+            AND flight.DepartureDateTime > NOW() AND flight.IsCancelled = 0
+        ORDER BY flight.DepartureDateTime ASC, r.ReservationID ASC;
+    `;
+    const [rows] = await pool.query(query, [formatted, userId]);
+    return rows;
 }
+
 //!Export
 module.exports = {
     Login,
@@ -936,6 +990,6 @@ module.exports = {
     selectNotCancelledBookingsCancelledFlightsByUserIdHun,
     selectNotCancelledBookingsCancelledFlightsByUserIdEn,
     selectFlightCancelledReservationsByUserIdAndFlightId,
-    checkEmailInDatabase,
-    checkEmailOfUser
+    selectBookingDetails,
+    selectCancellableReservationDetails
 };
