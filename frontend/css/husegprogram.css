@@ -57,7 +57,7 @@ main.flex-grow-1 > .container-fluid {
 .bg {
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow-y: visible !important;
   padding-bottom: 120px;
 }
 
@@ -65,16 +65,30 @@ main.flex-grow-1 > .container-fluid {
   height: 100%;
 }
 
-.nextLevelDiv{
-  height: 100%;
-}
-
 footer {
-  position: relative;
-  margin-top: auto;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 100;
 }
 
-@media only screen and (max-width: 768px) {
+body {
+  padding-bottom: 300px;
+}
+
+@media only screen and (max-width: 992px) {
+  body {
+    padding-bottom: 0;
+  }
+  footer {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    width: auto;
+  }
   .card {
     height: auto !important;
     max-height: 70vh;
