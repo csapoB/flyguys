@@ -115,7 +115,10 @@
             "server_error_during_profile_update": "A server error occured during profile update. Please, try again later!",
             "wrong_email_or_password": "Wrong email or password!",
             "cancel_bookings_no_adults": "When cancelling bookings, there has to be at least 1 adult remaining beside children!",
-            "invalid_email": "Please enter a valid email address!"
+            "invalid_email": "Please enter a valid email address!",
+            "invalid_birth_date_format": "Invalid birth date format!",
+            "invalid_birth_date": "You have to be at least 18 years old to register!",
+            "email_already_registered": "That e-mail is taken. Please, use a different one!"
         },
         "success": {
             "login_successful": "Login successful!",

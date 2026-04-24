@@ -212,8 +212,9 @@ async function initMapMarkers(api, input_name, markers_array, map, language, cus
     $contentString.append(`<div class="pin-info"><h2>${pins[i].City}</h2><p>(${pins[i].AirportCode})</p></div>`)
 
     let btn = $('<button>', {
+      id: "pin-btn",
       text: i18n_values.choose_button,
-      class: 'pin-btn w-50 mb-3',
+      class: 'w-50 mb-3',
       on: {
         "click": () => {
           $(`#${input_name}_input`).trigger("marker:click", [pins[i].AirportCode]);
@@ -309,7 +310,7 @@ function reviveMarker(marker, map) {
 function markerPopoverManualTrigger(markers_array, $marker, popover_obj) {
 
 
-  let popover_div;
+  let $popover_div;
 
   $marker.on("click.popover", function () {
     //console.log(1)
@@ -323,21 +324,22 @@ function markerPopoverManualTrigger(markers_array, $marker, popover_obj) {
       //console.log($(popover_obj.tip).find(".popover-body").first())
       $(popover_obj.tip).find(".popover-body").addClass("marker_popover_body")
 
-      popover_div = document.getElementById(popover_obj.tip.id); // Az popover_div id-ja minden megjelenésnél újragenerálódik => más lesz, mint az előző
-      popover_div.tabIndex = -1; // A tabindex beállítása azért szükséges, hogy az elemet (popover_div) a böngésző focusable-nek tekintse
-      popover_div.addEventListener("blur", (event) => {
+      $popover_div = $(`#${popover_obj.tip.id}`) // Az popover_div id-ja minden megjelenésnél újragenerálódik => más lesz, mint az előző
+      $popover_div.prop("tabindex", -1); // A tabindex beállítása azért szükséges, hogy az elemet (popover_div) a böngésző focusable-nek tekintse
+      $popover_div.on("blur", (event) => {
 
         if (event.relatedTarget == null) { // Ha az elem amire kattintottunk nem focusable, akkor lesz null az event.relatedTarget értéke
           popover_obj.hide();
 
 
         } else {
-          if (event.relatedTarget.id != $marker.prop("id")) { // Ha nem az input_fiealdbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
+          if (event.relatedTarget.id != $marker.prop("id") && !event.relatedTarget.id != "pin-btn") { // Ha nem az input_fiealdbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
             popover_obj.hide();
 
           }
         }
       });
+      $popover_div.trigger("focus");
     }
   });
 

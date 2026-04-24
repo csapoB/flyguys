@@ -800,21 +800,43 @@ router.post('/register', async (request, response) => {
                 response.status(400).json({
                     error: request.t("modal.error.invalid_email", { returnObjects: true })
                 });
-            }
-            else {
-                const saltRounds = 10;
-                const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
-                const register = await database.Register(nev, email, hashedPassword, szuldatum);
-                if (!register) {
+
+            } else {
+                if ((await database.checkEmailInDatabase(email))) {
                     response.status(400).json({
-                        error: request.t("modal.error.registration_unsuccessful", { returnObjects: true })
+                        error: request.t("modal.error.email_already_registered", { returnObjects: true })
                     });
+                } else {
+                    let szuldatum_date_obj = new Date(szuldatum);
+
+                    if (szuldatum_date_obj == "Invalid Date") {
+                        response.status(400).json({
+                            error: request.t("modal.error.invalid_birth_date_format", { returnObjects: true })
+                        });
+                    } else {
+                        if (!isAtLeast18(szuldatum_date_obj)) {
+
+                            response.status(400).json({
+                                error: request.t("modal.error.invalid_birth_date", { returnObjects: true })
+                            });
+                        } else {
+                            const saltRounds = 10;
+                            const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
+                            const register = await database.Register(nev, email, hashedPassword, szuldatum);
+                            if (!register) {
+                                response.status(400).json({
+                                    error: request.t("modal.error.registration_unsuccessful", { returnObjects: true })
+                                });
+                            }
+                            else {
+                                response.status(201).json({
+                                    message: request.t("modal.success.registration_successful", { returnObjects: true }),
+                                });
+                            }
+                        }
+                    }
                 }
-                else {
-                    response.status(200).json({
-                        message: request.t("modal.success.registration_successful", { returnObjects: true }),
-                    });
-                }
+
             }
         }
     } catch (error) {
@@ -955,21 +977,50 @@ router.put('/updateprofile', async (request, response) => {
                     error: request.t("errors.missing_data", { returnObjects: true })
                 });
             } else {
-                const user = await database.getUserById(request.session.user.id);
-
-                if (!user) {
+                if (!isValidEmail(email)) {
                     response.status(400).json({
-                        error: request.t("profile.error.user_not_found", { returnObjects: true })
+                        error: request.t("modal.error.invalid_email", { returnObjects: true })
                     });
                 } else {
-                    const saltRounds = 10;
-                    const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
-                    await database.updateUserProfile(request.session.user.id, nev, email, hashedPassword, szuldatum);
+                    if (!(await database.checkEmailInDatabase(email)) || !(await database.checkEmailOfUser(request.session.user.id, email))) {
+                        response.status(400).json({
+                            error: request.t("modal.error.email_already_registered", { returnObjects: true })
+                        });
+                    } else {
+                        let szuldatum_date_obj = new Date(szuldatum);
 
-                    response.status(200).json({
-                        message: request.t("modal.success.profile_updated_successfully", { returnObjects: true })
-                    });
+                        if (szuldatum_date_obj == "Invalid Date") {
+                            response.status(400).json({
+                                error: request.t("modal.error.invalid_birth_date_format", { returnObjects: true })
+                            });
+                        } else {
+                            if (!isAtLeast18(szuldatum_date_obj)) {
+
+                                response.status(400).json({
+                                    error: request.t("modal.error.invalid_birth_date", { returnObjects: true })
+                                });
+                            } else {
+                                const user = await database.getUserById(request.session.user.id);
+
+                                if (!user) {
+                                    response.status(400).json({
+                                        error: request.t("profile.error.user_not_found", { returnObjects: true })
+                                    });
+                                } else {
+                                    const saltRounds = 10;
+                                    const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
+                                    await database.updateUserProfile(request.session.user.id, nev, email, hashedPassword, szuldatum);
+
+                                    response.status(200).json({
+                                        message: request.t("modal.success.profile_updated_successfully", { returnObjects: true })
+                                    });
+                                }
+                            }
+                        }
+
+                    }
                 }
+
             }
         }
 
@@ -1211,6 +1262,15 @@ function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+function isAtLeast18(birthDate) {
+
+    const today = new Date();
+
+    const cutoffDate = new Date();
+    cutoffDate.setFullYear(today.getFullYear() - 18);
+
+    return birthDate <= cutoffDate;
+}
 
 router.get('/helyfoglalas', async (request, response) => {
     try {

@@ -86,16 +86,14 @@ export async function modalInit(current_language, end_point) {
                             case "profil":
                                 await initProfile(current_language, getprofile);
                                 break;
-                            default:
-                                break;
                         }
 
                         generateToast(getmodal.success.login_successful, "success");
                         break;
 
                     default:
-                        generateToast(getmodal.error.login_unsuccessful, "danger");
-                        console.error(data.error);
+                        generateToast(getmodal.error.login_unsuccessful + " " + data.error, "danger");
+                        console.error(getmodal.error.login_unsuccessful + " " + data.error);
                         break;
                 }
             }
@@ -107,9 +105,9 @@ export async function modalInit(current_language, end_point) {
 
         let userName;
         if (current_language == "hu") {
-            userName = $("#last_name").val().trim() + "&" + $("#first_name").val().trim();
+            userName = $("#new_last_name").val().trim() + "&" + $("#new_first_name").val().trim();
         } else {
-            userName = $("#first_name").val().trim() + "&" + $("#last_name").val().trim();
+            userName = $("#new_first_name").val().trim() + "&" + $("#new_last_name").val().trim();
         }
 
 
@@ -117,12 +115,9 @@ export async function modalInit(current_language, end_point) {
         const password = $("#new_usr_passw").val().trim();
 
         // Születési dátum konvertálása mm/dd/yyyy formátumból YYYY-MM-DD formátumba
-        const birthDateInput = $("#birth_date").val().trim();
-        let birthDate = null;
-
-        if (birthDateInput) {
-            birthDate = dateFormatter(birthDateInput, current_language);
-        }
+        const birthDateInput = $("#new_birth_date").val().trim();
+        let birthDate = dateFormatter(birthDateInput, current_language);
+        let birthDate_date_obj = new Date(birthDate);
 
         if (!userName.trim() || !email || !password || !birthDate) {
             generateToast(getmodal.error.missing_fields, "danger");
@@ -130,24 +125,29 @@ export async function modalInit(current_language, end_point) {
             generateToast(getmodal.error.password_char_limit, "danger");
         } else if (!isValidEmail(email)) {
             generateToast(getmodal.error.invalid_email, "danger");
+        } else if (birthDate_date_obj == "Invalid Date") {
+            generateToast(getmodal.error.invalid_birth_date_format, "danger");
+        } else if (!isAtLeast18(birthDate_date_obj)) {
+            generateToast(getmodal.error.invalid_birth_date, "danger");
         } else {
-            try {
-                const response = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept-Language': current_language
-                    },
-                    body: JSON.stringify({
-                        nev: userName.trim(),
-                        email,
-                        jelszo: password,
-                        szuldatum: birthDate || null
-                    })
-                });
-                const data = await response.json();
 
-                if (response.ok) {
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept-Language': current_language
+                },
+                body: JSON.stringify({
+                    nev: userName.trim(),
+                    email,
+                    jelszo: password,
+                    szuldatum: birthDate
+                })
+            });
+            const data = await response.json();
+
+            switch (response.status) {
+                case 201:
                     const childModal = bootstrap.Modal.getInstance(document.getElementById('childModal'));
                     const parentModal = bootstrap.Modal.getInstance(document.getElementById('monadModal'));
 
@@ -159,15 +159,14 @@ export async function modalInit(current_language, end_point) {
                     }
 
                     generateToast(getmodal.success.registration_successful, "success");
+                    break;
 
-                } else {
+                default:
                     console.error(data.error);
-                    generateToast(getmodal.error.registration_unsuccessful, "danger");
-                }
-            } catch (error) {
-                console.error('ERROR: ', error);
-                generateToast(getmodal.error.server_error_during_registration, "danger");
+                    generateToast(getmodal.error.registration_unsuccessful + " " + data.error, "danger");
+                    break;
             }
+
         }
     });
     $("#logout_button").on("click", async function () {
@@ -200,14 +199,12 @@ export async function modalInit(current_language, end_point) {
                     case "profil":
                         await initProfile(current_language, getprofile);
                         break;
-                    default:
-                        break;
                 }
 
                 generateToast(getmodal.success.logout_successful, "success");
 
             } else {
-                console.error(data.error);
+                console.error(getmodal.error.logout_unsuccessful + " " + data.error);
                 generateToast(getmodal.error.logout_unsuccessful + " " + data.error, "danger");
             }
 
@@ -421,14 +418,14 @@ function regis_modal(i18n_values) {
     });
 
     let $first_name = $("<input/>", {
-        "id": "first_name",
+        "id": "new_first_name",
         "class": "modal_input form-control",
         "type": "text",
         "placeholder": `${i18n_values.field.first_name}`
     });
 
     let $last_name = $("<input/>", {
-        "id": "last_name",
+        "id": "new_last_name",
         "class": "modal_input form-control",
         "type": "text",
         "placeholder": `${i18n_values.field.last_name}`
@@ -438,7 +435,7 @@ function regis_modal(i18n_values) {
     $input_group_for_name.append($first_name);
 
     let $birth_date = $("<input/>", {
-        "id": "birth_date",
+        "id": "new_birth_date",
         "class": "form-control modal_input mb-4 w-75",
         "type": "text",
         "placeholder": `${i18n_values.field.birth_date}`
@@ -766,32 +763,36 @@ export async function initEditProfileModal(profile_data, current_language, i18n_
         "text": `${getmodal.button.save}`,
         on: {
             "click": async function (event) {
+
                 event.preventDefault();
 
-                const userName = $("#edit_first_name").val().trim() + "&" + $("#edit_last_name").val().trim();
+                let userName;
+                if (current_language == "hu") {
+                    userName = $("#edit_last_name").val().trim() + "&" + $("#edit_first_name").val().trim();
+                } else {
+                    userName = $("#edit_first_name").val().trim() + "&" + $("#edit_last_name").val().trim();
+                }
+
+
                 const email = $("#edit_usr_email").val().trim();
                 const password = $("#edit_usr_passw").val().trim();
 
                 // Születési dátum konvertálása mm/dd/yyyy formátumból YYYY-MM-DD formátumba
                 const birthDateInput = $("#edit_birth_date").val().trim();
+                let birthDate = dateFormatter(birthDateInput, current_language);
+                let birthDate_date_obj = new Date(birthDate);
 
-                let birthDate = null;
-
-                if (birthDateInput) {
-
-                    birthDate = dateFormatter(birthDateInput, current_language)
-                }
-
-                if (!userName.trim() || !email || !password) {
+                if (!userName.trim() || !email || !password || !birthDate) {
                     generateToast(getmodal.error.missing_fields, "danger");
-                    return;
-                }
-
-                if (password.length < 6) {
+                } else if (password.length < 6) {
                     generateToast(getmodal.error.password_char_limit, "danger");
-                    return;
-                }
-                try {
+                } else if (!isValidEmail(email)) {
+                    generateToast(getmodal.error.invalid_email, "danger");
+                } else if (birthDate_date_obj == "Invalid Date") {
+                    generateToast(getmodal.error.invalid_birth_date_format, "danger");
+                } else if (!isAtLeast18(birthDate_date_obj)) {
+                    generateToast(getmodal.error.invalid_birth_date, "danger");
+                } else {
 
                     const response = await fetch('/api/updateprofile', {
                         method: 'PUT',
@@ -803,37 +804,35 @@ export async function initEditProfileModal(profile_data, current_language, i18n_
                             nev: userName.trim(),
                             email: email,
                             jelszo: password,
-                            szuldatum: birthDate || null
+                            szuldatum: birthDate
                         })
                     });
                     const data = await response.json();
 
-                    if (response.ok) {
+                    switch (response.status) {
+                        case 200:
+                            const childModal = bootstrap.Modal.getInstance(document.getElementById('childModal3'));
+                            const parentModal = bootstrap.Modal.getInstance(document.getElementById('monadModal3'));
 
-                        // Modal bezárása
-                        const childModal = bootstrap.Modal.getInstance(document.getElementById('childModal3'));
-                        const parentModal = bootstrap.Modal.getInstance(document.getElementById('monadModal3'));
+                            if (childModal) {
+                                childModal.hide();
+                            }
+                            if (parentModal) {
+                                parentModal.hide();
+                            }
 
-                        if (childModal) {
-                            childModal.hide();
-                        }
-                        if (parentModal) {
-                            parentModal.hide();
-                        }
+                            generateToast(getmodal.success.profile_updated_successfully, "success");
+                            await initProfile(current_language, i18n_values);
+                            break;
 
-                        generateToast(getmodal.success.profile_updated_successfully, "success");
-                        await initProfile(current_language, i18n_values);
-
-                    } else {
-
-                        console.error(data.error);
-                        generateToast(getmodal.error.profile_update_failed + "" + data.error, "danger");
-
+                        default:
+                            console.error(data.error);
+                            generateToast(getmodal.error.profile_update_failed + " " + data.error, "danger");
+                            break;
                     }
-                } catch (error) {
-                    console.error('ERROR: ', error);
-                    generateToast(getmodal.error.server_error_during_profile_update, "danger");
+
                 }
+
             }
         }
     });
@@ -1090,4 +1089,14 @@ function waitForModalHide(modalElement) {
             resolve();
         }, { once: true });
     });
+}
+
+function isAtLeast18(birthDate) {
+
+    const today = new Date();
+
+    const cutoffDate = new Date();
+    cutoffDate.setFullYear(today.getFullYear() - 18);
+
+    return birthDate <= cutoffDate;
 }
