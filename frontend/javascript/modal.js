@@ -1,7 +1,7 @@
 import { getFlights, getIndex, getLoyaltyProgram, getModal, getProfile } from "./locale.js";
 import { dateDeFormatter, dateFormatter, generateToast, initCheapestFlights, initFlights, initHusegprogram, initProfile, nameDeFormatter } from "./toolbox.js";
 
-function isValidEmail(email) {
+export function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
@@ -127,7 +127,7 @@ export async function modalInit(current_language, end_point) {
             generateToast(getmodal.error.invalid_email, "danger");
         } else if (birthDate_date_obj == "Invalid Date") {
             generateToast(getmodal.error.invalid_birth_date_format, "danger");
-        } else if (!isAtLeast18(birthDate_date_obj)) {
+        } else if (!isAtLeast18(birthDate)) {
             generateToast(getmodal.error.invalid_birth_date, "danger");
         } else {
 
@@ -790,7 +790,7 @@ export async function initEditProfileModal(profile_data, current_language, i18n_
                     generateToast(getmodal.error.invalid_email, "danger");
                 } else if (birthDate_date_obj == "Invalid Date") {
                     generateToast(getmodal.error.invalid_birth_date_format, "danger");
-                } else if (!isAtLeast18(birthDate_date_obj)) {
+                } else if (!isAtLeast18(birthDate)) {
                     generateToast(getmodal.error.invalid_birth_date, "danger");
                 } else {
 
@@ -1091,12 +1091,12 @@ function waitForModalHide(modalElement) {
     });
 }
 
-function isAtLeast18(birthDate) {
+export function isAtLeast18(birthDate) {
 
     const today = new Date();
 
     const cutoffDate = new Date();
     cutoffDate.setFullYear(today.getFullYear() - 18);
 
-    return birthDate <= cutoffDate;
+    return new Date(birthDate) <= cutoffDate;
 }

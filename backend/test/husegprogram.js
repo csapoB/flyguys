@@ -15,5 +15,7 @@ QUnit.test.each("flightNumbers",
     [undefined, undefined]
   ], (assert, [n, expected]) => {
     assert.deepEqual(flightNumbers(n), expected);
+    
+
 });
 
