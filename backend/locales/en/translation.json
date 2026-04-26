@@ -118,7 +118,9 @@
             "invalid_email": "Please enter a valid email address!",
             "invalid_birth_date_format": "Invalid birth date format!",
             "invalid_birth_date": "You have to be at least 18 years old to register!",
-            "email_already_registered": "That e-mail is taken. Please, use a different one!"
+            "email_already_registered": "That e-mail is taken. Please, use a different one!",
+            "invalid_birth_date_too_old": "Please, enter a valid birth date!"
+            
         },
         "success": {
             "login_successful": "Login successful!",

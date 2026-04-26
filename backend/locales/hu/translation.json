@@ -117,7 +117,8 @@
             "invalid_email": "Kérjük, adjon meg érvényes e-mail címet!",
             "invalid_birth_date_format": "Hibás a születési dátum formátuma!",
             "invalid_birth_date": "Legalább 18 évesnek kell lenned ahhoz, hogy regisztrálj!",
-            "email_already_registered": "Ez az e-mail már foglalt. Kérjük, használjon egy másikat!"
+            "email_already_registered": "Ez az e-mail már foglalt. Kérjük, használjon egy másikat!",
+            "invalid_birth_date_too_old": "Kérjük, adjon meg egy érvényes születési dátumot!"
         },
         "success": {
             "login_successful": "Sikeres bejelentkezés!",

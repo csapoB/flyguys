@@ -820,18 +820,25 @@ router.post('/register', async (request, response) => {
                                 error: request.t("modal.error.invalid_birth_date", { returnObjects: true })
                             });
                         } else {
-                            const saltRounds = 10;
-                            const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
-                            const register = await database.Register(nev, email, hashedPassword, szuldatum);
-                            if (!register) {
+                            if (!isBeliveableBirthDate(szuldatum_date_obj)) {
+
                                 response.status(400).json({
-                                    error: request.t("modal.error.registration_unsuccessful", { returnObjects: true })
+                                    error: request.t("modal.error.invalid_birth_date_too_old", { returnObjects: true })
                                 });
-                            }
-                            else {
-                                response.status(201).json({
-                                    message: request.t("modal.success.registration_successful", { returnObjects: true }),
-                                });
+                            } else {
+                                const saltRounds = 10;
+                                const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
+                                const register = await database.Register(nev, email, hashedPassword, birthDateObjConverter(szuldatum_date_obj));
+                                if (!register) {
+                                    response.status(400).json({
+                                        error: request.t("modal.error.registration_unsuccessful", { returnObjects: true })
+                                    });
+                                }
+                                else {
+                                    response.status(201).json({
+                                        message: request.t("modal.success.registration_successful", { returnObjects: true }),
+                                    });
+                                }
                             }
                         }
                     }
@@ -1000,21 +1007,29 @@ router.put('/updateprofile', async (request, response) => {
                                     error: request.t("modal.error.invalid_birth_date", { returnObjects: true })
                                 });
                             } else {
-                                const user = await database.getUserById(request.session.user.id);
 
-                                if (!user) {
+                                if (!isBeliveableBirthDate(szuldatum_date_obj)) {
                                     response.status(400).json({
-                                        error: request.t("profile.error.user_not_found", { returnObjects: true })
+                                        error: request.t("modal.error.invalid_birth_date_too_old", { returnObjects: true })
                                     });
                                 } else {
-                                    const saltRounds = 10;
-                                    const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
-                                    await database.updateUserProfile(request.session.user.id, nev, email, hashedPassword, szuldatum);
+                                    const user = await database.getUserById(request.session.user.id);
 
-                                    response.status(200).json({
-                                        message: request.t("modal.success.profile_updated_successfully", { returnObjects: true })
-                                    });
+                                    if (!user) {
+                                        response.status(400).json({
+                                            error: request.t("profile.error.user_not_found", { returnObjects: true })
+                                        });
+                                    } else {
+                                        const saltRounds = 10;
+                                        const hashedPassword = await bcrypt.hash(jelszo, saltRounds);
+                                        await database.updateUserProfile(request.session.user.id, nev, email, hashedPassword, birthDateObjConverter(szuldatum_date_obj));
+
+                                        response.status(200).json({
+                                            message: request.t("modal.success.profile_updated_successfully", { returnObjects: true })
+                                        });
+                                    }
                                 }
+
                             }
                         }
 
@@ -1270,6 +1285,23 @@ function isAtLeast18(birthDate) {
     cutoffDate.setFullYear(today.getFullYear() - 18);
 
     return birthDate <= cutoffDate;
+}
+
+function birthDateObjConverter(birth_date) {
+
+    let birthDate = new Date(birth_date);
+
+    return birthDate.getFullYear() + "-" + ((birthDate.getMonth() < 10 ) ? "0" + birthDate.getMonth()+1 : birthDate.getMonth()+1) + "-" + ((birthDate.getDate() < 10 ) ? "0" + birthDate.getDate() : birthDate.getDate());
+}
+
+function isBeliveableBirthDate(birthDate) {
+
+    const today = new Date();
+
+    const cutoffDate = new Date();
+    cutoffDate.setFullYear(today.getFullYear() - 120);
+
+    return birthDate >= cutoffDate;
 }
 
 router.get('/helyfoglalas', async (request, response) => {

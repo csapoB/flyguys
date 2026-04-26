@@ -928,6 +928,19 @@ async function selectCancellableReservationDetails(reservationIds, userId) {
     return rows;
 }
 
+async function checkEmailInDatabase(userEmail) {
+    const query = "SELECT UserEmail FROM useraccount WHERE UserEmail LIKE ? "
+    const [result] = await pool.execute(query, [userEmail]);
+
+    return result.length > 0;
+}
+async function checkEmailOfUser(userId, userEmail) {
+    const query = "SELECT UserID, UserEmail FROM useraccount WHERE UserEmail LIKE ? "
+    const [result] = await pool.execute(query, [userEmail]);
+
+    return result[0].UserID == userId;
+}
+
 //!Export
 module.exports = {
     Login,
@@ -991,5 +1004,7 @@ module.exports = {
     selectNotCancelledBookingsCancelledFlightsByUserIdEn,
     selectFlightCancelledReservationsByUserIdAndFlightId,
     selectBookingDetails,
-    selectCancellableReservationDetails
+    selectCancellableReservationDetails,
+    checkEmailInDatabase,
+    checkEmailOfUser
 };
