@@ -1,5 +1,5 @@
 ﻿import { getSeatChooser } from "./locale.js";
-import { infoPageGenerator, errorPageGenerator, showLogin, initI18n, generateToast } from "./toolbox.js";
+import { infoPageGenerator, errorPageGenerator, showLogin, initI18n, generateToast, szamolOsszar, lefoglalgombAllapot } from "./toolbox.js";
 
 let kivalaszottUlesekOda = [];
 let kivalaszottUlesekVissza = [];
@@ -101,9 +101,7 @@ $(document).ready(async function () {
                         }
                     });
                 }
-                let osszesen = 0;
-                kivalaszottUlesekOda.forEach(u => osszesen += u.ar);
-                kivalaszottUlesekVissza.forEach(u => osszesen += u.ar);
+                let osszesen = szamolOsszar(kivalaszottUlesekOda, kivalaszottUlesekVissza);
                 generateToast(getseatchooser.reservation_successful, "success");
                 setTimeout(function () {
                     window.location.replace(`/${language}`);
@@ -241,10 +239,7 @@ function frissitAllapot(i18n_values) {
     }
 
     // Osszes ar
-    let osszesen = 0;
-    kivalaszottUlesekOda.forEach(u => osszesen += u.ar);
-    kivalaszottUlesekVissza.forEach(u => osszesen += u.ar);
-    $('#ar').text(osszesen);
+    $('#ar').text(szamolOsszar(kivalaszottUlesekOda, kivalaszottUlesekVissza));
 
     // Szamlalo
     $('#oda_szamlalo').text(kivalaszottUlesekOda.length + ' / ' + maxPassengers);
@@ -253,9 +248,7 @@ function frissitAllapot(i18n_values) {
     }
 
     // Lefoglalas gomb: pontosan num_of_passengers kell mindket iranyban
-    let odaOk = kivalaszottUlesekOda.length === maxPassengers;
-    let visszaOk = !isRoundTrip || kivalaszottUlesekVissza.length === maxPassengers;
-    $('#lefoglal').prop('disabled', !(odaOk && visszaOk));
+    $('#lefoglal').prop('disabled', !lefoglalgombAllapot(kivalaszottUlesekOda, kivalaszottUlesekVissza, maxPassengers, isRoundTrip));
 }
 
 function megjelenitKijeloltek($lista, ulesek, i18n_values) {
@@ -289,3 +282,4 @@ function errorHandler(message, lang) {
 
     showLogin(lang);
 }
+

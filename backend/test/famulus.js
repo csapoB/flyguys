@@ -1,4 +1,4 @@
-import { nameDeFormatter, dateFormatter, dateDeFormatter} from "../../frontend/javascript/toolbox.js"; 
+import { nameDeFormatter, dateFormatter, dateDeFormatter, progression } from "../../frontend/javascript/toolbox.js";
 
 QUnit.module("famulus");
 
@@ -49,4 +49,20 @@ QUnit.test.each("dateFormatter",
   ], (assert, [date, language, expected]) => {
     assert.equal(dateFormatter(date, language), expected);
     //console.log(`date: ${date}, language: ${language} => ${expected}`);
+});
+
+QUnit.test.each("progression",
+  [
+    [0, { nofIncurrentLvl: 0, toNextRank: 6, percent: 0, capped: false }],
+    [5, { nofIncurrentLvl: 5, toNextRank: 1, percent: 100, capped: false }],
+    [6, { nofIncurrentLvl: 6, toNextRank: 10, percent: 0, capped: false }],
+    [15, { nofIncurrentLvl: 15, toNextRank: 1, percent: 100, capped: false }],
+    [16, { nofIncurrentLvl: 16, toNextRank: 10, percent: 0, capped: false }],
+    [25, { nofIncurrentLvl: 25, toNextRank: 1, percent: 100, capped: false }],
+    [26, { nofIncurrentLvl: 26, toNextRank: 10, percent: 0, capped: false }],
+    [35, { nofIncurrentLvl: 35, toNextRank: 1, percent: 100, capped: false }],
+    [36, { nofIncurrentLvl: 0, toNextRank: 0, percent: 100, capped: true }],
+    [100, { nofIncurrentLvl: 0, toNextRank: 0, percent: 100, capped: true }]
+  ], (assert, [nof, expected]) => {
+    assert.deepEqual(progression(nof), expected);
 });
