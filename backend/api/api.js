@@ -1893,3 +1893,8 @@ router.put('/messageread', async (request, response) => {
 });
 
 module.exports = router;
+module.exports.ToSqlDateTime = ToSqlDateTime;
+module.exports.isValidEmail = isValidEmail;
+module.exports.isAtLeast18 = isAtLeast18;
+module.exports.LoggedInCheck = LoggedInCheck;
+module.exports.EnsureAdminSession = EnsureAdminSession;
