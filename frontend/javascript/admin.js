@@ -1,5 +1,5 @@
 import { getAdmin } from "./locale.js";
-import { initI18n, generateToast, errorPageGenerator} from "./toolbox.js";
+import { initI18n, generateToast, errorPageGenerator, toBool, formatDateTime, formatPrice, toLocalDateTimeInputValue, addMinutesToInputValue, validateCreateFlightForm, validateAircraftConstraint, getFlightStatus } from "./toolbox.js";
 
 $(async function () {
 
@@ -410,32 +410,6 @@ async function expandFlightRow($row, $detailRow, userId, flightId, language, i18
     }
 }
 
-function getFlightStatus(flight, activeCount, cancelledCount, reservationCount, i18n_values) {
-    let groupStatusRaw = '';
-    if (flight.GroupStatus) {
-        groupStatusRaw = String(flight.GroupStatus);
-    }
-    const groupStatus = groupStatusRaw.toLowerCase();
-    const flightCancelled = toBool(flight.FlightIsCancelled);
-    const cancelled = Number.parseInt(cancelledCount, 10);
-    const active = Number.parseInt(activeCount, 10);
-    const total = Number.parseInt(reservationCount, 10);
-
-    let result = { label: i18n_values.tabel.flights.body.status.mixed, className: 'status-mixed' };
-    if (flightCancelled) {
-        result = { label: i18n_values.tabel.flights.body.status.flight_deleted, className: 'status-flight-cancelled' };
-    } else {
-        if (groupStatus === 'torolt' || (total > 0 && cancelled === total)) {
-            result = { label: i18n_values.tabel.flights.body.status.cancelled, className: 'status-cancelled' };
-        } else {
-            if (groupStatus === 'aktiv' || active === total) {
-                result = { label: i18n_values.tabel.flights.body.status.active, className: 'status-active' };
-            }
-        }
-    }
-    return result;
-}
-
 function renderSeatsTable(seats, i18n_values) {
     let result;
     if (!Array.isArray(seats) || !seats.length) {
@@ -784,45 +758,6 @@ async function applyAircraftConstraint(i18n_values) {
     $departureDateTime.trigger('change');
 }
 
-// --- Járat létrehozás validáció ---
-
-function validateCreateFlightForm(aircraftID, departureAirport, arrivalAirport, departureDate, arrivalDate, basePriceInHUF, i18n_values) {
-    let error = null;
-    if (!Number.isInteger(aircraftID) || aircraftID <= 0) {
-        error = i18n_values.error.choose_valid_aircraft;
-    } else if (!departureAirport || !arrivalAirport) {
-        error = i18n_values.error.choose_origin_and_destination_airport;
-    } else if (departureAirport == arrivalAirport) {
-        error = i18n_values.error.origin_equals_destination;
-    } else if (Number.isNaN(departureDate.getTime()) || Number.isNaN(arrivalDate.getTime())) {
-        error = i18n_values.error.choose_valid_dates;
-    } else if (arrivalDate <= departureDate) {
-        error = i18n_values.error.new_departure_before_old_departure;
-    } else if (!Number.isInteger(basePriceInHUF) || basePriceInHUF <= 0) {
-        error = i18n_values.error.base_price_must_be_positive_integer;
-    }
-    return error;
-}
-
-function validateAircraftConstraint(selectedAircraft, departureAirport, departureDate, i18n_values) {
-    let error = null;
-    if (selectedAircraft && selectedAircraft.LastArrivalAirport) {
-        const lastKnownAirport = String(selectedAircraft.LastArrivalAirport).toUpperCase();
-        if (departureAirport != lastKnownAirport) {
-            error = `${i18n_values.error.aircraft_must_take_off_here}: ${lastKnownAirport}.`;
-        } else {
-            const lastArrivalDate = new Date(selectedAircraft.LastArrivalDateTime);
-            if (!Number.isNaN(lastArrivalDate.getTime())) {
-                const minDepartureDate = new Date(lastArrivalDate.getTime() + 30 * 60 * 1000);
-                if (departureDate < minDepartureDate) {
-                    error = i18n_values.error.new_take_off_just_after_previous_take_off;
-                }
-            }
-        }
-    }
-    return error;
-}
-
 async function handleCreateFlightSubmit(event, language, i18n_values) {
     event.preventDefault();
     renderAdminFeedback('#create_flight_feedback');
@@ -887,70 +822,3 @@ function renderAdminFeedback(selector, message, type) {
     }
 }
 
-function toBool(value) {
-    return value === true || value === 1 || value === '1';
-}
-
-function formatDateTime(value, language) {
-    let result = '';
-    if (value) {
-        const parsedDate = new Date(value);
-        if (Number.isNaN(parsedDate.getTime())) {
-            result = String(value);
-        } else {
-            const locale = language === 'en' ? 'en-GB' : 'hu-HU';
-            result = parsedDate.toLocaleString(locale, {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-    }
-    return result;
-}
-
-function formatPrice(value, i18n_values) {
-    const numericValue = Number(value);
-    let result = '';
-    if (!Number.isNaN(numericValue)) {
-        result = `${new Intl.NumberFormat('hu-HU').format(numericValue)} ${i18n_values.currency}`;
-    }
-    return result;
-}
-
-function toLocalDateTimeInputValue(value) {
-    let parsedDate;
-    if (value instanceof Date) {
-        parsedDate = value;
-    } else {
-        parsedDate = new Date(value);
-    }
-    let result = '';
-    if (!Number.isNaN(parsedDate.getTime())) {
-        const pad = n => String(n).padStart(2, '0');
-        result = [
-            parsedDate.getFullYear(),
-            '-',
-            pad(parsedDate.getMonth() + 1),
-            '-',
-            pad(parsedDate.getDate()),
-            'T',
-            pad(parsedDate.getHours()),
-            ':',
-            pad(parsedDate.getMinutes())
-        ].join('');
-    }
-    return result;
-}
-
-function addMinutesToInputValue(inputValue, minutes) {
-    const parsedDate = new Date(inputValue);
-    let result = '';
-    if (!Number.isNaN(parsedDate.getTime())) {
-        parsedDate.setMinutes(parsedDate.getMinutes() + minutes);
-        result = toLocalDateTimeInputValue(parsedDate);
-    }
-    return result;
-}
