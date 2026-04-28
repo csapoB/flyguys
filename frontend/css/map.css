@@ -1,0 +1,26 @@
+.pin-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background-color: white;
+    justify-content: center;
+}
+
+#pin-btn {
+    padding: 5px 12px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.pin-btn:hover {
+    background-color: #c82333;
+}
+
+.marker_popover_body{
+    padding: 0px !important;
+}

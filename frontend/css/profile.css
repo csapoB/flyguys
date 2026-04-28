@@ -1,0 +1,98 @@
+#cont{
+    display:flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+#profileDiv{
+    
+    width: 100%;
+    /*flex-direction: column;
+    justify-content: center;
+    align-items: center;*/
+    background-color: #ffffff;
+    border-radius: 20px;
+    border: solid 1px #DC3545;
+    padding: 1rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+}
+
+#r2{
+    display:flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+}
+
+#aktivFoglalasok, #korabbiFoglalasok, #toroltJaratokFoglalasok{
+    background-color: #ffffff;
+    border-radius: 20px;
+    border: solid 1px #DC3545;
+    padding: 2rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+}
+
+.popover{
+  --bs-popover-max-width : none;
+  width: 70%;
+  max-height: 450px;
+  overflow-y: scroll;
+}
+
+.tcim{
+    width: fit-content;
+    border-bottom: 1px solid #A4161A;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+.form-check-input:checked {
+  background-color: #DC3545;
+}
+
+.form-control:focus {
+  border-color: #A4161A;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #A4161A;
+}
+.modal_input.form-control:focus{
+  border-color: #000;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #000;
+}
+
+.modal-backdrop {
+  --bs-backdrop-zindex: 1050;
+  --bs-backdrop-bg: #A4161A;
+  --bs-backdrop-opacity: 0.5;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--bs-backdrop-zindex);
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bs-backdrop-bg);
+}
+.ui-datepicker-year option:hover{
+    background-color: #DC3545 !important;
+}
+.ui-datepicker-month option:hover{
+    background-color: #DC3545 !important;
+}
+@media (max-width: 767px) {
+    #r2{
+        flex-direction: column;
+    }
+
+    #aktivFoglalasok, #korabbiFoglalasok, #toroltJaratokFoglalasok{
+        margin-bottom: 2rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    #departure_date{
+        border-left: 1px solid #dee2e6 !important;
+        border-right: 1px solid #dee2e6 !important;
+        margin-bottom: 0 !important;
+    }
+}
+
+
+

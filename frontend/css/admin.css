@@ -1,0 +1,627 @@
+:root {
+    --admin-accent: #a4161a;
+    --admin-accent-dark: #660708;
+    --admin-ink: #201b19;
+    --admin-muted: #705f5b;
+    --admin-border: #e9d8d3;
+    --admin-card: #ffffff;
+    --admin-soft: #fff7f4;
+    --admin-hover: #fcebe7;
+}
+
+body {
+    background: #ffffff;
+    color: var(--admin-ink);
+    font-family: "Zalando Sans Expanded", sans-serif;
+}
+
+.admin-page {
+    position: relative;
+}
+
+.admin-mode-switch {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+
+.admin-mode-btn {
+    border: 1px solid #dcb7af;
+    color: var(--admin-accent-dark);
+    background: #ffffff;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    transition: all 0.16s ease;
+}
+
+.admin-mode-btn:hover {
+    background: #fff3f0;
+    border-color: #cc9e95;
+}
+
+.admin-mode-btn.active {
+    background: var(--admin-accent);
+    border-color: var(--admin-accent);
+    color: #ffffff;
+}
+
+.admin-mode-panel {
+    animation: adminModeFade 0.18s ease;
+}
+
+@keyframes adminModeFade {
+    from {
+        opacity: 0;
+        transform: translateY(3px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.admin-page-wide {
+    max-width: 1720px;
+}
+
+.admin-card {
+    background: var(--admin-card);
+    border: 1px solid var(--admin-border);
+    border-radius: 14px;
+    box-shadow: 0 10px 22px rgba(63, 28, 23, 0.07);
+    overflow: hidden;
+}
+
+.admin-card-header {
+    padding: 1rem 1.2rem;
+    background: linear-gradient(180deg, #fffefe 0%, #fcf2ef 100%);
+    border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-title,
+.admin-title-sm {
+    margin: 0;
+    color: var(--admin-accent-dark);
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    letter-spacing: 0.02em;
+}
+
+.admin-title {
+    font-size: 1.45rem;
+}
+
+.admin-title-sm {
+    font-size: 1.25rem;
+}
+
+.admin-subtitle {
+    color: var(--admin-muted);
+    font-size: 0.94rem;
+}
+
+.users-toolbar {
+    margin-top: 0.75rem;
+    display: flex;
+    gap: 0.55rem;
+    align-items: center;
+}
+
+.users-toolbar .form-control {
+    flex: 1;
+    min-width: 0;
+    border-color: #d8bcb5;
+    background: #ffffff;
+    direction: ltr;
+    text-align: left;
+}
+
+.users-toolbar .btn {
+    white-space: nowrap;
+}
+
+.users-table-wrapper {
+    max-height: 68vh;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+.admin-table,
+.reservation-table,
+.seat-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.admin-table {
+    width: max-content;
+    min-width: 100%;
+}
+
+.reservation-table {
+    width: max-content;
+    min-width: 100%;
+}
+
+.seat-table {
+    width: max-content;
+    min-width: 100%;
+}
+
+.admin-table thead th,
+.reservation-table thead th,
+.seat-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f6e6e2;
+    color: #531516;
+    font-size: 0.79rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid #e0c5bf;
+    white-space: normal;
+}
+
+.admin-table thead th {
+    white-space: nowrap;
+}
+
+.admin-table td,
+.admin-table th,
+.reservation-table td,
+.reservation-table th,
+.seat-table td,
+.seat-table th {
+    padding: 0.62rem 0.76rem;
+    vertical-align: middle;
+    word-break: break-word;
+}
+
+.reservation-table td,
+.reservation-table th,
+.seat-table td,
+.seat-table th {
+    white-space: nowrap;
+    word-break: normal;
+}
+
+.admin-table td,
+.admin-table th {
+    white-space: nowrap;
+    word-break: normal;
+}
+
+.table-responsive.users-table-wrapper {
+    overflow-x: auto;
+}
+
+.admin-table tbody tr {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.admin-table tbody tr:nth-child(even) {
+    background: #fffdfa;
+}
+
+.admin-table tbody tr:hover {
+    background: var(--admin-hover);
+}
+
+.admin-table tbody tr.selected-user {
+    background: #fff1ed;
+    box-shadow: inset 4px 0 0 var(--admin-accent);
+}
+
+.reservation-area {
+    padding: 1rem 1.2rem 1.3rem;
+    min-height: 240px;
+}
+
+#admin_flights_table,
+#reservation_area {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.flight-create-form .form-label {
+    font-size: 0.84rem;
+    color: #5e2f28;
+    margin-bottom: 0.28rem;
+    text-transform: uppercase;
+    letter-spacing: 0.035em;
+    font-weight: 700;
+}
+
+.flight-create-form .form-select,
+.flight-create-form .form-control {
+    border-color: #dcb7af;
+}
+
+.flight-create-form .form-select:disabled {
+    background: #f4ece9;
+    color: #775e58;
+}
+
+.admin-feedback {
+    border-radius: 10px;
+    border: 1px solid var(--admin-border);
+    padding: 0.64rem 0.8rem;
+    font-size: 0.9rem;
+}
+
+.admin-feedback.is-info {
+    background: #fff7f4;
+    color: #6f4f48;
+    border-color: #edd2cb;
+}
+
+.admin-feedback.is-success {
+    background: #e9f7ef;
+    color: #1f6f49;
+    border-color: #c9e8d8;
+}
+
+.admin-feedback.is-error {
+    background: #fff2f2;
+    color: #8f2429;
+    border-color: #efc0c3;
+}
+
+.admin-action-btn {
+    white-space: nowrap;
+}
+
+.flight-group-row {
+    cursor: pointer;
+    transition: background-color 0.16s ease;
+}
+
+.flight-group-row:hover {
+    background: #fff1ed;
+}
+
+.flight-group-row.expanded {
+    background: #ffece8;
+}
+
+.flight-summary {
+    color: var(--admin-accent-dark);
+    font-weight: 700;
+}
+
+.toggle-indicator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.55rem;
+    height: 1.55rem;
+    border-radius: 999px;
+    border: 1px solid #cc9e95;
+    color: var(--admin-accent-dark);
+    background: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.flight-detail-row td {
+    background: #fff8f6;
+    border-top: 0;
+    padding: 0.8rem;
+}
+
+.seats-table-wrapper {
+    border: 1px solid #edd9d3;
+    border-radius: 10px;
+    overflow-x: auto;
+    overflow-y: visible;
+    background: #ffffff;
+}
+
+.seat-table tbody tr:nth-child(even) {
+    background: #fffaf8;
+}
+
+.status-badge,
+.type-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.16rem 0.58rem;
+    font-size: 0.77rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.status-active {
+    color: #1f6f49;
+    background: #def3e7;
+}
+
+.status-cancelled {
+    color: #8a1f23;
+    background: #f9dddd;
+}
+
+.status-mixed {
+    color: #8e5d12;
+    background: #faecd4;
+}
+
+.status-flight-cancelled {
+    color: #ffffff;
+    background: #660708;
+}
+
+.status-active-light {
+    color: #1f6f49;
+    background: #e9f7ef;
+}
+
+.status-completed {
+    color: #084298;
+    background: #9ec5fe;
+    border: 1px solid #6ea8fe;
+    font-weight: 800;
+}
+
+.flight-past {
+    background: #dbeafe !important;
+    box-shadow: inset 5px 0 0 #2563eb;
+}
+
+.flight-past:hover {
+    background: #bfdbfe !important;
+}
+
+.flight-past .cancel-flight-btn {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.type-badge {
+    color: #5f4a45;
+    background: #eee7e4;
+}
+
+.seat-cancelled {
+    opacity: 0.76;
+}
+
+.loading-inline {
+    margin: 0;
+}
+
+.empty-state,
+.loading-state,
+.error-state {
+    border-radius: 10px;
+    border: 1px dashed var(--admin-border);
+    background: var(--admin-soft);
+    color: var(--admin-muted);
+    text-align: center;
+    padding: 1rem;
+}
+
+.error-state {
+    background: #fff2f2;
+    color: #8f2429;
+    border-color: #efc0c3;
+}
+
+/* ≤1199.98px: az admin járatkezelő tábla kártyás nézete
+   (9 oszloppal xl alatt már nem férne ki tisztán) */
+@media (max-width: 1199.98px) {
+    #admin_flights_table .reservation-table {
+        width: 100%;
+        min-width: 0;
+    }
+
+    #admin_flights_table .reservation-table thead {
+        display: none;
+    }
+
+    #admin_flights_table .reservation-table,
+    #admin_flights_table .reservation-table tbody,
+    #admin_flights_table .reservation-table tr,
+    #admin_flights_table .reservation-table td {
+        display: block;
+        width: 100%;
+    }
+
+    #admin_flights_table .reservation-table tbody tr {
+        margin: 0 0 0.85rem 0;
+        border: 1px solid var(--admin-border);
+        border-radius: 12px;
+        background: #ffffff;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(63, 28, 23, 0.04);
+    }
+
+    #admin_flights_table .reservation-table td {
+        border: 0;
+        border-bottom: 1px solid #f3e7e4;
+        padding: 0.6rem 0.9rem;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    #admin_flights_table .reservation-table td:last-child {
+        border-bottom: 0;
+    }
+
+    #admin_flights_table .reservation-table td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--admin-accent-dark);
+        letter-spacing: 0.05em;
+        margin-bottom: 0.25rem;
+        opacity: 0.85;
+    }
+
+    #admin_flights_table .admin-action-btn {
+        width: 100%;
+    }
+}
+
+/* ≤991.98px: tablet + mobil */
+@media (max-width: 991.98px) {
+    .admin-title {
+        font-size: 1.24rem;
+    }
+
+    .admin-title-sm {
+        font-size: 1.14rem;
+    }
+
+    .users-table-wrapper {
+        max-height: 52vh;
+    }
+
+    .admin-table {
+        font-size: 0.85rem;
+    }
+
+    .admin-table td,
+    .admin-table th {
+        padding: 0.5rem 0.55rem;
+    }
+
+    .reservation-table,
+    .seat-table {
+        font-size: 0.88rem;
+    }
+
+    .reservation-table td,
+    .reservation-table th,
+    .seat-table td,
+    .seat-table th {
+        padding: 0.5rem 0.58rem;
+    }
+
+    .admin-mode-btn {
+        flex: 1 1 180px;
+    }
+}
+
+/* ≤767.98px: mobil - minden tábla kártyás labelekkel */
+@media (max-width: 767.98px) {
+    .users-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin-mode-switch {
+        gap: 0.4rem;
+    }
+
+    .admin-mode-btn {
+        width: 100%;
+    }
+
+    .users-toolbar .btn {
+        width: 100%;
+    }
+
+    .reservation-area {
+        padding: 0.9rem;
+    }
+
+    .admin-card-header {
+        padding: 0.9rem 1rem;
+    }
+
+    /* Felhasználók / foglalások / ülőhelyek táblái: kártyás elrendezés */
+    .admin-table thead,
+    .reservation-table thead,
+    .seat-table thead {
+        display: none;
+    }
+
+    .admin-table,
+    .admin-table tbody,
+    .admin-table tr,
+    .admin-table td,
+    .reservation-table,
+    .reservation-table tbody,
+    .reservation-table tr,
+    .reservation-table td,
+    .seat-table,
+    .seat-table tbody,
+    .seat-table tr,
+    .seat-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .admin-table,
+    .reservation-table,
+    .seat-table {
+        min-width: 0;
+    }
+
+    .admin-table tbody tr,
+    .reservation-table tbody tr,
+    .seat-table tbody tr {
+        margin: 0 0 0.8rem 0;
+        border: 1px solid var(--admin-border);
+        border-radius: 12px;
+        background: #ffffff;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(63, 28, 23, 0.04);
+    }
+
+    .admin-table td,
+    .reservation-table td,
+    .seat-table td {
+        border: 0;
+        border-bottom: 1px solid #f3e7e4;
+        padding: 0.55rem 0.85rem;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .admin-table td:last-child,
+    .reservation-table td:last-child,
+    .seat-table td:last-child {
+        border-bottom: 0;
+    }
+
+    .admin-table td[data-label]::before,
+    .reservation-table td[data-label]::before,
+    .seat-table td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--admin-accent-dark);
+        letter-spacing: 0.05em;
+        margin-bottom: 0.25rem;
+        opacity: 0.85;
+    }
+
+    /* Ülésrészletek kibontott sora: átlátható box */
+    .flight-detail-row td {
+        display: block;
+        padding: 0.65rem;
+        white-space: normal;
+        border-bottom: 0;
+    }
+
+    .flight-detail-row td::before {
+        content: none !important;
+    }
+
+    .admin-action-btn {
+        width: 100%;
+    }
+}

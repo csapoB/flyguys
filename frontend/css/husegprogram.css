@@ -1,0 +1,148 @@
+.bar {
+  height: 14px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  width: 0%;
+  transition: width 0.4s ease;
+}
+.levels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.bronz   { background: linear-gradient(90deg, #cd7f32, #b87333); }
+.silver   { background: linear-gradient(90deg, #9ca3af, #d1d5db); }
+.gold     { background: linear-gradient(90deg, #facc15, #f59e0b); }
+.platinum { background: linear-gradient(90deg, #38bdf8, #0ea5e9); }
+.diamond  { background: linear-gradient(90deg, #a855f7, #7c3aed); }
+
+.flights-left {
+  margin-top: 6px;
+  font-size: 13px;
+  text-align: right;
+  color: #555;
+}
+
+main.flex-grow-1 {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow-y: auto;
+}
+
+main.flex-grow-1 > .container-fluid {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+}
+#row1 {
+  flex: 0 0 auto !important;
+  min-height: 250px;
+}
+#row2 {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+}
+
+.card{
+  height:80% !important;
+}
+
+.bg {
+  display: flex;
+  flex-direction: column;
+  overflow-y: visible !important;
+  padding-bottom: 120px;
+}
+
+.userDiv{
+  height: 100%;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+body {
+  padding-bottom: 300px;
+}
+
+@media (max-height: 1080px) {
+  body {
+    padding-bottom: 10px !important;
+  }
+  footer {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: auto !important;
+    z-index: auto !important;
+  }
+  main.flex-grow-1 {
+    overflow-y: auto !important;
+    max-height: none !important;
+  }
+  main.flex-grow-1 > .container-fluid {
+    flex: none !important;
+    min-height: auto !important;
+  }
+  #row2 {
+    flex: none !important;
+    min-height: auto !important;
+  }
+  .bg {
+    overflow-y: visible !important;
+    padding-bottom: 0 !important;
+  }
+}
+
+@media only screen and (max-width: 992px) {
+  body {
+    padding-bottom: 0;
+  }
+  footer {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    width: auto;
+  }
+  .card {
+    height: auto !important;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  main.flex-grow-1 {
+    overflow-y: visible !important;
+    max-height: none !important;
+    flex: 1 1 auto !important;
+  }
+  main.flex-grow-1 > .container-fluid {
+    flex: none !important;
+    min-height: auto !important;
+  }
+  #row1 {
+    min-height: auto !important;
+  }
+  #row2 {
+    min-height: auto !important;
+    flex: none !important;
+  }
+  .bg {
+    overflow-y: visible !important;
+    max-height: none !important;
+    padding-bottom: 0 !important;
+  }
+}

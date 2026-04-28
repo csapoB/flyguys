@@ -1,0 +1,180 @@
+.repulotest{
+    background-color: white;
+    border-radius: 60px 60px 20px 20px;
+    padding: 50px 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 15px;
+}
+
+.ules{
+    width: 40px;
+    height: 45px;
+    margin: 4px;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    background-color: white;
+    transition: all 0.2s ease;
+}
+
+/* First Class - arany/előkelő */
+.ules.tipus1{
+    border-color: #b8860b;
+    background: linear-gradient(135deg, #fffbe6 0%, #fff0c2 100%);
+    color: #7a5c00;
+}
+.ules.tipus1:hover{
+    border-color: #8b6914;
+    box-shadow: 0 0 8px rgba(184, 134, 11, 0.5);
+}
+.ules.tipus1.kivalasztott{
+    background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);
+    border-color: #7a5c00;
+    color: white;
+    box-shadow: 0 0 10px rgba(218, 165, 32, 0.6);
+}
+
+/* Business Class - kék */
+.ules.tipus2{
+    border-color: #1a5276;
+    background: linear-gradient(135deg, #eaf2f8 0%, #d4e6f1 100%);
+    color: #1a5276;
+}
+.ules.tipus2:hover{
+    border-color: #154360;
+    box-shadow: 0 0 8px rgba(26, 82, 118, 0.5);
+}
+.ules.tipus2.kivalasztott{
+    background: linear-gradient(135deg, #1a5276 0%, #2980b9 100%);
+    border-color: #154360;
+    color: white;
+    box-shadow: 0 0 10px rgba(41, 128, 185, 0.6);
+}
+
+/* Economy Class - zöld */
+.ules.tipus3{
+    border-color: #1e8449;
+    background: linear-gradient(135deg, #eafaf1 0%, #d5f5e3 100%);
+    color: #1e8449;
+}
+.ules.tipus3:hover{
+    border-color: #196f3d;
+    box-shadow: 0 0 8px rgba(30, 132, 73, 0.5);
+}
+.ules.tipus3.kivalasztott{
+    background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);
+    border-color: #196f3d;
+    color: white;
+    box-shadow: 0 0 10px rgba(39, 174, 96, 0.6);
+}
+
+
+/* Jelmagyarázat */
+.legend{
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+.legend-item{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+}
+.legend-color{
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 2px solid;
+}
+.legend-color.first{
+    border-color: #b8860b;
+    background: linear-gradient(135deg, #fffbe6 0%, #fff0c2 100%);
+}
+.legend-color.business{
+    border-color: #1a5276;
+    background: linear-gradient(135deg, #eaf2f8 0%, #d4e6f1 100%);
+}
+.legend-color.economy{
+    border-color: #1e8449;
+    background: linear-gradient(135deg, #eafaf1 0%, #d5f5e3 100%);
+}
+
+/* Osztály badge-ek a kiválasztott listában */
+.class-badge-first{
+    background-color: #daa520;
+    color: white;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+.class-badge-business{
+    background-color: #2980b9;
+    color: white;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+.class-badge-economy{
+    background-color: #27ae60;
+    color: white;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.lefoglalt{
+    background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+    border-color: #616161;
+    color: #ffffff;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.folyoso{
+    width: 40px;
+}
+
+.sorszama{
+    width: 30px;
+    display: flex;
+    align-items: center;
+    color: #A4161A;
+}
+
+/* Sticky sidebar az összesítőnek */
+.booking-sidebar{
+    position: sticky;
+    top: 90px;
+}
+
+.booking-summary-card{
+    border: 2px solid #A4161A;
+}
+
+#lefoglal:disabled{
+    background-color: #999;
+    border-color: #999;
+    cursor: not-allowed;
+}
+
+#lefoglal:not(:disabled){
+    background-color: #A4161A;
+    border-color: #A4161A;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse{
+    0%{ box-shadow: 0 0 0 0 rgba(164, 22, 26, 0.4); }
+    70%{ box-shadow: 0 0 0 10px rgba(164, 22, 26, 0); }
+    100%{ box-shadow: 0 0 0 0 rgba(164, 22, 26, 0); }
+}
