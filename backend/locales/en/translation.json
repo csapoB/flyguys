@@ -245,7 +245,7 @@
         "num_of_my_flights": "Number of my flights",
         "no_rank": "No rank",
         "max_rank_reached": "Max rank reached!",
-        "num_of_travels_to_reach_next_level": "travel to the next level",
+        "num_of_travels_to_reach_next_level": "travel(s) to the next level",
         "bronze": {
             "title": "Bronze",
             "range": "Number of your flights: 0-5",

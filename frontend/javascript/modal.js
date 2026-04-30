@@ -905,6 +905,7 @@ export async function initDeleteProfileModal(current_language) {
     });
 
     let $yes_button = $("<button>", {
+        "type":"button",
         "class": "col-3 btn btn-danger",
         "text": getmodal.button.yes,
         on: {
@@ -930,6 +931,7 @@ export async function initDeleteProfileModal(current_language) {
     });
 
     let $no_button = $("<button>", {
+        "type": "button",
         "class": "col-3 btn btn-danger",
         "text": getmodal.button.no,
         on: {
