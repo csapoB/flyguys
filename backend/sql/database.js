@@ -51,7 +51,7 @@ async function selectAvailableDepartureDatesFiltered(departureAirport, arrivalAi
 
 // minden paraméter kötelező
 async function selectAvailableReturnDates(departureAirport, arrivalAirport, destinationArrivalDate) {
-    const query = 'SELECT DISTINCT DATE(DepartureDate) AS "ReturnDate" FROM available_flights_simplified WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate >= ?;';
+    const query = 'SELECT DISTINCT DepartureDate AS "ReturnDate" FROM available_flights_simplified WHERE DepartureAirport LIKE ? AND ArrivalAirport LIKE ? AND DepartureDate > ?;';
     const [rows] = await pool.execute(query, [`${departureAirport}`, `${arrivalAirport}`, `${destinationArrivalDate}`]);
     return rows;
 }

@@ -808,6 +808,7 @@ router.post('/register', async (request, response) => {
                     });
                 } else {
                     let szuldatum_date_obj = new Date(szuldatum);
+                    console.log(szuldatum_date_obj)
 
                     if (szuldatum_date_obj == "Invalid Date") {
                         response.status(400).json({
@@ -989,7 +990,7 @@ router.put('/updateprofile', async (request, response) => {
                         error: request.t("modal.error.invalid_email", { returnObjects: true })
                     });
                 } else {
-                    if (!(await database.checkEmailInDatabase(email)) || !(await database.checkEmailOfUser(request.session.user.id, email))) {
+                    if (await database.checkEmailInDatabase(email) && !(await database.checkEmailOfUser(request.session.user.id, email))) {
                         response.status(400).json({
                             error: request.t("modal.error.email_already_registered", { returnObjects: true })
                         });
@@ -1289,9 +1290,7 @@ function isAtLeast18(birthDate) {
 
 function birthDateObjConverter(birth_date) {
 
-    let birthDate = new Date(birth_date);
-
-    return birthDate.getFullYear() + "-" + ((birthDate.getMonth() < 10 ) ? "0" + birthDate.getMonth()+1 : birthDate.getMonth()+1) + "-" + ((birthDate.getDate() < 10 ) ? "0" + birthDate.getDate() : birthDate.getDate());
+    return birth_date.getFullYear() + "-" + ((birth_date.getMonth() < 10 ) ? "0" + (birth_date.getMonth()+1) : (birth_date.getMonth()+1)) + "-" + ((birth_date.getDate() < 10 ) ? "0" + birth_date.getDate() : birth_date.getDate());
 }
 
 function isBeliveableBirthDate(birthDate) {
