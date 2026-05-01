@@ -63,7 +63,8 @@
         "currency": "&nbsp€",
         "per_person": " &nbsp/ person",
         "errors": {
-            "no_flights_by_parameters": "Unfortunately, there's no flight by the given parameters."
+            "no_flights_by_parameters": "Unfortunately, there's no flight by the given parameters!",
+            "return_before_departure": "Return can't be before departure!"
         }
     },
     "errors": {

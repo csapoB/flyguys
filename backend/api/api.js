@@ -351,6 +351,12 @@ router.get('/en/flights', async (request, response) => {
             let data;
             let current_eur_exch_rate;
 
+            try {
+                current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+            } catch {
+                current_eur_exch_rate = 0.00259;
+            }
+
             if (LoggedInCheck(request)) {
                 await database.updateLoyaltyStatus(request.session.user.id);
                 if (request.query.arrivalTime != undefined) {
@@ -366,6 +372,7 @@ router.get('/en/flights', async (request, response) => {
             } else {
                 if (request.query.arrivalTime != undefined) {
                     data = await database.selectAvailableFlightsFilteredEnByArrivalTime(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL", request.query.arrivalTime);
+                    
                 } else {
                     if (request.query.departureTime != undefined) {
                         data = await database.selectAvailableFlightsFilteredEnByDepartureTime(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL", request.query.departureTime);
