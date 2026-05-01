@@ -302,9 +302,27 @@ router.get('/hu/flights', async (request, response) => {
             let data;
             if (LoggedInCheck(request)) {
                 await database.updateLoyaltyStatus(request.session.user.id);
-                data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), request.session.user.id);
+                if (request.query.arrivalTime != undefined) {
+                    data = await database.selectAvailableFlightsFilteredHunByArrivalTime(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), request.session.user.id, request.query.arrivalTime);
+                } else {
+                    if (request.query.departureTime != undefined) {
+                        data = await database.selectAvailableFlightsFilteredHunByDepartureTime(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), request.session.user.id, request.query.departureTime);
+                    } else {
+                        data = await database.selectAvailableFlightsFilteredHunByDepartureTime(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), request.session.user.id);
+                    }
+                }
+
             } else {
-                data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL");
+                if (request.query.arrivalTime != undefined) {
+                    data = await database.selectAvailableFlightsFilteredHunByArrivalTime(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL", request.query.arrivalTime);
+                } else {
+                    if (request.query.departureTime != undefined) {
+                        data = await database.selectAvailableFlightsFilteredHunByDepartureTime(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL", request.query.departureTime);
+                    } else {
+                        data = await database.selectAvailableFlightsFilteredHun(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL");
+                    }
+                }
+
             }
 
             response.status(200).json({
@@ -338,11 +356,31 @@ router.get('/en/flights', async (request, response) => {
             } catch {
                 current_eur_exch_rate = 0.00259;
             }
+
             if (LoggedInCheck(request)) {
                 await database.updateLoyaltyStatus(request.session.user.id);
-                data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), request.session.user.id);
+                if (request.query.arrivalTime != undefined) {
+                    data = await database.selectAvailableFlightsFilteredEnByArrivalTime(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), request.session.user.id, request.query.arrivalTime);
+                } else {
+                    if (request.query.departureTime != undefined) {
+                        data = await database.selectAvailableFlightsFilteredEnByDepartureTime(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), request.session.user.id, request.query.departureTime);
+                    } else {
+                        data = await database.selectAvailableFlightsFilteredEnByDepartureTime(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), request.session.user.id);
+                    }
+                }
+
             } else {
-                data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL");
+                if (request.query.arrivalTime != undefined) {
+                    data = await database.selectAvailableFlightsFilteredEnByArrivalTime(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL", request.query.arrivalTime);
+                    
+                } else {
+                    if (request.query.departureTime != undefined) {
+                        data = await database.selectAvailableFlightsFilteredEnByDepartureTime(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL", request.query.departureTime);
+                    } else {
+                        data = await database.selectAvailableFlightsFilteredEn(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL");
+                    }
+                }
+
             }
 
 
@@ -1290,7 +1328,7 @@ function isAtLeast18(birthDate) {
 
 function birthDateObjConverter(birth_date) {
 
-    return birth_date.getFullYear() + "-" + ((birth_date.getMonth() < 10 ) ? "0" + (birth_date.getMonth()+1) : (birth_date.getMonth()+1)) + "-" + ((birth_date.getDate() < 10 ) ? "0" + birth_date.getDate() : birth_date.getDate());
+    return birth_date.getFullYear() + "-" + ((birth_date.getMonth() < 10) ? "0" + (birth_date.getMonth() + 1) : (birth_date.getMonth() + 1)) + "-" + ((birth_date.getDate() < 10) ? "0" + birth_date.getDate() : birth_date.getDate());
 }
 
 function isBeliveableBirthDate(birthDate) {

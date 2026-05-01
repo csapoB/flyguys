@@ -63,7 +63,8 @@
         "currency": "&nbspFt",
         "per_person": " &nbsp/ fő",
         "errors": {
-            "no_flights_by_parameters": "Sajnos, nincs a feltételeknek megfelelő járat."
+            "no_flights_by_parameters": "Sajnos, nincs a feltételeknek megfelelő járat!",
+            "return_before_departure": "A visszaút időpontja nem lehet előbb, mint az indulás időpontja!"
         }
     },
     "errors": {
