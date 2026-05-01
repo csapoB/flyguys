@@ -305,7 +305,7 @@ async function airports_popover_contentGenerator(input_field_id, content_div_id,
     if (airports_data_from_api.results == undefined) {
         let err = (await (await fetch("/api/geterrors", { method: "GET", headers: { "Accept-Language": language } })).json()).errors.server_error;
         errorPageGenerator($popover_content, err)
-        generateToast(err, "danger");
+        generateToast((await (await fetch("/api/geterrors", { method: "GET", headers: { "Accept-Language": language } })).json()).errors.server_err, "danger");
 
     } else {
         let $delete_button;
@@ -491,7 +491,7 @@ async function airports_popover_contentGenerator(input_field_id, content_div_id,
 
     return $popover_content;
 }
-// probléma : annyi utast lehessen megadni maximum, ahány szabad férőhely van a járaton
+
 function passengers_popover_contentGenerator(content_div_id, popover_content_i18n_values) {
 
     let $popover_content = $("<div>", {
