@@ -26,7 +26,6 @@ $(async function () {
             language = url_splitted[3];
         }
 
-        console.log(language)
         $("html").prop("lang", language);
 
         await getNavbar(language, url_splitted);

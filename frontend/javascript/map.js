@@ -94,8 +94,6 @@ async function initMap(language, i18n_values) {
   });
   $map.on("map:reset", function (event, departureDate, departureAirport) {
     deleteMarkers(destination_markers);
-    console.log(departureAirport);
-    console.log(departureDate)
     if (departureAirport != "") {
       updateArrivalMapMarkers(destination_markers, map, language, departureAirport, departureDate);
     }
@@ -167,14 +165,12 @@ async function initMap(language, i18n_values) {
     while (origin_markers[k][0].dataset.code != departureAirport) {
       k++;
     }
-    console.log(origin_markers[k][0].dataset.code)
     reviveMarker(origin_markers[k][0], map);
 
     let l = 0;
     while (destination_markers[l][0].dataset.code != arrivalAirport) {
       l++;
     }
-    console.log(destination_markers[l][0].dataset.code)
     reviveMarker(destination_markers[l][0], map);
   });
 
