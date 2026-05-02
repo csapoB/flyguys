@@ -192,6 +192,7 @@
         "selected_seats": "Selected seats",
         "no_seats_selected": "No seats have been selected!",
         "reservation_successful": "Reservation successful! You will be redirected in 5 seconds.",
+        "no_seats_left": "No unoccupied seats left on this flight.",
         "error": {
             "not_logged_in": "You have to be logged in to book a flight!",
             "no_adults": "When booking, there has to be at least 1 adult!",

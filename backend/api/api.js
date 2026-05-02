@@ -1345,7 +1345,7 @@ router.get('/helyfoglalas', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
             response.status(401).json({
-                error: request.t("errors.login_needed_get", { returnObjects: true })
+                error: request.t("seat_chooser.error.not_logged_in", { returnObjects: true })
             });
         }
         else {
