@@ -602,6 +602,7 @@ INSERT INTO useraccount (useraccount.UserName, useraccount.UserEmail, useraccoun
 ("Sulós&Laci", "suloslaci@gmail.com", "$2b$10$7GqRU5JcV3WwRWjZF00etO.gv213OgbRgpPmyQtAH01LynJx9fv9K", 0);
 
 INSERT INTO flight (flight.DepartureAirport, flight.ArrivalAirport, flight.DepartureDateTime, flight.ArrivalDateTime, flight.AircraftID, flight.BasePriceInHUF) VALUES
+("BUD", "ZRH", DATE_ADD(CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-25 12:10:00"), INTERVAL -1 MONTH), DATE_ADD(CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-25 13:45:00"), INTERVAL -1 MONTH), 4, 39000),
 ("BUD", "ATH", CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-28 10:30:00"), CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-28 13:30:00"), 1, 15000),
 ("BUD", "MUC", CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-28 15:40:00"), CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-28 16:55:00"), 3, 8000),
 ("ZRH", "FCO", DATE_ADD(CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-01 8:10:00"), INTERVAL 1 MONTH), DATE_ADD(CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-01 9:45:00"), INTERVAL 1 MONTH), 4, 30000),
@@ -640,5 +641,5 @@ INSERT INTO flight (flight.DepartureAirport, flight.ArrivalAirport, flight.Depar
 ("FCO", "ATH", DATE_ADD(CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-13 23:30:00"), INTERVAL 1 MONTH), DATE_ADD(CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-14 02:30:00"), INTERVAL 1 MONTH), 7, 18000),
 ("BCN", "CPH", DATE_ADD(CONCAT(YEAR(NOW()), "-", MONTH(NOW()), "-16 06:00:00"), INTERVAL 1 MONTH), DATE_ADD(CONCAT(YEAR(NOW()),"-",MONTH(NOW()), "-16 09:00:00"), INTERVAL 1 MONTH), 6, 77000);
 
-
+INSERT INTO reservation (reservation.PassengerID, reservation.FlightID, reservation.RowID, reservation.ColumnID, reservation.IsCancelled, reservation.IsAdult) VALUES (2, 1, 1, "A", 0, 1), (2, 1, 3, "B", 0, 1), (2, 1, 10, "C", 0, 0);
 
