@@ -5,6 +5,7 @@ const path = require('path');
 const i18next = require('i18next');
 const i18next_fs_backend = require('i18next-fs-backend');
 const i18next_http_middleware = require('i18next-http-middleware');
+require('dotenv').config()
 
 
 //!Beállítások
@@ -20,7 +21,7 @@ app.set('trust proxy', 1); //?Middleware Proxy
 //!Session beállítása:
 app.use(
     session({
-        secret: 'gDZBo41C3KZQe0vWDdBRZGt3l4EQG5RrW1cI2iJ2aM0BfkbglC0SHRAhammalq6U', //?Ezt generálni kell a későbbiekben
+        secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: true
     })

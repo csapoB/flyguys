@@ -90,6 +90,7 @@ Nyisd meg a böngésződben a **http://localhost:3000** címet.
 `bcrypt`<br>
 `nodemailer`<br>
 `i18next`<br>
+`dotenv`<br>
 
 ## nodemon.json felépítése:<br>
 
