@@ -194,7 +194,8 @@
             "not_logged_in": "A foglaláshoz be kell jelentkeznie!",
             "no_adults": "A foglalásnál legalább 1 felnőtt utasnak lennie kell!",
             "already_booked_seat": "A foglalás meghiusult! Az ülőhelyet már korábban lefoglalták!",
-            "no_flightid": "Nincs flightId!"
+            "no_flightid": "Nincs flightId!",
+            "loading_seats_failed" : "Nem sikerült betölteni az ülőhelyeket!"
         }
     },
     "profile": {

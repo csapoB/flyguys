@@ -1,5 +1,5 @@
-import { getFlights, getIndex, getLoyaltyProgram, getModal, getProfile } from "./locale.js";
-import { dateDeFormatter, dateFormatter, generateToast, initCheapestFlights, initFlights, initHusegprogram, initProfile, nameDeFormatter } from "./toolbox.js";
+import { getFlights, getIndex, getLoyaltyProgram, getModal, getProfile, getSeatChooser } from "./locale.js";
+import { dateDeFormatter, dateFormatter, generateToast, initCheapestFlights, initFlights, initHelyfoglalas, initHusegprogram, initProfile, nameDeFormatter } from "./toolbox.js";
 
 export function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -13,6 +13,7 @@ export async function modalInit(current_language, end_point) {
     let getflights = await getFlights(current_language);
     let getloyaltyprogram = await getLoyaltyProgram(current_language);
     let getprofile = await getProfile(current_language);
+    let getseatchooser = await getSeatChooser(current_language);
     await checkLoginStatus();
     $("#login_button").on("click", async function () {
         await login_modal(current_language);
@@ -85,6 +86,9 @@ export async function modalInit(current_language, end_point) {
                                 break;
                             case "profil":
                                 await initProfile(current_language, getprofile);
+                                break;
+                            case "helyfoglalas":
+                                await initHelyfoglalas(current_language, getseatchooser);
                                 break;
                         }
 
@@ -198,6 +202,9 @@ export async function modalInit(current_language, end_point) {
                         break;
                     case "profil":
                         await initProfile(current_language, getprofile);
+                        break;
+                    case "helyfoglalas":
+                        await initHelyfoglalas(current_language, getseatchooser);
                         break;
                 }
 
@@ -905,7 +912,7 @@ export async function initDeleteProfileModal(current_language) {
     });
 
     let $yes_button = $("<button>", {
-        "type":"button",
+        "type": "button",
         "class": "col-3 btn btn-danger",
         "text": getmodal.button.yes,
         on: {
