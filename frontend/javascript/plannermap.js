@@ -131,8 +131,6 @@ export async function plannerMapInit(current_language) {
             });
             $input_field.parent().prepend($delete_button);
 
-            /*origin[1].setContent({ ".popover-body": await airports_popover_contentGenerator("origin_input", "origin_popover", origin[1], (await (await fetch(`/api/${`availablearrivalairportsfiltered?departureAirport=${destination[0].data("code_of_selected_airport")}&departureDate=${dateText}`}`, { method: "GET", headers : {"Accept-Language" : current_language} })).json())) });*/
-
             airportSwapperEnabler(origin[0], destination[0], dateFormatter($departure.val(), current_language), dateFormatter($return.val(), current_language));
         }
     });
@@ -242,10 +240,6 @@ export async function plannerMapInit(current_language) {
 
     // A passengers_input kivvételével mindenhez eseménykezlőt írni !!!
     origin[0].on("change", async function () {
-
-
-        /*origin[1].setContent({ ".popover-body": await airports_popover_contentGenerator("origin_input", "origin_popover", origin[1], (await (await fetch(`/api/${`availabledepartureairportsfiltered?arrivalAirport=${destination[0].data("code_of_selected_airport")}&departureDate=${dateFormatter($departure.val(), current_language)}`}`, { method: "GET", headers : {"Accept-Language" : current_language} })).json())) });*/
-
         destination[1].setContent({ ".popover-body": await airports_popover_contentGenerator(destination[0], "destination_popover", destination[1], (await (await fetch(`/api/${`availablearrivalairportsfiltered?departureAirport=${origin[0].data("code_of_selected_airport")}&departureDate=${dateFormatter($departure.val(), current_language)}`}`, { method: "GET", headers: { "Accept-Language": current_language } })).json())) });
 
         available_departure_dates = (await (await fetch(`/api/availabledeparturedatesfiltered?departureAirport=${origin[0].data("code_of_selected_airport")}&arrivalAirport=${destination[0].data("code_of_selected_airport")}`, { method: "GET" })).json()).departuredates;

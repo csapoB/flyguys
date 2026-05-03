@@ -20,9 +20,6 @@ export async function modalInit(current_language, end_point) {
         await login_modal(current_language);
     });
     $(document).on("click", ".submit-login", async function () {
-        //event.preventDefault();
-
-
         const email = $("#usr_email").val().trim();
         const password = $("#usr_passw").val().trim();
 
@@ -178,7 +175,6 @@ export async function modalInit(current_language, end_point) {
         }
     });
     $("#logout_button").on("click", async function () {
-        //event.preventDefault();
         try {
             let response = await fetch('/api/logout', {
                 method: 'POST'
