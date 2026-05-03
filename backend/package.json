@@ -1,14 +1,14 @@
 {
-    "name": "nodejs-template-2025",
+    "name": "flyguys",
     "version": "1.0.0",
-    "description": "Template project",
+    "description": "FlyGuys vizsgaremek",
     "main": "server.js",
     "scripts": {
         "test": "qunit",
         "start": "node server.js",
         "dev": "nodemon"
     },
-    "author": "Kardos Krisztián",
+    "author": "Mészáros Gergő, Csapó Benedek, Pető Gábor",
     "license": "ISC",
     "devDependencies": {
         "nodemon": "^3.1.10",
