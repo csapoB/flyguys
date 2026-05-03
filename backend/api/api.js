@@ -372,7 +372,7 @@ router.get('/en/flights', async (request, response) => {
             } else {
                 if (request.query.arrivalTime != undefined) {
                     data = await database.selectAvailableFlightsFilteredEnByArrivalTime(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL", request.query.arrivalTime);
-                    
+
                 } else {
                     if (request.query.departureTime != undefined) {
                         data = await database.selectAvailableFlightsFilteredEnByDepartureTime(request.query.departureAirport, request.query.arrivalAirport, request.query.departureDate, parseInt(request.query.numOfAdults) + parseInt(request.query.numOfChildren), "NULL", request.query.departureTime);
@@ -1345,7 +1345,7 @@ router.get('/helyfoglalas', async (request, response) => {
     try {
         if (!LoggedInCheck(request)) {
             response.status(401).json({
-                error: request.t("errors.login_needed_get", { returnObjects: true })
+                error: request.t("seat_chooser.error.not_logged_in", { returnObjects: true })
             });
         }
         else {
@@ -1354,24 +1354,26 @@ router.get('/helyfoglalas', async (request, response) => {
                 response.status(400).json({
                     error: request.t("seat_chooser.error.no_flightid", { returnObjects: true })
                 });
-            }
-            await database.updateLoyaltyStatus(request.session.user.id);
-            const helyek = await database.selectAvailableSeatsOnFlight(id, request.session.user.id);
+            } else {
+                await database.updateLoyaltyStatus(request.session.user.id);
+                const helyek = await database.selectAvailableSeatsOnFlight(id, request.session.user.id);
 
-            if (request.get("Accept-Language") == "en") {
-                let current_eur_exch_rate;
+                if (request.get("Accept-Language") == "en") {
+                    let current_eur_exch_rate;
 
-                try {
-                    current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
-                } catch {
-                    current_eur_exch_rate = 0.00259;
+                    try {
+                        current_eur_exch_rate = (await (await fetch("https://api.frankfurter.dev/v1/latest?base=HUF&symbols=EUR", { method: "GET" })).json()).rates.EUR;
+                    } catch {
+                        current_eur_exch_rate = 0.00259;
+                    }
+
+                    helyek.map(x => x.PriceInHUF = Math.round(x.PriceInHUF * current_eur_exch_rate))
                 }
-
-                helyek.map(x => x.PriceInHUF = Math.round(x.PriceInHUF * current_eur_exch_rate))
+                response.status(200).json({
+                    helyek: helyek
+                });
             }
-            response.status(200).json({
-                helyek: helyek
-            })
+
         }
     } catch (error) {
         console.error(error)
