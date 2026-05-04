@@ -16,7 +16,7 @@ $(async function () {
     let $map_frame = $("#map_frame");
     let $map = $("<div>", {
       "id": "map",
-      "class" : "container mb-2 border border-2 border-danger rounded w-100"
+      "class": "container mb-2 border border-2 border-danger rounded w-100"
     });
     $map_frame.append($map);
 
@@ -314,7 +314,7 @@ function markerPopoverManualTrigger(markers_array, $marker, popover_obj) {
         (bootstrap.Popover.getInstance(markers_array[i][0])).hide();
 
       }
-      
+
       popover_obj.show();
       $(popover_obj.tip).find(".popover-body").addClass("marker_popover_body")
 
@@ -328,9 +328,9 @@ function markerPopoverManualTrigger(markers_array, $marker, popover_obj) {
 
         } else {
           if (event.relatedTarget.id != $marker.prop("id") && event.relatedTarget.id != "pin-btn") {
-            
-              popover_obj.hide();
-            
+
+            popover_obj.hide();
+
           }
         }
       });
