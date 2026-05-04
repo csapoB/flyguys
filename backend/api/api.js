@@ -841,7 +841,6 @@ router.post('/register', async (request, response) => {
                     });
                 } else {
                     let szuldatum_date_obj = new Date(szuldatum);
-                    console.log(szuldatum_date_obj)
 
                     if (szuldatum_date_obj == "Invalid Date") {
                         response.status(400).json({
