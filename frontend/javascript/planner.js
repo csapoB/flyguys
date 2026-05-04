@@ -61,9 +61,9 @@ export async function plannerInit(current_language) {
 
                         destination[1].setContent({ ".popover-body": await airports_popover_contentGenerator("destination_input", "destination_popover", destination[1], (await (await fetch(`/api/${`availablearrivalairportsfiltered?departureAirport=${origin[0].data("code_of_selected_airport")}`}`, { method: "GET", headers: { "Accept-Language": current_language } })).json()), current_language) });
 
-                        returnEnabler(available_return_dates, current_language);
+                        await returnEnabler(available_return_dates, current_language);
 
-                        airportSwapperEnabler(origin[0], destination[0], "", "");
+                        await airportSwapperEnabler(origin[0], destination[0], "", "");
 
                     }
                 }
@@ -75,9 +75,9 @@ export async function plannerInit(current_language) {
 
             destination[1].setContent({ ".popover-body": await airports_popover_contentGenerator("destination_input", "destination_popover", destination[1], (await (await fetch(`/api/${`availablearrivalairportsfiltered?departureAirport=${origin[0].data("code_of_selected_airport")}&departureDate=${dateText}`}`, { method: "GET", headers: { "Accept-Language": current_language } })).json()), current_language) });
 
-            returnEnabler(available_return_dates, current_language);
+            await returnEnabler(available_return_dates, current_language);
 
-            airportSwapperEnabler(origin[0], destination[0], dateFormatter($departure.val(), current_language), dateFormatter($return.val(), current_language));
+            await airportSwapperEnabler(origin[0], destination[0], dateFormatter($departure.val(), current_language), dateFormatter($return.val(), current_language));
         }
     });
 
@@ -116,7 +116,7 @@ export async function plannerInit(current_language) {
 
                         $input_field.val("");
 
-                        airportSwapperEnabler(origin[0], destination[0], dateFormatter($departure.val(), current_language), dateFormatter($return.val(), current_language));
+                        await airportSwapperEnabler(origin[0], destination[0], dateFormatter($departure.val(), current_language), dateFormatter($return.val(), current_language));
 
                     }
                 }
@@ -124,7 +124,7 @@ export async function plannerInit(current_language) {
             });
             $input_field.parent().prepend($delete_button);
 
-            airportSwapperEnabler(origin[0], destination[0], dateFormatter($departure.val(), current_language), dateFormatter($return.val(), current_language));
+            await airportSwapperEnabler(origin[0], destination[0], dateFormatter($departure.val(), current_language), dateFormatter($return.val(), current_language));
         }
     });
 
@@ -146,7 +146,7 @@ export async function plannerInit(current_language) {
                 $return.prev().trigger("click");
             }
 
-            origin[1].setContent({ ".popover-body": await airports_popover_contentGenerator("origin_input", "origin_popover", origin[1], (await (await fetch(`/api/${`availabledepartureairportsfiltered?arrivalAirport=${destination[0].data("code_of_selected_airport")}`}`, { method: "GET", headers: { "Accept-Language": current_language } })).json()), current_language) });
+            //origin[1].setContent({ ".popover-body": await airports_popover_contentGenerator("origin_input", "origin_popover", origin[1], (await (await fetch(`/api/${`availabledepartureairportsfiltered?arrivalAirport=${destination[0].data("code_of_selected_airport")}`}`, { method: "GET", headers: { "Accept-Language": current_language } })).json()), current_language) });
 
         } else {
 
@@ -156,7 +156,7 @@ export async function plannerInit(current_language) {
 
             inputSwitcher($return);
 
-            origin[1].setContent({ ".popover-body": await airports_popover_contentGenerator("origin_input", "origin_popover", origin[1], (await (await fetch(`/api/${`availablearrivalairportsfiltered?departureAirport=${destination[0].data("code_of_selected_airport")}`}`, { method: "GET", headers: { "Accept-Language": current_language } })).json()), current_language) });
+            //origin[1].setContent({ ".popover-body": await airports_popover_contentGenerator("origin_input", "origin_popover", origin[1], (await (await fetch(`/api/${`availablearrivalairportsfiltered?departureAirport=${destination[0].data("code_of_selected_airport")}`}`, { method: "GET", headers: { "Accept-Language": current_language } })).json()), current_language) });
 
         }
 
@@ -180,7 +180,7 @@ export async function plannerInit(current_language) {
 
         available_departure_dates = (await (await fetch(`/api/availabledeparturedatesfiltered?departureAirport=${origin[0].data("code_of_selected_airport")}&arrivalAirport=${destination[0].data("code_of_selected_airport")}`, { method: "GET" })).json()).departuredates;
 
-        returnEnabler(available_return_dates, current_language);
+        await returnEnabler(available_return_dates, current_language);
 
     });
 
@@ -233,9 +233,9 @@ export async function plannerInit(current_language) {
 
         available_departure_dates = (await (await fetch(`/api/availabledeparturedatesfiltered?departureAirport=${origin[0].data("code_of_selected_airport")}&arrivalAirport=${destination[0].data("code_of_selected_airport")}`, { method: "GET" })).json()).departuredates;
 
-        returnEnabler(available_return_dates, current_language);
+        await returnEnabler(available_return_dates, current_language);
 
-        airportSwapperEnabler(origin[0], destination[0], dateFormatter($departure.val(), current_language), dateFormatter($return.val(), current_language));
+        await airportSwapperEnabler(origin[0], destination[0], dateFormatter($departure.val(), current_language), dateFormatter($return.val(), current_language));
 
     });
 
@@ -245,9 +245,9 @@ export async function plannerInit(current_language) {
 
         available_departure_dates = (await (await fetch(`/api/availabledeparturedatesfiltered?departureAirport=${origin[0].data("code_of_selected_airport")}&arrivalAirport=${destination[0].data("code_of_selected_airport")}`, { method: "GET" })).json()).departuredates;
 
-        returnEnabler(available_return_dates, current_language);
+        await returnEnabler(available_return_dates, current_language);
 
-        airportSwapperEnabler(origin[0], destination[0], dateFormatter($departure.val(), current_language), dateFormatter($return.val(), current_language));
+        await airportSwapperEnabler(origin[0], destination[0], dateFormatter($departure.val(), current_language), dateFormatter($return.val(), current_language));
 
     });
 
@@ -705,7 +705,13 @@ export async function returnEnabler(available_return_dates, current_language) {
                 available_return_dates.length = 0;
                 available_return_dates.push(...return_dates);
             } else {
+                let $return_input = $("#return_input");
+                if ($return_input.prev().length != 0) {
+                    $return_input.prev().trigger("click");
+                }
+                inputDisabler($return_input);
                 turnOff($switcher_departure_return);
+                
             }
         }
     } else {
@@ -715,6 +721,7 @@ export async function returnEnabler(available_return_dates, current_language) {
         }
         inputDisabler($return_input);
         turnOff($switcher_departure_return);
+        
     }
 }
 
@@ -739,6 +746,8 @@ export function turnOff($element) {
         if ($element.prop("id") == "switcher_departure_return") {
 
             $element.html("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-arrow-right\" viewBox=\"0 0 16 16\"><path fill-rule=\"evenodd\" d=\"M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8\"/></svg>");
+
+            $element.data("set_to_return", false);
         }
     }
 }
