@@ -108,11 +108,14 @@ export async function modalInit(current_language, end_point) {
     $(document).on("click", ".submit-register", async function (event) {
         event.preventDefault();
 
+        const lastName = $("#new_last_name").val().trim();
+        const firstName = $("#new_first_name").val().trim();
+
         let userName;
         if (current_language == "hu") {
-            userName = $("#new_last_name").val().trim() + "&" + $("#new_first_name").val().trim();
+            userName = lastName + "&" + firstName;
         } else {
-            userName = $("#new_first_name").val().trim() + "&" + $("#new_last_name").val().trim();
+            userName = firstName + "&" + lastName;
         }
 
 
@@ -124,7 +127,7 @@ export async function modalInit(current_language, end_point) {
         let birthDate = dateFormatter(birthDateInput, current_language);
         let birthDate_date_obj = new Date(birthDate);
 
-        if (!userName.trim() || !email || !password || !birthDate) {
+        if (!lastName || !firstName || !email || !password || !birthDate) {
             generateToast(getmodal.error.missing_fields, "danger");
         } else if (password.length < 6) {
             generateToast(getmodal.error.password_char_limit, "danger");
@@ -776,11 +779,14 @@ export async function initEditProfileModal(profile_data, current_language, i18n_
 
                 event.preventDefault();
 
+                const lastName = $("#edit_last_name").val().trim();
+                const firstName = $("#edit_first_name").val().trim();
+
                 let userName;
                 if (current_language == "hu") {
-                    userName = $("#edit_last_name").val().trim() + "&" + $("#edit_first_name").val().trim();
+                    userName = lastName + "&" + firstName;
                 } else {
-                    userName = $("#edit_first_name").val().trim() + "&" + $("#edit_last_name").val().trim();
+                    userName = firstName + "&" + lastName;
                 }
 
 
@@ -792,7 +798,7 @@ export async function initEditProfileModal(profile_data, current_language, i18n_
                 let birthDate = dateFormatter(birthDateInput, current_language);
                 let birthDate_date_obj = new Date(birthDate);
 
-                if (!userName.trim() || !email || !password || !birthDate) {
+                if (!lastName || !firstName || !email || !password || !birthDate) {
                     generateToast(getmodal.error.missing_fields, "danger");
                 } else if (password.length < 6) {
                     generateToast(getmodal.error.password_char_limit, "danger");

@@ -40,19 +40,14 @@
 3. Telepítsd a függőségeket a backend mappába a következő parancs segítségével, amennyiben nincs node_modules mappa a backend mappában:<br>
    `npm install`<br>
 
-4. Telepítsd a modulokat<br>
-   `npm install bcrypt`
-   `npm install i18next`
-   `npm install nodemailer`
-   `npm install dotenv`
-   <br>
-
-
-5. Backend indítása fejlesztés alatt: _(Fájlok szerkesztésének az esetén újraindul a szerver.)_<br>
+4. Backend indítása fejlesztés alatt: _(Fájlok szerkesztésének az esetén újraindul a szerver.)_<br>
    `npm run dev`<br>
 
-6. Backend indítása élesben: _(Fájlok szerkesztésének az esetén nem indul újra a szerver.)_<br>
+5. Backend indítása élesben: _(Fájlok szerkesztésének az esetén nem indul újra a szerver.)_<br>
    `npm run start`<br>
+
+6. Egységtesztek futtatása: _(QUnit alapú tesztek a `backend/test/` mappából.)_<br>
+   `npm run test`<br>
 
 ## NPM hiba esetén<br>
 
@@ -89,7 +84,7 @@ Nyisd meg a böngésződben a **http://localhost:3000** címet.
 `express-session`<br>
 `multer`<br>
 `mysql2`<br>
-`bcrypt`<br>
+`bcryptjs`<br>
 `nodemailer`<br>
 `i18next`<br>
 `dotenv`<br>
