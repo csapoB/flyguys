@@ -1934,7 +1934,7 @@ router.put('/messageread', async (request, response) => {
                     error: request.t("errors.missing_data", { returnObjects: true })
                 });
             } else {
-                if (parseInt(message_id) == NaN) {
+                if (Number.isNaN(parseInt(message_id))) {
                     response.status(400).json({
                         error: request.t("errors.wrong_data_type", { returnObjects: true })
                     });
