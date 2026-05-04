@@ -8,8 +8,8 @@ const nodemailer = require('nodemailer'); //?npm install nodemailer
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'flyguys.noreply@gmail.com',
-        pass: 'vooa clfx myki jopf'
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASSWORD
     }
 });
 
