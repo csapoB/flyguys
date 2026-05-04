@@ -14,7 +14,6 @@ QUnit.test.each("nameDeFormatter",
     [undefined, "en", { "first_name": "", "last_name": "" }]
   ], (assert, [name, language, expected]) => {
     assert.deepEqual(nameDeFormatter(name, language), expected);
-    //console.log(`name: ${name}, language: ${language} => { "first_name": ${expected.first_name}, "last_name": ${expected.last_name} }`);
 });
 
 QUnit.test.each("dateDeFormatter",
@@ -31,7 +30,6 @@ QUnit.test.each("dateDeFormatter",
     [undefined, undefined, ""]
   ], (assert, [date, language, expected]) => {
     assert.equal(dateDeFormatter(date, language), expected);
-    //console.log(`date: ${date}, language: ${language} => ${expected}`);
 });
 
 QUnit.test.each("dateFormatter",
@@ -49,7 +47,6 @@ QUnit.test.each("dateFormatter",
     [undefined, undefined, ""]
   ], (assert, [date, language, expected]) => {
     assert.equal(dateFormatter(date, language), expected);
-    //console.log(`date: ${date}, language: ${language} => ${expected}`);
 });
 
 QUnit.test.each("progression",

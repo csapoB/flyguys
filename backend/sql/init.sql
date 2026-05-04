@@ -137,8 +137,7 @@ CREATE VIEW IF NOT EXISTS flights_with_flight_time_hun AS
     SELECT flight.FlightID, flight.DepartureAirport, origin_city.Hungarian AS "DepartureCity", flight.ArrivalAirport, destination_city.Hungarian AS "ArrivalCity", flight.DepartureDateTime, flight.ArrivalDateTime, TIMEDIFF(flight.ArrivalDateTime, ADDTIME(flight.DepartureDateTime, SUBTIME(TIME(ABS(TIME(destination.UTCOffset))), TIME(ABS(TIME(origin.UTCOffset))))))  AS "FlightTime", flight.BasePriceInHUF, flight.AircraftID, flight.IsCancelled FROM flight INNER JOIN airport origin ON flight.DepartureAirport = origin.AirportCode INNER JOIN airport destination ON flight.ArrivalAirport = destination.AirportCode INNER JOIN city origin_city ON origin.CityID = origin_city.CityID INNER JOIN city destination_city ON destination.CityID = destination_city.CityID; 
 
 CREATE VIEW IF NOT EXISTS flights_with_flight_time_en AS
-    SELECT flight.FlightID, flight.DepartureAirport, origin_city.English AS "DepartureCity", flight.ArrivalAirport, destination_city.English AS "ArrivalCity", flight.DepartureDateTime, flight.ArrivalDateTime, TIMEDIFF(flight.ArrivalDateTime, ADDTIME(flight.DepartureDateTime, SUBTIME(TIME(ABS(TIME(destination.UTCOffset))), TIME(ABS(TIME(origin.UTCOffset))))))  AS "FlightTime", flight.BasePriceInHUF, flight.AircraftID, flight.IsCancelled FROM flight INNER JOIN airport origin ON flight.DepartureAirport = origin.AirportCode INNER JOIN airport destination ON flight.ArrivalAirport = destination.AirportCode INNER JOIN city origin_city ON origin.CityID = origin_city.CityID INNER JOIN city destination_city ON destination.CityID = destination_city.CityID; 
--- SELECT flight.DepartureAirport, flight.ArrivalAirport, flight.DepartureDateTime, flight.ArrivalDateTime, flight.BasePrice FROM flight;
+    SELECT flight.FlightID, flight.DepartureAirport, origin_city.English AS "DepartureCity", flight.ArrivalAirport, destination_city.English AS "ArrivalCity", flight.DepartureDateTime, flight.ArrivalDateTime, TIMEDIFF(flight.ArrivalDateTime, ADDTIME(flight.DepartureDateTime, SUBTIME(TIME(ABS(TIME(destination.UTCOffset))), TIME(ABS(TIME(origin.UTCOffset))))))  AS "FlightTime", flight.BasePriceInHUF, flight.AircraftID, flight.IsCancelled FROM flight INNER JOIN airport origin ON flight.DepartureAirport = origin.AirportCode INNER JOIN airport destination ON flight.ArrivalAirport = destination.AirportCode INNER JOIN city origin_city ON origin.CityID = origin_city.CityID INNER JOIN city destination_city ON destination.CityID = destination_city.CityID;
 
 CREATE VIEW IF NOT EXISTS active_flights_hun AS
 	SELECT flights_with_flight_time_hun.* FROM flights_with_flight_time_hun WHERE flights_with_flight_time_hun.DepartureDateTime > NOW() AND flights_with_flight_time_hun.IsCancelled = 0;
@@ -154,10 +153,6 @@ CREATE VIEW IF NOT EXISTS active_flights_en AS
 
 CREATE VIEW IF NOT EXISTS available_flights_simplified AS
 	SELECT DepartureAirport, ArrivalAirport, DepartureDate, NumOfAvailableSeats FROM num_of_available_seats_on_active_flights_hun WHERE NumOfAvailableSeats > 0;
-
-
--- CREATE VIEW IF NOT EXISTS num_of_available_seats_on_flights AS
---    SELECT flights_with_flight_time.* , (aircraftmodel.NumberOfSeats - COUNT(CASE WHEN reservation.IsCancelled = 0 THEN reservation.ReservationID END)) AS "NumOfAvailableSeats" FROM flights_with_flight_time INNER JOIN aircraft ON flights_with_flight_time.AircraftID = aircraft.AircraftID INNER JOIN aircraftmodel ON aircraft.AircraftModelID = aircraftmodel.AircraftModelID LEFT JOIN reservation ON flights_with_flight_time.FlightID = reservation.FlightID GROUP BY flights_with_flight_time.FlightID;
 
 
 CREATE VIEW IF NOT EXISTS not_cancelled_reservations AS

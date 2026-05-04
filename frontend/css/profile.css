@@ -5,11 +5,8 @@
 }
 
 #profileDiv{
-    
+
     width: 100%;
-    /*flex-direction: column;
-    justify-content: center;
-    align-items: center;*/
     background-color: #ffffff;
     border-radius: 20px;
     border: solid 1px #DC3545;

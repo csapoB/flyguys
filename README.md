@@ -43,6 +43,8 @@
 4. Telepítsd a modulokat<br>
    `npm install bcrypt`
    `npm install i18next`
+   `npm install nodemailer`
+   `npm install dotenv`
    <br>
 
 

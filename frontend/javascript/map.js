@@ -309,7 +309,6 @@ function markerPopoverManualTrigger(markers_array, $marker, popover_obj) {
   let $popover_div;
 
   $marker.on("click.popover", function () {
-    //console.log(1)
     if (popover_obj.tip == null) {
       for (let i = 0; i < markers_array.length; i++) {
         (bootstrap.Popover.getInstance(markers_array[i][0])).hide();
@@ -317,7 +316,6 @@ function markerPopoverManualTrigger(markers_array, $marker, popover_obj) {
       }
       
       popover_obj.show();
-      //console.log($(popover_obj.tip).find(".popover-body").first())
       $(popover_obj.tip).find(".popover-body").addClass("marker_popover_body")
 
       $popover_div = $(`#${popover_obj.tip.id}`) // Az popover_div id-ja minden megjelenésnél újragenerálódik => más lesz, mint az előző

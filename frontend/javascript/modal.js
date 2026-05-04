@@ -1,5 +1,5 @@
-import { getFlights, getIndex, getLoyaltyProgram, getModal, getProfile, getSeatChooser } from "./locale.js";
-import { dateDeFormatter, dateFormatter, generateToast, initCheapestFlights, initFlights, initHelyfoglalas, initHusegprogram, initProfile, nameDeFormatter } from "./toolbox.js";
+import { getAdmin, getFlights, getIndex, getLoyaltyProgram, getModal, getProfile, getSeatChooser } from "./locale.js";
+import { adminCheck, dateDeFormatter, dateFormatter, generateToast, initCheapestFlights, initFlights, initHelyfoglalas, initHusegprogram, initProfile, nameDeFormatter } from "./toolbox.js";
 
 export function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -14,14 +14,12 @@ export async function modalInit(current_language, end_point) {
     let getloyaltyprogram = await getLoyaltyProgram(current_language);
     let getprofile = await getProfile(current_language);
     let getseatchooser = await getSeatChooser(current_language);
+    let getadmin = await getAdmin(current_language);
     await checkLoginStatus();
     $("#login_button").on("click", async function () {
         await login_modal(current_language);
     });
     $(document).on("click", ".submit-login", async function () {
-        //event.preventDefault();
-
-
         const email = $("#usr_email").val().trim();
         const password = $("#usr_passw").val().trim();
 
@@ -89,6 +87,9 @@ export async function modalInit(current_language, end_point) {
                                 break;
                             case "helyfoglalas":
                                 await initHelyfoglalas(current_language, getseatchooser);
+                                break;
+                            case "admin":
+                                await adminCheck(current_language, getadmin);
                                 break;
                         }
 
@@ -174,7 +175,6 @@ export async function modalInit(current_language, end_point) {
         }
     });
     $("#logout_button").on("click", async function () {
-        //event.preventDefault();
         try {
             let response = await fetch('/api/logout', {
                 method: 'POST'
@@ -205,6 +205,9 @@ export async function modalInit(current_language, end_point) {
                         break;
                     case "helyfoglalas":
                         await initHelyfoglalas(current_language, getseatchooser);
+                        break;
+                    case "admin":
+                        await adminCheck(current_language, getadmin);
                         break;
                 }
 

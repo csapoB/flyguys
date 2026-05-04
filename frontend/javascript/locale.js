@@ -134,11 +134,11 @@ export async function getAdmin(lang) {
     $("#admin_mode_flights .flight-create-card .admin-title-sm").text(getadmin.title.create_new_flight);
     $("#admin_mode_flights .flight-create-card .admin-subtitle").text(getadmin.caption.create_flight);
     $("#create_aircraft_id_label").text(getadmin.title.aircraft);
-    $("#create_aircraft_id option").text(getadmin.caption.choose_aircraft);
-    $("#create_departure_airport").text(getadmin.caption.choose_origin_airport);
+    $("#create_aircraft_id option[value='']").text(getadmin.caption.choose_aircraft);
+    $("#create_departure_airport option[value='']").text(getadmin.caption.choose_origin_airport);
     $("#create_departure_airport_label").text(getadmin.title.origin_airport);
     $("#create_arrival_airport_label").text(getadmin.title.destination_airport);
-    $("#create_arrival_airport").text(getadmin.caption.choose_destination_airport);
+    $("#create_arrival_airport option[value='']").text(getadmin.caption.choose_destination_airport);
     $("#create_departure_datetime_label").text(getadmin.title.departure_date);
     $("#create_arrival_datetime_label").text(getadmin.title.arrival_date);
     $("#create_base_price_label").text(getadmin.title.base_price);

@@ -408,8 +408,6 @@ router.get('/cheapestflights', async (request, response) => {
             } else {
                 one_way = await database.selectTop4CheapestOneWayFlightsHun("NULL");
             }
-
-            //return_ = await database.selectCheapestReturnFlightsHun();
         } else {
             let current_eur_exch_rate;
 
@@ -425,10 +423,7 @@ router.get('/cheapestflights', async (request, response) => {
             } else {
                 one_way = await database.selectTop4CheapestOneWayFlightsEn("NULL");
             }
-            //return_ = await database.selectCheapestReturnFlightsEn()
             one_way.map(x => x.PriceInHUF = Math.round(x.PriceInHUF * current_eur_exch_rate));
-            //return_.map(x => x.PriceInHUF = `${Math.round(x.PriceInHUF * current_eur_exch_rate)}`);
-
         }
 
         response.status(200).json({
@@ -1778,8 +1773,6 @@ router.post('/AdminCreateFlight', async (request, response) => {
                 aircraftID,
                 basePriceInHUF
             } = request.body;
-
-            console.log(request.body);
 
             if (!departureAirport || !arrivalAirport || !departureDateTime || !arrivalDateTime || aircraftID === undefined || basePriceInHUF === undefined) {
                 return response.status(400).json({

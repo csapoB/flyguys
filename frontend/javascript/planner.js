@@ -668,8 +668,6 @@ export function airportSelector($popover_content_children, $selected_airport_cod
     }
 
     if (j != undefined) {
-        //console.log($popover_content_children.eq(i).children().eq(j).first())
-
         indexes = [i, j];
 
     }
@@ -706,8 +704,6 @@ export async function returnEnabler(available_return_dates, current_language) {
                 turnOn($switcher_departure_return);
                 available_return_dates.length = 0;
                 available_return_dates.push(...return_dates);
-                //console.log(available_return_dates);
-
             } else {
                 turnOff($switcher_departure_return);
             }
@@ -770,7 +766,6 @@ export async function airportSwapperEnabler($origin_input, $destination_input, d
     if (departureDate != "") {
         swappable_airports = (await (await fetch(`/api/swappableairportswithsamedeparturedates?departureAirport=${$origin_input.data("code_of_selected_airport")}&arrivalAirport=${$destination_input.data("code_of_selected_airport")}&departureDate=${departureDate}`, { method: "GET" })).json()).airports;
 
-        //console.log(swappable_airports);
         if (swappable_airports.includes($origin_input.data("code_of_selected_airport"))) {
 
 

@@ -15,7 +15,6 @@ QUnit.test.each("isValidEmail",
     ["VICTOR@MÁTÉ.COM", true]
   ], (assert, [email, expected]) => {
     assert.equal(isValidEmail(email), expected);
-    //console.log(`name: ${name}, language: ${language} => { "first_name": ${expected.first_name}, "last_name": ${expected.last_name} }`);
 });
 
 QUnit.test.each("isAtLeast18",
