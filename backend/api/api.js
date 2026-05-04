@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const database = require('../sql/database.js');
 const fs = require('fs/promises');
-const bcrypt = require('bcryptjs'); //?npm install bcrypt
+const bcrypt = require('bcryptjs'); //?npm install bcryptjs
 const nodemailer = require('nodemailer'); //?npm install nodemailer
 
 const transporter = nodemailer.createTransport({
