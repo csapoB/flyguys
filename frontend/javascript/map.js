@@ -85,21 +85,21 @@ async function initMap(language, i18n_values) {
     strokeWeight: 3
   });
 
-  $map.on("map:factory-reset", function (event, departureDate, wasPreviousArrivalAirport) {
+  $map.on("map:factory-reset", async function (event, departureDate, wasPreviousArrivalAirport) {
     if (!wasPreviousArrivalAirport) {
       deleteMarkers(destination_markers);
     }
 
-    updateOriginMapMarkers(origin_markers, map, language, departureDate);
+    await updateOriginMapMarkers(origin_markers, map, language, departureDate);
   });
-  $map.on("map:reset", function (event, departureDate, departureAirport) {
+  $map.on("map:reset", async function (event, departureDate, departureAirport) {
     deleteMarkers(destination_markers);
     if (departureAirport != "") {
-      updateArrivalMapMarkers(destination_markers, map, language, departureAirport, departureDate);
+      await updateArrivalMapMarkers(destination_markers, map, language, departureAirport, departureDate);
     }
     flightPath.setPath([]);
   });
-  $map.on("map:origin-selected", function (event, departureDate, departureAirport, arrivalAirport) {
+  $map.on("map:origin-selected", async function (event, departureDate, departureAirport, arrivalAirport) {
 
     let i = 0;
     while (origin_markers[i][0].dataset.code != departureAirport) {
@@ -116,7 +116,7 @@ async function initMap(language, i18n_values) {
 
       flightPath.setPath([origin_markers[i][0].position, destination_markers[j][0].position]);
     } else {
-      updateArrivalMapMarkers(destination_markers, map, language, departureAirport, departureDate);
+      await updateArrivalMapMarkers(destination_markers, map, language, departureAirport, departureDate);
     }
   });
   $map.on("map:destination-selected", function (event, arrivalAirport, departureAirport) {
@@ -136,14 +136,14 @@ async function initMap(language, i18n_values) {
 
     flightPath.setMap(map);
   });
-  $map.on("map:departure-changed", function (event, departureDate, departureAirport, arrivalAirport) {
+  $map.on("map:departure-changed", async function (event, departureDate, departureAirport, arrivalAirport) {
     if (departureAirport == "") {
       deleteMarkers(origin_markers);
-      updateOriginMapMarkers(origin_markers, map, language, departureDate);
+      await updateOriginMapMarkers(origin_markers, map, language, departureDate);
     } else {
       if (arrivalAirport == "") {
         deleteMarkers(destination_markers);
-        updateArrivalMapMarkers(destination_markers, map, language, departureAirport, departureDate);
+        await updateArrivalMapMarkers(destination_markers, map, language, departureAirport, departureDate);
       }
     }
   });
@@ -175,8 +175,8 @@ async function initMap(language, i18n_values) {
   });
 
   // /api/availabledepartureairportsfiltered
-  initMapMarkers("/api/availabledepartureairportsfiltered", "origin", origin_markers, map, language, { glyphColor: '#FFFFFF', borderColor: '#dc3545', background: '#dc3545' }, i18n_values);
-  initMapMarkers("/api/availablearrivalairportsfiltered", "destination", destination_markers, null, language, { glyphColor: '#dc3545', borderColor: '#dc3545', background: '#D1D1D1' }, i18n_values);
+  await initMapMarkers("/api/availabledepartureairportsfiltered", "origin", origin_markers, map, language, { glyphColor: '#FFFFFF', borderColor: '#dc3545', background: '#dc3545' }, i18n_values);
+  await initMapMarkers("/api/availablearrivalairportsfiltered", "destination", destination_markers, null, language, { glyphColor: '#dc3545', borderColor: '#dc3545', background: '#D1D1D1' }, i18n_values);
 
 }
 
@@ -327,9 +327,10 @@ function markerPopoverManualTrigger(markers_array, $marker, popover_obj) {
 
 
         } else {
-          if (event.relatedTarget.id != $marker.prop("id") && !event.relatedTarget.id != "pin-btn") { // Ha nem az input_fiealdbe kattintunk, mikőzben megvan nyitva a popover, akkor tűnjön el a popover
-            popover_obj.hide();
-
+          if (event.relatedTarget.id != $marker.prop("id") && event.relatedTarget.id != "pin-btn") {
+            
+              popover_obj.hide();
+            
           }
         }
       });
